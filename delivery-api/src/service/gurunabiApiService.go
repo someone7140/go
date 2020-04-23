@@ -2,10 +2,10 @@ package service
 
 import (
 	"encoding/json"
+	"os"
 	"sort"
 	"strconv"
 
-	"../config"
 	"../model"
 	"github.com/thoas/go-funk"
 )
@@ -16,7 +16,7 @@ func GetStoreSearchURL(request model.StoreInfoRequest) string {
 		return ""
 	}
 	url := "https://api.gnavi.co.jp/RestSearchAPI/v3/" +
-		"?keyid=" + config.GurunabiKey +
+		"?keyid=" + os.Getenv("GURUNABI_API_KEY") +
 		"&latitude=" + strconv.FormatFloat(request.Latitude, 'f', -1, 64) +
 		"&longitude=" + strconv.FormatFloat(request.Longitude, 'f', -1, 64) +
 		"&hit_per_page=100"
@@ -38,27 +38,29 @@ func ResponseJSONConvert(jsonStr string, provideType string) model.StoreInfos {
 		if err != nil {
 			return storeInfoList
 		}
-		restList := responseMap["rest"].([]interface{})
-		for _, r := range restList {
-			var s model.StoreInfo
-			s.ID = r.(map[string]interface{})["id"].(string)
-			s.Name = r.(map[string]interface{})["name"].(string)
-			s.Latitude, err = strconv.ParseFloat(r.(map[string]interface{})["latitude"].(string), 32)
-			if err != nil {
-				continue
+		if responseMap["rest"] != nil {
+			restList := responseMap["rest"].([]interface{})
+			for _, r := range restList {
+				var s model.StoreInfo
+				s.ID = r.(map[string]interface{})["id"].(string)
+				s.Name = r.(map[string]interface{})["name"].(string)
+				s.Latitude, err = strconv.ParseFloat(r.(map[string]interface{})["latitude"].(string), 32)
+				if err != nil {
+					continue
+				}
+				s.Longitude, err = strconv.ParseFloat(r.(map[string]interface{})["longitude"].(string), 32)
+				if err != nil {
+					continue
+				}
+				s.Category = r.(map[string]interface{})["category"].(string)
+				s.URL = r.(map[string]interface{})["url"].(string)
+				s.Image = r.(map[string]interface{})["image_url"].(map[string]interface{})["shop_image1"].(string)
+				s.Opentime = r.(map[string]interface{})["opentime"].(string)
+				s.Holiday = r.(map[string]interface{})["holiday"].(string)
+				s.Pr = r.(map[string]interface{})["pr"].(map[string]interface{})["pr_short"].(string)
+				s.Type = provideType
+				storeInfoList = append(storeInfoList, s)
 			}
-			s.Longitude, err = strconv.ParseFloat(r.(map[string]interface{})["longitude"].(string), 32)
-			if err != nil {
-				continue
-			}
-			s.Category = r.(map[string]interface{})["category"].(string)
-			s.URL = r.(map[string]interface{})["url"].(string)
-			s.Image = r.(map[string]interface{})["image_url"].(map[string]interface{})["shop_image1"].(string)
-			s.Opentime = r.(map[string]interface{})["opentime"].(string)
-			s.Holiday = r.(map[string]interface{})["holiday"].(string)
-			s.Pr = r.(map[string]interface{})["pr"].(map[string]interface{})["pr_short"].(string)
-			s.Type = provideType
-			storeInfoList = append(storeInfoList, s)
 		}
 	}
 	return storeInfoList
