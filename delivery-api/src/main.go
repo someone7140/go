@@ -59,6 +59,7 @@ func main() {
 		ctx.HTML(200, "index.html", gin.H{})
 	})
 	router.POST("/searchStore", handler.StoreSearch)
+	router.GET("/getCategoryL", handler.GetCategoryL)
 
 	router.Run()
 }

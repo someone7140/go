@@ -10,7 +10,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-// GetStoreSearchURL ぐるなびAPI送信用URL
+// GetStoreSearchURL ぐるなび店舗取得API送信用URL
 func GetStoreSearchURL(request model.StoreInfoRequest) string {
 	if request.Latitude == 0 || request.Longitude == 0 {
 		return ""
@@ -29,8 +29,8 @@ func GetStoreSearchURL(request model.StoreInfoRequest) string {
 	return url
 }
 
-// ResponseJSONConvert ぐるなびのレスポンスをStructの配列にうつす
-func ResponseJSONConvert(jsonStr string, provideType string) model.StoreInfos {
+// ResponseStoreJSONConvert ぐるなびの店情報レスポンスをStructの配列にうつす
+func ResponseStoreJSONConvert(jsonStr string, provideType string) model.StoreInfos {
 	var storeInfoList model.StoreInfos
 	if jsonStr != "" {
 		var responseMap map[string]interface{}
