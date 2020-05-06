@@ -29,8 +29,10 @@ func EnvLoad() {
 func main() {
 	EnvLoad()
 	router := gin.Default()
+	// HTMLのロード
 	router.LoadHTMLGlob("view/*.html")
-
+	// 静的ファイルのパスを指定
+	router.Static("/assets", "./assets")
 	router.Use(cors.New(cors.Config{
 		// 許可したいHTTPメソッドの一覧
 		AllowMethods: []string{
