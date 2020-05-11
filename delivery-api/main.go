@@ -6,7 +6,8 @@ import (
 	"os"
 	"time"
 
-	"./handler"
+	"deliverly/src/handler"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -19,7 +20,7 @@ func EnvLoad() {
 		os.Setenv("GO_ENV", "local")
 	}
 
-	err := godotenv.Load(fmt.Sprintf("../%s.env", os.Getenv("GO_ENV")))
+	err := godotenv.Load(fmt.Sprintf("./%s.env", os.Getenv("GO_ENV")))
 
 	if err != nil {
 		log.Fatal("Error loading .env file")

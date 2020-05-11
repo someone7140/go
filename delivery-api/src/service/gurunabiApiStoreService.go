@@ -6,7 +6,8 @@ import (
 	"sort"
 	"strconv"
 
-	"../model"
+	"deliverly/src/model"
+
 	"github.com/thoas/go-funk"
 )
 

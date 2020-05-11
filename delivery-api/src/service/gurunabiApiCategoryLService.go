@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	"../model"
+	"deliverly/src/model"
 )
 
 // GetCategoryLURL ぐるなび大カテゴリーAPI送信用URL

@@ -3,9 +3,12 @@ package handler
 import (
 	"net/http"
 
-	"../model"
-	"../service"
-	"../util"
+	"deliverly/src/model"
+
+	"deliverly/src/service"
+
+	"deliverly/src/util"
+
 	"github.com/gin-gonic/gin"
 )
 
