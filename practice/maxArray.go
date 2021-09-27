@@ -7,7 +7,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-func main() {
+func mainMaxArray() {
 	sampleArray := []int{1, 6, 2, 10, 9, 14, 100, 5}
 	// 愚直にループを回す
 	max := -9999999
@@ -25,6 +25,6 @@ func main() {
 
 	//go-funkのライブラリを使う
 	max = -9999999
-	max = funk.MaxInt(sampleArray).(int)
+	max = funk.MaxInt(sampleArray)
 	fmt.Println(max)
 }

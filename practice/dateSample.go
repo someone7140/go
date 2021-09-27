@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func main() {
+func mainDateSample() {
 	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
 	// JST今日日付
 	currentTimeJst, _ := time.ParseInLocation("20060102", time.Now().In(jst).Format("20060102"), jst)
