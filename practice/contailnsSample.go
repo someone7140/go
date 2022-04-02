@@ -12,7 +12,7 @@ type SampleStruct struct {
 	Value string
 }
 
-func main() {
+func contailnsSample() {
 	// 数字が含まれているか
 	var numberSlice = []int{1, 2, 3, 4, 5, 6}
 	fmt.Println(funk.Contains(numberSlice, 6))

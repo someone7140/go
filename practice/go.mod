@@ -1,8 +1,8 @@
 module practice
 
-go 1.14
+go 1.16
 
 require (
 	github.com/adam-lavrik/go-imath v0.0.0-20200104135348-19d2b923d06c
-	github.com/thoas/go-funk v0.9.1
+	github.com/thoas/go-funk v0.9.2
 )
