@@ -15,7 +15,7 @@ func CCounting2Main() {
 
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
 
-	aStrArray := strings.Split(readLine(rdr), " ")
+	aStrArray := strings.Split(readLineCCounting2(rdr), " ")
 	aArray := make([]int, n)
 
 	for i := 0; i < n; i++ {
@@ -27,7 +27,7 @@ func CCounting2Main() {
 	results := make([]int, q)
 
 	for i := 0; i < q; i++ {
-		xStr := readLine(rdr)
+		xStr := readLineCCounting2(rdr)
 		x, _ := strconv.Atoi(xStr)
 		results[i] = nibun(aArray, n, x)
 	}
@@ -37,7 +37,7 @@ func CCounting2Main() {
 	}
 }
 
-func readLine(rdr *bufio.Reader) string {
+func readLineCCounting2(rdr *bufio.Reader) string {
 	buf := make([]byte, 0, 10000)
 	for {
 		l, p, e := rdr.ReadLine()

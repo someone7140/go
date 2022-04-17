@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "pb/;pb";
+
+import "validate/validate.proto";
+
+package pb;
+
+// ユーザ認証用のサービス
+service AuthenticationUserService {
+  // Google認証コードの検証
+  rpc VerifyGoogleAuthCode (VerifyGoogleAuthCodeRequest) returns (UserResponse) {}
+  // 認証トークンの検証
+  rpc VerifyAuthToken (VerifyAuthTokenRequest) returns (AuthTokenResponse) {}
+}
+
+message VerifyGoogleAuthCodeRequest {
+  string googleAuthCode = 1 [(validate.rules).string.min_len = 1];
+}
+
+message UserResponse {
+  string id = 1;
+  string name = 2;
+  string authToken = 3;
+}
+
+message VerifyAuthTokenRequest {}
+
+message AuthTokenResponse {
+  string id = 1;
+  string name = 2;
+}

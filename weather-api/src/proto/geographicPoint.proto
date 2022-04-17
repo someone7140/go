@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "pb/;pb";
+
+import "validate/validate.proto";
+
+package pb;
+
+// 地点登録用のサービス
+service GeographicPointService {
+  // 地点の追加
+  rpc AddGeographicPoint (AddGeographicPointRequest) returns (RegsiterGeographicPointResponse) {}
+}
+  
+message AddGeographicPointRequest {
+  string name = 1 [(validate.rules).string.min_len = 1];
+  double lat = 2 [(validate.rules).double = {gte: 0}];
+  double lon = 3 [(validate.rules).double = {gte: 0}];
+}
+
+message RegsiterGeographicPointResponse{}
