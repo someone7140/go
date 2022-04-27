@@ -8,7 +8,8 @@ import (
 	"xorm.io/xorm"
 )
 
-func AddGeographicPoint(engine *xorm.Engine, userId string, name string, lat float64, lon float64) error {
+// 地点の追加
+func AddGeographicPoint(engine *xorm.Engine, userId string, name string, lat float64, lon float64, displayOrder int32) error {
 	nowTime := time.Now().UTC().Unix()
 	uuid, err := util.GenerateUUID()
 
@@ -21,6 +22,7 @@ func AddGeographicPoint(engine *xorm.Engine, userId string, name string, lat flo
 		UserId:           userId,
 		Lat:              lat,
 		Lon:              lon,
+		DisplayOrder:     displayOrder,
 		RegisterDateTime: nowTime,
 	}
 	_, err = engine.Table("GEOGRAPHIC_POINT").Insert(geographicPoint)
@@ -28,4 +30,14 @@ func AddGeographicPoint(engine *xorm.Engine, userId string, name string, lat flo
 		return err
 	}
 	return nil
+}
+
+// ユーザが登録した地点の一覧
+func GetGeographicPointsByUserId(engine *xorm.Engine, userId string) ([]db.GeographicPoint, error) {
+	points := []db.GeographicPoint{}
+	err := engine.Table("GEOGRAPHIC_POINT").Where("USER_ID = ?", userId).OrderBy("DISPLAY_ORDER ASC").Find(&points)
+	if err != nil {
+		return nil, err
+	}
+	return points, nil
 }

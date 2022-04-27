@@ -12,6 +12,7 @@ CREATE TABLE GEOGRAPHIC_POINT (
   user_id VARCHAR2(100) NOT NULL,
   lat FLOAT NOT NULL,
   lon FLOAT NOT NULL,
+  display_order NUMBER NOT NULL,
   register_date_time NUMBER NOT NULL
 );
 

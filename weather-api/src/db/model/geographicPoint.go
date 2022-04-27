@@ -6,5 +6,6 @@ type GeographicPoint struct {
 	UserId           string  `xorm:"USER_ID"`
 	Lat              float64 `xorm:"LAT"`
 	Lon              float64 `xorm:"LON"`
+	DisplayOrder     int32   `xorm:"DISPLAY_ORDER"`
 	RegisterDateTime int64   `xorm:"REGISTER_DATE_TIME"`
 }

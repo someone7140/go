@@ -90,6 +90,17 @@ func (m *AddGeographicPointRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	if m.GetDisplayOrder() < 1 {
+		err := AddGeographicPointRequestValidationError{
+			field:  "DisplayOrder",
+			reason: "value must be greater than or equal to 1",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return AddGeographicPointRequestMultiError(errors)
 	}
@@ -272,3 +283,373 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RegsiterGeographicPointResponseValidationError{}
+
+// Validate checks the field values on GetWeatherListByGeographicPointRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *GetWeatherListByGeographicPointRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// GetWeatherListByGeographicPointRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// GetWeatherListByGeographicPointRequestMultiError, or nil if none found.
+func (m *GetWeatherListByGeographicPointRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetWeatherListByGeographicPointRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return GetWeatherListByGeographicPointRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetWeatherListByGeographicPointRequestMultiError is an error wrapping
+// multiple validation errors returned by
+// GetWeatherListByGeographicPointRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetWeatherListByGeographicPointRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetWeatherListByGeographicPointRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetWeatherListByGeographicPointRequestMultiError) AllErrors() []error { return m }
+
+// GetWeatherListByGeographicPointRequestValidationError is the validation
+// error returned by GetWeatherListByGeographicPointRequest.Validate if the
+// designated constraints aren't met.
+type GetWeatherListByGeographicPointRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetWeatherListByGeographicPointRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetWeatherListByGeographicPointRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetWeatherListByGeographicPointRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetWeatherListByGeographicPointRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetWeatherListByGeographicPointRequestValidationError) ErrorName() string {
+	return "GetWeatherListByGeographicPointRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetWeatherListByGeographicPointRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetWeatherListByGeographicPointRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetWeatherListByGeographicPointRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetWeatherListByGeographicPointRequestValidationError{}
+
+// Validate checks the field values on GetWeatherListByGeographicPointResponse
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *GetWeatherListByGeographicPointResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// GetWeatherListByGeographicPointResponse with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// GetWeatherListByGeographicPointResponseMultiError, or nil if none found.
+func (m *GetWeatherListByGeographicPointResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetWeatherListByGeographicPointResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetWeatherByGeographicPoint() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetWeatherListByGeographicPointResponseValidationError{
+						field:  fmt.Sprintf("WeatherByGeographicPoint[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetWeatherListByGeographicPointResponseValidationError{
+						field:  fmt.Sprintf("WeatherByGeographicPoint[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetWeatherListByGeographicPointResponseValidationError{
+					field:  fmt.Sprintf("WeatherByGeographicPoint[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetWeatherListByGeographicPointResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetWeatherListByGeographicPointResponseMultiError is an error wrapping
+// multiple validation errors returned by
+// GetWeatherListByGeographicPointResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetWeatherListByGeographicPointResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetWeatherListByGeographicPointResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetWeatherListByGeographicPointResponseMultiError) AllErrors() []error { return m }
+
+// GetWeatherListByGeographicPointResponseValidationError is the validation
+// error returned by GetWeatherListByGeographicPointResponse.Validate if the
+// designated constraints aren't met.
+type GetWeatherListByGeographicPointResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetWeatherListByGeographicPointResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetWeatherListByGeographicPointResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetWeatherListByGeographicPointResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetWeatherListByGeographicPointResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetWeatherListByGeographicPointResponseValidationError) ErrorName() string {
+	return "GetWeatherListByGeographicPointResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetWeatherListByGeographicPointResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetWeatherListByGeographicPointResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetWeatherListByGeographicPointResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetWeatherListByGeographicPointResponseValidationError{}
+
+// Validate checks the field values on WeatherByGeographicPoint with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WeatherByGeographicPoint) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WeatherByGeographicPoint with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WeatherByGeographicPointMultiError, or nil if none found.
+func (m *WeatherByGeographicPoint) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WeatherByGeographicPoint) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for UnixTime
+
+	// no validation rules for PointId
+
+	// no validation rules for PointName
+
+	// no validation rules for Lat
+
+	// no validation rules for Lon
+
+	// no validation rules for DisplayOrder
+
+	// no validation rules for WeatherIcon
+
+	// no validation rules for TempFeelsLike
+
+	// no validation rules for TempMin
+
+	// no validation rules for TempMax
+
+	// no validation rules for RainFall
+
+	if len(errors) > 0 {
+		return WeatherByGeographicPointMultiError(errors)
+	}
+
+	return nil
+}
+
+// WeatherByGeographicPointMultiError is an error wrapping multiple validation
+// errors returned by WeatherByGeographicPoint.ValidateAll() if the designated
+// constraints aren't met.
+type WeatherByGeographicPointMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WeatherByGeographicPointMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WeatherByGeographicPointMultiError) AllErrors() []error { return m }
+
+// WeatherByGeographicPointValidationError is the validation error returned by
+// WeatherByGeographicPoint.Validate if the designated constraints aren't met.
+type WeatherByGeographicPointValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WeatherByGeographicPointValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WeatherByGeographicPointValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WeatherByGeographicPointValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WeatherByGeographicPointValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WeatherByGeographicPointValidationError) ErrorName() string {
+	return "WeatherByGeographicPointValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WeatherByGeographicPointValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWeatherByGeographicPoint.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WeatherByGeographicPointValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WeatherByGeographicPointValidationError{}

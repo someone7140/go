@@ -133,4 +133,67 @@ proto.pb.GeographicPointServicePromiseClient.prototype.addGeographicPoint =
     );
   };
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.pb.GetWeatherListByGeographicPointRequest,
+ *   !proto.pb.GetWeatherListByGeographicPointResponse>}
+ */
+const methodDescriptor_GeographicPointService_GetWeatherListByGeographicPoint =
+  new grpc.web.MethodDescriptor(
+    "/pb.GeographicPointService/GetWeatherListByGeographicPoint",
+    grpc.web.MethodType.UNARY,
+    proto.pb.GetWeatherListByGeographicPointRequest,
+    proto.pb.GetWeatherListByGeographicPointResponse,
+    /**
+     * @param {!proto.pb.GetWeatherListByGeographicPointRequest} request
+     * @return {!Uint8Array}
+     */
+    function (request) {
+      return request.serializeBinary();
+    },
+    proto.pb.GetWeatherListByGeographicPointResponse.deserializeBinary
+  );
+
+/**
+ * @param {!proto.pb.GetWeatherListByGeographicPointRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.pb.GetWeatherListByGeographicPointResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.pb.GetWeatherListByGeographicPointResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.pb.GeographicPointServiceClient.prototype.getWeatherListByGeographicPoint =
+  function (request, metadata, callback) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        "/pb.GeographicPointService/GetWeatherListByGeographicPoint",
+      request,
+      metadata || {},
+      methodDescriptor_GeographicPointService_GetWeatherListByGeographicPoint,
+      callback
+    );
+  };
+
+/**
+ * @param {!proto.pb.GetWeatherListByGeographicPointRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.pb.GetWeatherListByGeographicPointResponse>}
+ *     Promise that resolves to the response
+ */
+proto.pb.GeographicPointServicePromiseClient.prototype.getWeatherListByGeographicPoint =
+  function (request, metadata) {
+    return this.client_.unaryCall(
+      this.hostname_ +
+        "/pb.GeographicPointService/GetWeatherListByGeographicPoint",
+      request,
+      metadata || {},
+      methodDescriptor_GeographicPointService_GetWeatherListByGeographicPoint
+    );
+  };
+
 module.exports = proto.pb;

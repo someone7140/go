@@ -10,12 +10,35 @@ package pb;
 service GeographicPointService {
   // 地点の追加
   rpc AddGeographicPoint (AddGeographicPointRequest) returns (RegsiterGeographicPointResponse) {}
+  // 地点毎の天気一覧
+  rpc GetWeatherListByGeographicPoint (GetWeatherListByGeographicPointRequest) returns (GetWeatherListByGeographicPointResponse) {}
 }
   
 message AddGeographicPointRequest {
   string name = 1 [(validate.rules).string.min_len = 1];
   double lat = 2 [(validate.rules).double = {gte: 0}];
   double lon = 3 [(validate.rules).double = {gte: 0}];
+  int32 displayOrder = 4 [(validate.rules).int32.gte = 1];
 }
 
 message RegsiterGeographicPointResponse{}
+
+message GetWeatherListByGeographicPointRequest {}
+
+message GetWeatherListByGeographicPointResponse{
+  repeated WeatherByGeographicPoint weatherByGeographicPoint = 1;
+}
+
+message WeatherByGeographicPoint{
+  int64 unixTime= 1;
+  string pointId = 2;
+  string pointName = 3;
+  double lat = 4;
+  double lon = 5;
+  int32 displayOrder =6;
+  string weatherIcon = 7;
+  double tempFeelsLike = 8;
+  double tempMin = 9;
+  double tempMax = 10;
+  double rainFall = 11;
+}

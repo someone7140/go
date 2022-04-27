@@ -10,7 +10,9 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/joho/godotenv v1.4.0
+	github.com/json-iterator/go v1.1.11
 	github.com/mattn/go-oci8 v0.1.1
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/rubenv/sql-migrate v1.1.1 // indirect
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 	golang.org/x/text v0.3.7 // indirect
