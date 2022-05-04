@@ -572,7 +572,15 @@ func (m *WeatherByGeographicPoint) validate(all bool) error {
 
 	// no validation rules for TempMax
 
+	// no validation rules for Clouds
+
 	// no validation rules for RainFall
+
+	// no validation rules for Humidity
+
+	// no validation rules for WindSpeed
+
+	// no validation rules for Pressure
 
 	if len(errors) > 0 {
 		return WeatherByGeographicPointMultiError(errors)

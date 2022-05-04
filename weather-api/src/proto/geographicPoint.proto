@@ -35,10 +35,14 @@ message WeatherByGeographicPoint{
   string pointName = 3;
   double lat = 4;
   double lon = 5;
-  int32 displayOrder =6;
+  int32 displayOrder = 6;
   string weatherIcon = 7;
   double tempFeelsLike = 8;
   double tempMin = 9;
   double tempMax = 10;
-  double rainFall = 11;
+  double clouds = 11;
+  double rainFall = 12;
+  double humidity = 13;
+  double windSpeed = 14;
+  double pressure = 15;
 }

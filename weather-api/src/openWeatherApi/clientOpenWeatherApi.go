@@ -49,11 +49,16 @@ func getWeatherResponseStrJSONConvert(jsonStr string, lat float64, lon float64, 
 		weatherInfo.TempFeelsLike = response.Get("main").Get("feels_like").ToFloat64()
 		weatherInfo.TempMin = response.Get("main").Get("temp_min").ToFloat64()
 		weatherInfo.TempMax = response.Get("main").Get("temp_max").ToFloat64()
+		weatherInfo.Clouds = response.Get("clouds").Get("all").ToFloat64()
 		// 降水量の項目存在判定のため、まずはstringで取得
 		rainFallStr := response.Get("rain").Get("3h").ToString()
 		if rainFallStr != "" {
 			weatherInfo.RainFall = response.Get("rain").Get("3h").ToFloat64()
 		}
+		weatherInfo.Humidity = response.Get("main").Get("humidity").ToFloat64()
+		weatherInfo.WindSpeed = response.Get("wind").Get("speed").ToFloat64()
+		weatherInfo.Pressure = response.Get("main").Get("pressure").ToFloat64()
+
 		weatherList = append(weatherList, weatherInfo)
 	}
 	return weatherList, nil

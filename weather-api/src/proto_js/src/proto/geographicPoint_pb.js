@@ -829,7 +829,11 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
         ),
         tempmin: jspb.Message.getFloatingPointFieldWithDefault(msg, 9, 0.0),
         tempmax: jspb.Message.getFloatingPointFieldWithDefault(msg, 10, 0.0),
-        rainfall: jspb.Message.getFloatingPointFieldWithDefault(msg, 11, 0.0),
+        clouds: jspb.Message.getFloatingPointFieldWithDefault(msg, 11, 0.0),
+        rainfall: jspb.Message.getFloatingPointFieldWithDefault(msg, 12, 0.0),
+        humidity: jspb.Message.getFloatingPointFieldWithDefault(msg, 13, 0.0),
+        windspeed: jspb.Message.getFloatingPointFieldWithDefault(msg, 14, 0.0),
+        pressure: jspb.Message.getFloatingPointFieldWithDefault(msg, 15, 0.0),
       };
 
     if (includeInstance) {
@@ -912,7 +916,23 @@ proto.pb.WeatherByGeographicPoint.deserializeBinaryFromReader = function (
         break;
       case 11:
         var value = /** @type {number} */ (reader.readDouble());
+        msg.setClouds(value);
+        break;
+      case 12:
+        var value = /** @type {number} */ (reader.readDouble());
         msg.setRainfall(value);
+        break;
+      case 13:
+        var value = /** @type {number} */ (reader.readDouble());
+        msg.setHumidity(value);
+        break;
+      case 14:
+        var value = /** @type {number} */ (reader.readDouble());
+        msg.setWindspeed(value);
+        break;
+      case 15:
+        var value = /** @type {number} */ (reader.readDouble());
+        msg.setPressure(value);
         break;
       default:
         reader.skipField();
@@ -984,9 +1004,25 @@ proto.pb.WeatherByGeographicPoint.serializeBinaryToWriter = function (
   if (f !== 0.0) {
     writer.writeDouble(10, f);
   }
-  f = message.getRainfall();
+  f = message.getClouds();
   if (f !== 0.0) {
     writer.writeDouble(11, f);
+  }
+  f = message.getRainfall();
+  if (f !== 0.0) {
+    writer.writeDouble(12, f);
+  }
+  f = message.getHumidity();
+  if (f !== 0.0) {
+    writer.writeDouble(13, f);
+  }
+  f = message.getWindspeed();
+  if (f !== 0.0) {
+    writer.writeDouble(14, f);
+  }
+  f = message.getPressure();
+  if (f !== 0.0) {
+    writer.writeDouble(15, f);
   }
 };
 
@@ -1163,10 +1199,10 @@ proto.pb.WeatherByGeographicPoint.prototype.setTempmax = function (value) {
 };
 
 /**
- * optional double rainFall = 11;
+ * optional double clouds = 11;
  * @return {number}
  */
-proto.pb.WeatherByGeographicPoint.prototype.getRainfall = function () {
+proto.pb.WeatherByGeographicPoint.prototype.getClouds = function () {
   return /** @type {number} */ (
     jspb.Message.getFloatingPointFieldWithDefault(this, 11, 0.0)
   );
@@ -1176,8 +1212,80 @@ proto.pb.WeatherByGeographicPoint.prototype.getRainfall = function () {
  * @param {number} value
  * @return {!proto.pb.WeatherByGeographicPoint} returns this
  */
-proto.pb.WeatherByGeographicPoint.prototype.setRainfall = function (value) {
+proto.pb.WeatherByGeographicPoint.prototype.setClouds = function (value) {
   return jspb.Message.setProto3FloatField(this, 11, value);
+};
+
+/**
+ * optional double rainFall = 12;
+ * @return {number}
+ */
+proto.pb.WeatherByGeographicPoint.prototype.getRainfall = function () {
+  return /** @type {number} */ (
+    jspb.Message.getFloatingPointFieldWithDefault(this, 12, 0.0)
+  );
+};
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.WeatherByGeographicPoint} returns this
+ */
+proto.pb.WeatherByGeographicPoint.prototype.setRainfall = function (value) {
+  return jspb.Message.setProto3FloatField(this, 12, value);
+};
+
+/**
+ * optional double humidity = 13;
+ * @return {number}
+ */
+proto.pb.WeatherByGeographicPoint.prototype.getHumidity = function () {
+  return /** @type {number} */ (
+    jspb.Message.getFloatingPointFieldWithDefault(this, 13, 0.0)
+  );
+};
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.WeatherByGeographicPoint} returns this
+ */
+proto.pb.WeatherByGeographicPoint.prototype.setHumidity = function (value) {
+  return jspb.Message.setProto3FloatField(this, 13, value);
+};
+
+/**
+ * optional double windSpeed = 14;
+ * @return {number}
+ */
+proto.pb.WeatherByGeographicPoint.prototype.getWindspeed = function () {
+  return /** @type {number} */ (
+    jspb.Message.getFloatingPointFieldWithDefault(this, 14, 0.0)
+  );
+};
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.WeatherByGeographicPoint} returns this
+ */
+proto.pb.WeatherByGeographicPoint.prototype.setWindspeed = function (value) {
+  return jspb.Message.setProto3FloatField(this, 14, value);
+};
+
+/**
+ * optional double pressure = 15;
+ * @return {number}
+ */
+proto.pb.WeatherByGeographicPoint.prototype.getPressure = function () {
+  return /** @type {number} */ (
+    jspb.Message.getFloatingPointFieldWithDefault(this, 15, 0.0)
+  );
+};
+
+/**
+ * @param {number} value
+ * @return {!proto.pb.WeatherByGeographicPoint} returns this
+ */
+proto.pb.WeatherByGeographicPoint.prototype.setPressure = function (value) {
+  return jspb.Message.setProto3FloatField(this, 15, value);
 };
 
 goog.object.extend(exports, proto.pb);
