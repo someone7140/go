@@ -10,6 +10,10 @@ package pb;
 service GeographicPointService {
   // 地点の追加
   rpc AddGeographicPoint (AddGeographicPointRequest) returns (RegsiterGeographicPointResponse) {}
+  // 地点の更新
+  rpc UpdateGeographicPoint (UpdateGeographicPointRequest) returns (RegsiterGeographicPointResponse) {}
+  // 地点の削除
+  rpc DeleteGeographicPoint (DeleteGeographicPointRequest) returns (RegsiterGeographicPointResponse) {}
   // 地点毎の天気一覧
   rpc GetWeatherListByGeographicPoint (GetWeatherListByGeographicPointRequest) returns (GetWeatherListByGeographicPointResponse) {}
 }
@@ -19,6 +23,18 @@ message AddGeographicPointRequest {
   double lat = 2 [(validate.rules).double = {gte: 0}];
   double lon = 3 [(validate.rules).double = {gte: 0}];
   int32 displayOrder = 4 [(validate.rules).int32.gte = 1];
+}
+
+message UpdateGeographicPointRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+  string name = 2 [(validate.rules).string.min_len = 1];
+  double lat = 3 [(validate.rules).double = {gte: 0}];
+  double lon = 4 [(validate.rules).double = {gte: 0}];
+  int32 displayOrder = 5 [(validate.rules).int32.gte = 1];
+}
+
+message DeleteGeographicPointRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
 }
 
 message RegsiterGeographicPointResponse{}

@@ -181,6 +181,278 @@ var _ interface {
 	ErrorName() string
 } = AddGeographicPointRequestValidationError{}
 
+// Validate checks the field values on UpdateGeographicPointRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateGeographicPointRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateGeographicPointRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateGeographicPointRequestMultiError, or nil if none found.
+func (m *UpdateGeographicPointRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateGeographicPointRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		err := UpdateGeographicPointRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := UpdateGeographicPointRequestValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetLat() < 0 {
+		err := UpdateGeographicPointRequestValidationError{
+			field:  "Lat",
+			reason: "value must be greater than or equal to 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetLon() < 0 {
+		err := UpdateGeographicPointRequestValidationError{
+			field:  "Lon",
+			reason: "value must be greater than or equal to 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetDisplayOrder() < 1 {
+		err := UpdateGeographicPointRequestValidationError{
+			field:  "DisplayOrder",
+			reason: "value must be greater than or equal to 1",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return UpdateGeographicPointRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateGeographicPointRequestMultiError is an error wrapping multiple
+// validation errors returned by UpdateGeographicPointRequest.ValidateAll() if
+// the designated constraints aren't met.
+type UpdateGeographicPointRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateGeographicPointRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateGeographicPointRequestMultiError) AllErrors() []error { return m }
+
+// UpdateGeographicPointRequestValidationError is the validation error returned
+// by UpdateGeographicPointRequest.Validate if the designated constraints
+// aren't met.
+type UpdateGeographicPointRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateGeographicPointRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateGeographicPointRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateGeographicPointRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateGeographicPointRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateGeographicPointRequestValidationError) ErrorName() string {
+	return "UpdateGeographicPointRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateGeographicPointRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateGeographicPointRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateGeographicPointRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateGeographicPointRequestValidationError{}
+
+// Validate checks the field values on DeleteGeographicPointRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteGeographicPointRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteGeographicPointRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteGeographicPointRequestMultiError, or nil if none found.
+func (m *DeleteGeographicPointRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteGeographicPointRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		err := DeleteGeographicPointRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DeleteGeographicPointRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteGeographicPointRequestMultiError is an error wrapping multiple
+// validation errors returned by DeleteGeographicPointRequest.ValidateAll() if
+// the designated constraints aren't met.
+type DeleteGeographicPointRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteGeographicPointRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteGeographicPointRequestMultiError) AllErrors() []error { return m }
+
+// DeleteGeographicPointRequestValidationError is the validation error returned
+// by DeleteGeographicPointRequest.Validate if the designated constraints
+// aren't met.
+type DeleteGeographicPointRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteGeographicPointRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteGeographicPointRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteGeographicPointRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteGeographicPointRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteGeographicPointRequestValidationError) ErrorName() string {
+	return "DeleteGeographicPointRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteGeographicPointRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteGeographicPointRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteGeographicPointRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteGeographicPointRequestValidationError{}
+
 // Validate checks the field values on RegsiterGeographicPointResponse with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

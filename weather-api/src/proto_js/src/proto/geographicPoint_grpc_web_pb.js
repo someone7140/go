@@ -136,6 +136,128 @@ proto.pb.GeographicPointServicePromiseClient.prototype.addGeographicPoint =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.pb.UpdateGeographicPointRequest,
+ *   !proto.pb.RegsiterGeographicPointResponse>}
+ */
+const methodDescriptor_GeographicPointService_UpdateGeographicPoint =
+  new grpc.web.MethodDescriptor(
+    "/pb.GeographicPointService/UpdateGeographicPoint",
+    grpc.web.MethodType.UNARY,
+    proto.pb.UpdateGeographicPointRequest,
+    proto.pb.RegsiterGeographicPointResponse,
+    /**
+     * @param {!proto.pb.UpdateGeographicPointRequest} request
+     * @return {!Uint8Array}
+     */
+    function (request) {
+      return request.serializeBinary();
+    },
+    proto.pb.RegsiterGeographicPointResponse.deserializeBinary
+  );
+
+/**
+ * @param {!proto.pb.UpdateGeographicPointRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.pb.RegsiterGeographicPointResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.pb.RegsiterGeographicPointResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.pb.GeographicPointServiceClient.prototype.updateGeographicPoint =
+  function (request, metadata, callback) {
+    return this.client_.rpcCall(
+      this.hostname_ + "/pb.GeographicPointService/UpdateGeographicPoint",
+      request,
+      metadata || {},
+      methodDescriptor_GeographicPointService_UpdateGeographicPoint,
+      callback
+    );
+  };
+
+/**
+ * @param {!proto.pb.UpdateGeographicPointRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.pb.RegsiterGeographicPointResponse>}
+ *     Promise that resolves to the response
+ */
+proto.pb.GeographicPointServicePromiseClient.prototype.updateGeographicPoint =
+  function (request, metadata) {
+    return this.client_.unaryCall(
+      this.hostname_ + "/pb.GeographicPointService/UpdateGeographicPoint",
+      request,
+      metadata || {},
+      methodDescriptor_GeographicPointService_UpdateGeographicPoint
+    );
+  };
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.pb.DeleteGeographicPointRequest,
+ *   !proto.pb.RegsiterGeographicPointResponse>}
+ */
+const methodDescriptor_GeographicPointService_DeleteGeographicPoint =
+  new grpc.web.MethodDescriptor(
+    "/pb.GeographicPointService/DeleteGeographicPoint",
+    grpc.web.MethodType.UNARY,
+    proto.pb.DeleteGeographicPointRequest,
+    proto.pb.RegsiterGeographicPointResponse,
+    /**
+     * @param {!proto.pb.DeleteGeographicPointRequest} request
+     * @return {!Uint8Array}
+     */
+    function (request) {
+      return request.serializeBinary();
+    },
+    proto.pb.RegsiterGeographicPointResponse.deserializeBinary
+  );
+
+/**
+ * @param {!proto.pb.DeleteGeographicPointRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.pb.RegsiterGeographicPointResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.pb.RegsiterGeographicPointResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.pb.GeographicPointServiceClient.prototype.deleteGeographicPoint =
+  function (request, metadata, callback) {
+    return this.client_.rpcCall(
+      this.hostname_ + "/pb.GeographicPointService/DeleteGeographicPoint",
+      request,
+      metadata || {},
+      methodDescriptor_GeographicPointService_DeleteGeographicPoint,
+      callback
+    );
+  };
+
+/**
+ * @param {!proto.pb.DeleteGeographicPointRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.pb.RegsiterGeographicPointResponse>}
+ *     Promise that resolves to the response
+ */
+proto.pb.GeographicPointServicePromiseClient.prototype.deleteGeographicPoint =
+  function (request, metadata) {
+    return this.client_.unaryCall(
+      this.hostname_ + "/pb.GeographicPointService/DeleteGeographicPoint",
+      request,
+      metadata || {},
+      methodDescriptor_GeographicPointService_DeleteGeographicPoint
+    );
+  };
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.pb.GetWeatherListByGeographicPointRequest,
  *   !proto.pb.GetWeatherListByGeographicPointResponse>}
  */

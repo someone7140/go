@@ -28,6 +28,32 @@ func (s *GeographicPointService) AddGeographicPoint(ctx context.Context, r *pb.A
 
 }
 
+// 地点の更新
+func (s *GeographicPointService) UpdateGeographicPoint(ctx context.Context, r *pb.UpdateGeographicPointRequest) (*pb.RegsiterGeographicPointResponse, error) {
+	if ctx.Err() == context.Canceled {
+		return &pb.RegsiterGeographicPointResponse{}, fmt.Errorf("client cancelled: abandoning")
+	}
+	// contextからユーザID取得
+	userId := GetUserIdFromContext(ctx)
+	err := repository.UpdateGeographicPoint(s.dbEngine, userId, r.Id, r.Name, r.Lat, r.Lon, r.DisplayOrder)
+
+	return &pb.RegsiterGeographicPointResponse{}, err
+
+}
+
+// 地点の削除
+func (s *GeographicPointService) DeleteGeographicPoint(ctx context.Context, r *pb.DeleteGeographicPointRequest) (*pb.RegsiterGeographicPointResponse, error) {
+	if ctx.Err() == context.Canceled {
+		return &pb.RegsiterGeographicPointResponse{}, fmt.Errorf("client cancelled: abandoning")
+	}
+	// contextからユーザID取得
+	userId := GetUserIdFromContext(ctx)
+	err := repository.DeleteGeographicPoint(s.dbEngine, userId, r.Id)
+
+	return &pb.RegsiterGeographicPointResponse{}, err
+
+}
+
 // 地点毎の天気一覧
 func (s *GeographicPointService) GetWeatherListByGeographicPoint(ctx context.Context, r *pb.GetWeatherListByGeographicPointRequest) (*pb.GetWeatherListByGeographicPointResponse, error) {
 	if ctx.Err() == context.Canceled {
