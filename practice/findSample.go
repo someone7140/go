@@ -2,7 +2,7 @@ package main
 
 import "github.com/thoas/go-funk"
 
-func main() {
+func mainFindSample() {
 	numbers := []int{1, 2, 3, 4}
 
 	// Findメソッドだと返り値がinterface型
