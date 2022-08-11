@@ -1,2 +1,7 @@
 */vendor/
 *.env
+/coda-api/.devcontainer/*
+/coda-api/vendor/*
+coda-api/gcsKey/devKey.json
+coda-api/gcsKey/localKey.json
+coda-api/gcsKey/producitonKey.json

@@ -1,0 +1,52 @@
+[
+  {
+    "createIndexes": "user",
+    "indexes": [
+      {
+        "key": {
+          "user_setting_id": 1
+        },
+        "name": "user_setting_id_index",
+        "unique": true,
+        "background": true
+      },
+      {
+        "key": {
+          "categories": 1
+        },
+        "name": "categories_index",
+        "background": true
+      },
+      {
+        "key": {
+          "email": 1,
+          "facebook_id": 1,
+          "google_id": 1
+        },
+        "name": "auth_mehtod_index",
+        "unique": true,
+        "background": true
+      }
+    ]
+  },
+  {
+    "insert": "user",
+    "documents": [
+      {
+        "_id": "admin_coda_system_id",
+        "user_setting_id": "admin_coda",
+        "email": "admin@coda.com",
+        "password": "$2a$10$juEHYSVPMC2LTvMjk4sFm.ovMqdzyFOydDL/hnsdF0fJ8TbhPGtvS",
+        "name": "CODA管理者",
+        "user_type": "admin",
+        "status": "active",
+        "categories": ["male-standard-none-none"],
+        "login_count": 0,
+        "attribute": {
+          "gender": "male",
+          "silhouette": "standard"
+        }
+      }
+    ]
+  }
+]

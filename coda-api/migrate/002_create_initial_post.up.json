@@ -1,0 +1,56 @@
+[
+  {
+    "createIndexes": "post",
+    "indexes": [
+      {
+        "key": {
+          "post_type": 1
+        },
+        "name": "post_type_index",
+        "background": true
+      },
+      {
+        "key": {
+          "status": 1
+        },
+        "name": "status_index",
+        "background": true
+      },
+      {
+        "key": {
+          "post_user_id": 1
+        },
+        "name": "post_user_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "post_instagram_account_id": 1
+        },
+        "name": "post_instagram_account_id",
+        "background": true
+      },
+      {
+        "key": {
+          "post_date": -1
+        },
+        "name": "post_date_index",
+        "background": true
+      },
+      {
+        "key": {
+          "favorite_users.user_id": 1
+        },
+        "name": "favorite_users.user_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "favorite_users.favorite_date": -1
+        },
+        "name": "favorite_users.favorite_date_index",
+        "background": true
+      }
+    ]
+  }
+]

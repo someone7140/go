@@ -1,0 +1,91 @@
+[
+  {
+    "createIndexes": "item_post",
+    "indexes": [
+      {
+        "key": {
+          "title": 1
+        },
+        "name": "title_index",
+        "background": true
+      },
+      {
+        "key": {
+          "detail": 1
+        },
+        "name": "detail_index",
+        "background": true
+      },
+      {
+        "key": {
+          "status": 1
+        },
+        "name": "status_index",
+        "background": true
+      },
+      {
+        "key": {
+          "item_type": 1
+        },
+        "name": "item_type_index",
+        "background": true
+      },
+      {
+        "key": {
+          "post_user_id": 1
+        },
+        "name": "post_user_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "post_date": -1
+        },
+        "name": "post_date_index",
+        "background": true
+      },
+      {
+        "key": {
+          "category": 1
+        },
+        "name": "category_index",
+        "background": true
+      },
+      {
+        "key": {
+          "attribute.gender": 1
+        },
+        "name": "attribute.gender_index",
+        "background": true
+      },
+      {
+        "key": {
+          "attribute.silhouette": 1
+        },
+        "name": "attribute.silhouette_index",
+        "background": true
+      },
+      {
+        "key": {
+          "attribute.complex": 1
+        },
+        "name": "attribute.complex_index",
+        "background": true
+      },
+      {
+        "key": {
+          "favorite_users.user_id": 1
+        },
+        "name": "favorite_users.user_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "favorite_users.favorite_date": -1
+        },
+        "name": "favorite_users.favorite_date_index",
+        "background": true
+      }
+    ]
+  }
+]

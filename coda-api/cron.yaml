@@ -1,0 +1,8 @@
+cron:
+  # - description: "cronInstagramBatch"
+  #   url: /cronStartPostGather
+  #    schedule: every 120 minutes
+  - description: "cronAccessAnalysis"
+    url: /cronStartAccessAnalysis
+    schedule: every day 00:15
+    timezone: Asia/Tokyo

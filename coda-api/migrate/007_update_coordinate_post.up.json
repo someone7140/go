@@ -1,0 +1,28 @@
+[
+  {
+    "createIndexes": "coordinate_post",
+    "indexes": [
+      {
+        "key": {
+          "sale.sale_price": 1
+        },
+        "name": "sale_price_index",
+        "background": true
+      },
+      {
+        "key": {
+          "sale.start_date": -1
+        },
+        "name": "sale_start_date_index",
+        "background": true
+      },
+      {
+        "key": {
+          "sale.end_date": -1
+        },
+        "name": "sale_end_date_index",
+        "background": true
+      }
+    ]
+  }
+]

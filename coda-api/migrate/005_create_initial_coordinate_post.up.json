@@ -1,0 +1,132 @@
+[
+  {
+    "createIndexes": "coordinate_post",
+    "indexes": [
+      {
+        "key": {
+          "title": 1
+        },
+        "name": "title_index",
+        "background": true
+      },
+      {
+        "key": {
+          "detail": 1
+        },
+        "name": "detail_index",
+        "background": true
+      },
+      {
+        "key": {
+          "status": 1
+        },
+        "name": "status_index",
+        "background": true
+      },
+      {
+        "key": {
+          "shop_id": 1
+        },
+        "name": "shop_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "post_user_id": 1
+        },
+        "name": "post_user_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "post_date": -1
+        },
+        "name": "post_date_index",
+        "background": true
+      },
+      {
+        "key": {
+          "model_category": 1
+        },
+        "name": "model_category_index",
+        "background": true
+      },
+      {
+        "key": {
+          "model_attribute.gender": 1
+        },
+        "name": "model_attribute.gender_index",
+        "background": true
+      },
+      {
+        "key": {
+          "model_attribute.silhouette": 1
+        },
+        "name": "model_attribute.silhouette_index",
+        "background": true
+      },
+      {
+        "key": {
+          "model_attribute.height": 1
+        },
+        "name": "model_attribute.height_index",
+        "background": true
+      },
+      {
+        "key": {
+          "model_attribute.weight": 1
+        },
+        "name": "model_attribute.weight_index",
+        "background": true
+      },
+      {
+        "key": {
+          "favorite_users.user_id": 1
+        },
+        "name": "favorite_users.user_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "favorite_users.favorite_date": -1
+        },
+        "name": "favorite_users.favorite_date_index",
+        "background": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "shop",
+    "indexes": [
+      {
+        "key": {
+          "shop_setting_id": 1
+        },
+        "name": "shop_setting_id_index",
+        "unique": true,
+        "background": true
+      },
+      {
+        "key": {
+          "name": 1
+        },
+        "name": "name_index",
+        "background": true
+      },
+      {
+        "key": {
+          "detail": 1
+        },
+        "name": "detail_index",
+        "background": true
+      },
+      {
+        "key": {
+          "create_date": 1
+        },
+        "name": "create_date_index",
+        "background": true
+      }
+    ]
+  }
+]

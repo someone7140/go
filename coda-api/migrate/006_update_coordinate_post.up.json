@@ -1,0 +1,21 @@
+[
+  {
+    "createIndexes": "coordinate_post",
+    "indexes": [
+      {
+        "key": {
+          "price": 1
+        },
+        "name": "price_index",
+        "background": true
+      },
+      {
+        "key": {
+          "category": 1
+        },
+        "name": "category_index",
+        "background": true
+      }
+    ]
+  }
+]

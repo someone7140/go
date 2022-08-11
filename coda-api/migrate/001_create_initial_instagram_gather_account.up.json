@@ -1,0 +1,36 @@
+[
+  {
+    "createIndexes": "instagram_gather_account",
+    "indexes": [
+      {
+        "key": {
+          "status": 1
+        },
+        "name": "status_index",
+        "background": true
+      },
+      {
+        "key": {
+          "instagram_user_name": 1
+        },
+        "name": "instagram_user_name_index",
+        "unique": true,
+        "background": true
+      },
+      {
+        "key": {
+          "category": 1
+        },
+        "name": "category_index",
+        "background": true
+      },
+      {
+        "key": {
+          "gather_date": 1
+        },
+        "name": "gather_date_index",
+        "background": true
+      }
+    ]
+  }
+]
