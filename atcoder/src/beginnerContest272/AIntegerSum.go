@@ -8,30 +8,25 @@ import (
 	"strings"
 )
 
-type DIndexA struct {
-	index int
-	value int64
-}
-
-func main() {
-	var n, m int
-	fmt.Scan(&n, &m)
+func AIntegerSumMain() {
+	var n int
+	fmt.Scan(&n)
 
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
-	aStrArray := strings.Split(DIndexARdr(rdr), " ")
-	var aSlice = make([]DIndexA, n)
+	aLine := AIntegerSumRdr(rdr)
+	aStrArray := strings.Split(aLine, " ")
+
+	result := 0
 	for i := 0; i < n; i++ {
 		a, _ := strconv.Atoi(aStrArray[i])
-		aInt64 := int64(a)
-		aSlice[i] = DIndexA{
-			index: i,
-			value: aInt64,
-		}
+		result = result + a
 	}
+
+	fmt.Println(result)
 
 }
 
-func DIndexARdr(rdr *bufio.Reader) string {
+func AIntegerSumRdr(rdr *bufio.Reader) string {
 	buf := make([]byte, 0, 10000)
 	for {
 		l, p, e := rdr.ReadLine()
