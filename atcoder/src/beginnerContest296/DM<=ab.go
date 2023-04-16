@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func main() {
+func DMabMain() {
 	var n, m int64
 	fmt.Scan(&n, &m)
 
