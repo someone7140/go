@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func main() {
+func CCardsQueryProblemMain() {
 	var n, q int
 	fmt.Scan(&n, &q)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
