@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func main() {
+func DScopeMain() {
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
 	s := DScopeReadLine(rdr)
 
