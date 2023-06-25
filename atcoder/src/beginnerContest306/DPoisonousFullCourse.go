@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func DPoisonousFullCourseMain() {
 	var n int
 	fmt.Scan(&n)
 
