@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func main() {
+func DSnukeMazeMain() {
 	var h, w int
 	fmt.Scan(&h, &w)
 

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "placeNote/src/gen/proto;placeNote";
+
+import "validate/validate.proto";
+
+package placeNote;
+
+service UserService {
+    rpc AuthGoogleCode(AuthGoogleCodeRequest) returns (AuthGoogleCodeResponse) {}
+}
+
+message AuthGoogleCodeRequest {
+    string authCode = 1  [(validate.rules).string.min_len = 1];
+}
+
+message AuthGoogleCodeResponse {
+    string authGoogleToken = 1;
+}

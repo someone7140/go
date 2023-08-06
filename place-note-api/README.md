@@ -1,0 +1,1 @@
+- ` buf generate`で Go の grpc ソースコードを生成
