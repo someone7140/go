@@ -1,0 +1,13 @@
+package main
+
+import (
+	"fmt"
+)
+
+func A314Main() {
+	var n int
+	fmt.Scan(&n)
+	ensyuuStr := "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679"
+	fmt.Println(ensyuuStr[0 : n+2])
+
+}

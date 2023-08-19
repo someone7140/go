@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func main() {
+func CApproximateEqualization2Main() {
 	var n int
 	fmt.Scan(&n)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)

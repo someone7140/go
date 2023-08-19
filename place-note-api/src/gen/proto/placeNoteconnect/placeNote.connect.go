@@ -33,14 +33,14 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// UserServiceAuthGoogleCodeProcedure is the fully-qualified name of the UserService's
-	// AuthGoogleCode RPC.
-	UserServiceAuthGoogleCodeProcedure = "/placeNote.UserService/AuthGoogleCode"
+	// UserServiceRegisterUserProcedure is the fully-qualified name of the UserService's RegisterUser
+	// RPC.
+	UserServiceRegisterUserProcedure = "/placeNote.UserService/RegisterUser"
 )
 
 // UserServiceClient is a client for the placeNote.UserService service.
 type UserServiceClient interface {
-	AuthGoogleCode(context.Context, *connect_go.Request[proto.AuthGoogleCodeRequest]) (*connect_go.Response[proto.AuthGoogleCodeResponse], error)
+	RegisterUser(context.Context, *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error)
 }
 
 // NewUserServiceClient constructs a client for the placeNote.UserService service. By default, it
@@ -53,9 +53,9 @@ type UserServiceClient interface {
 func NewUserServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) UserServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &userServiceClient{
-		authGoogleCode: connect_go.NewClient[proto.AuthGoogleCodeRequest, proto.AuthGoogleCodeResponse](
+		registerUser: connect_go.NewClient[proto.RegsiterUserRequest, proto.UserResponse](
 			httpClient,
-			baseURL+UserServiceAuthGoogleCodeProcedure,
+			baseURL+UserServiceRegisterUserProcedure,
 			opts...,
 		),
 	}
@@ -63,17 +63,17 @@ func NewUserServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts
 
 // userServiceClient implements UserServiceClient.
 type userServiceClient struct {
-	authGoogleCode *connect_go.Client[proto.AuthGoogleCodeRequest, proto.AuthGoogleCodeResponse]
+	registerUser *connect_go.Client[proto.RegsiterUserRequest, proto.UserResponse]
 }
 
-// AuthGoogleCode calls placeNote.UserService.AuthGoogleCode.
-func (c *userServiceClient) AuthGoogleCode(ctx context.Context, req *connect_go.Request[proto.AuthGoogleCodeRequest]) (*connect_go.Response[proto.AuthGoogleCodeResponse], error) {
-	return c.authGoogleCode.CallUnary(ctx, req)
+// RegisterUser calls placeNote.UserService.RegisterUser.
+func (c *userServiceClient) RegisterUser(ctx context.Context, req *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error) {
+	return c.registerUser.CallUnary(ctx, req)
 }
 
 // UserServiceHandler is an implementation of the placeNote.UserService service.
 type UserServiceHandler interface {
-	AuthGoogleCode(context.Context, *connect_go.Request[proto.AuthGoogleCodeRequest]) (*connect_go.Response[proto.AuthGoogleCodeResponse], error)
+	RegisterUser(context.Context, *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error)
 }
 
 // NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -82,15 +82,15 @@ type UserServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewUserServiceHandler(svc UserServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	userServiceAuthGoogleCodeHandler := connect_go.NewUnaryHandler(
-		UserServiceAuthGoogleCodeProcedure,
-		svc.AuthGoogleCode,
+	userServiceRegisterUserHandler := connect_go.NewUnaryHandler(
+		UserServiceRegisterUserProcedure,
+		svc.RegisterUser,
 		opts...,
 	)
 	return "/placeNote.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case UserServiceAuthGoogleCodeProcedure:
-			userServiceAuthGoogleCodeHandler.ServeHTTP(w, r)
+		case UserServiceRegisterUserProcedure:
+			userServiceRegisterUserHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -100,6 +100,6 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect_go.HandlerOpt
 // UnimplementedUserServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedUserServiceHandler struct{}
 
-func (UnimplementedUserServiceHandler) AuthGoogleCode(context.Context, *connect_go.Request[proto.AuthGoogleCodeRequest]) (*connect_go.Response[proto.AuthGoogleCodeResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserService.AuthGoogleCode is not implemented"))
+func (UnimplementedUserServiceHandler) RegisterUser(context.Context, *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserService.RegisterUser is not implemented"))
 }

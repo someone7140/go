@@ -35,31 +35,75 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on AuthGoogleCodeRequest with the rules
+// Validate checks the field values on RegsiterUserRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AuthGoogleCodeRequest) Validate() error {
+func (m *RegsiterUserRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AuthGoogleCodeRequest with the rules
+// ValidateAll checks the field values on RegsiterUserRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// AuthGoogleCodeRequestMultiError, or nil if none found.
-func (m *AuthGoogleCodeRequest) ValidateAll() error {
+// RegsiterUserRequestMultiError, or nil if none found.
+func (m *RegsiterUserRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AuthGoogleCodeRequest) validate(all bool) error {
+func (m *RegsiterUserRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetAuthCode()) < 1 {
-		err := AuthGoogleCodeRequestValidationError{
-			field:  "AuthCode",
+	if utf8.RuneCountInString(m.GetAuthToken()) < 1 {
+		err := RegsiterUserRequestValidationError{
+			field:  "AuthToken",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := _RegsiterUserRequest_AuthMethod_NotInLookup[m.GetAuthMethod()]; ok {
+		err := RegsiterUserRequestValidationError{
+			field:  "AuthMethod",
+			reason: "value must not be in list [UNKNOWN]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := AuthMethod_name[int32(m.GetAuthMethod())]; !ok {
+		err := RegsiterUserRequestValidationError{
+			field:  "AuthMethod",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetUserSettingId()) < 1 {
+		err := RegsiterUserRequestValidationError{
+			field:  "UserSettingId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := RegsiterUserRequestValidationError{
+			field:  "Name",
 			reason: "value length must be at least 1 runes",
 		}
 		if !all {
@@ -69,19 +113,19 @@ func (m *AuthGoogleCodeRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AuthGoogleCodeRequestMultiError(errors)
+		return RegsiterUserRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// AuthGoogleCodeRequestMultiError is an error wrapping multiple validation
-// errors returned by AuthGoogleCodeRequest.ValidateAll() if the designated
+// RegsiterUserRequestMultiError is an error wrapping multiple validation
+// errors returned by RegsiterUserRequest.ValidateAll() if the designated
 // constraints aren't met.
-type AuthGoogleCodeRequestMultiError []error
+type RegsiterUserRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AuthGoogleCodeRequestMultiError) Error() string {
+func (m RegsiterUserRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -90,11 +134,11 @@ func (m AuthGoogleCodeRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AuthGoogleCodeRequestMultiError) AllErrors() []error { return m }
+func (m RegsiterUserRequestMultiError) AllErrors() []error { return m }
 
-// AuthGoogleCodeRequestValidationError is the validation error returned by
-// AuthGoogleCodeRequest.Validate if the designated constraints aren't met.
-type AuthGoogleCodeRequestValidationError struct {
+// RegsiterUserRequestValidationError is the validation error returned by
+// RegsiterUserRequest.Validate if the designated constraints aren't met.
+type RegsiterUserRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -102,24 +146,24 @@ type AuthGoogleCodeRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e AuthGoogleCodeRequestValidationError) Field() string { return e.field }
+func (e RegsiterUserRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AuthGoogleCodeRequestValidationError) Reason() string { return e.reason }
+func (e RegsiterUserRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AuthGoogleCodeRequestValidationError) Cause() error { return e.cause }
+func (e RegsiterUserRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AuthGoogleCodeRequestValidationError) Key() bool { return e.key }
+func (e RegsiterUserRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AuthGoogleCodeRequestValidationError) ErrorName() string {
-	return "AuthGoogleCodeRequestValidationError"
+func (e RegsiterUserRequestValidationError) ErrorName() string {
+	return "RegsiterUserRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AuthGoogleCodeRequestValidationError) Error() string {
+func (e RegsiterUserRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -131,14 +175,14 @@ func (e AuthGoogleCodeRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAuthGoogleCodeRequest.%s: %s%s",
+		"invalid %sRegsiterUserRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AuthGoogleCodeRequestValidationError{}
+var _ error = RegsiterUserRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -146,46 +190,55 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AuthGoogleCodeRequestValidationError{}
+} = RegsiterUserRequestValidationError{}
 
-// Validate checks the field values on AuthGoogleCodeResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AuthGoogleCodeResponse) Validate() error {
+var _RegsiterUserRequest_AuthMethod_NotInLookup = map[AuthMethod]struct{}{
+	0: {},
+}
+
+// Validate checks the field values on UserResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *UserResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AuthGoogleCodeResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// AuthGoogleCodeResponseMultiError, or nil if none found.
-func (m *AuthGoogleCodeResponse) ValidateAll() error {
+// ValidateAll checks the field values on UserResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UserResponseMultiError, or
+// nil if none found.
+func (m *UserResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AuthGoogleCodeResponse) validate(all bool) error {
+func (m *UserResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for AuthGoogleToken
+	// no validation rules for Token
+
+	// no validation rules for AuthMethod
+
+	// no validation rules for UserSettingId
+
+	// no validation rules for Name
 
 	if len(errors) > 0 {
-		return AuthGoogleCodeResponseMultiError(errors)
+		return UserResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// AuthGoogleCodeResponseMultiError is an error wrapping multiple validation
-// errors returned by AuthGoogleCodeResponse.ValidateAll() if the designated
-// constraints aren't met.
-type AuthGoogleCodeResponseMultiError []error
+// UserResponseMultiError is an error wrapping multiple validation errors
+// returned by UserResponse.ValidateAll() if the designated constraints aren't met.
+type UserResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AuthGoogleCodeResponseMultiError) Error() string {
+func (m UserResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -194,11 +247,11 @@ func (m AuthGoogleCodeResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AuthGoogleCodeResponseMultiError) AllErrors() []error { return m }
+func (m UserResponseMultiError) AllErrors() []error { return m }
 
-// AuthGoogleCodeResponseValidationError is the validation error returned by
-// AuthGoogleCodeResponse.Validate if the designated constraints aren't met.
-type AuthGoogleCodeResponseValidationError struct {
+// UserResponseValidationError is the validation error returned by
+// UserResponse.Validate if the designated constraints aren't met.
+type UserResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -206,24 +259,22 @@ type AuthGoogleCodeResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e AuthGoogleCodeResponseValidationError) Field() string { return e.field }
+func (e UserResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AuthGoogleCodeResponseValidationError) Reason() string { return e.reason }
+func (e UserResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AuthGoogleCodeResponseValidationError) Cause() error { return e.cause }
+func (e UserResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AuthGoogleCodeResponseValidationError) Key() bool { return e.key }
+func (e UserResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AuthGoogleCodeResponseValidationError) ErrorName() string {
-	return "AuthGoogleCodeResponseValidationError"
-}
+func (e UserResponseValidationError) ErrorName() string { return "UserResponseValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AuthGoogleCodeResponseValidationError) Error() string {
+func (e UserResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -235,14 +286,14 @@ func (e AuthGoogleCodeResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAuthGoogleCodeResponse.%s: %s%s",
+		"invalid %sUserResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AuthGoogleCodeResponseValidationError{}
+var _ error = UserResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -250,4 +301,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AuthGoogleCodeResponseValidationError{}
+} = UserResponseValidationError{}

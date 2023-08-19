@@ -9,12 +9,20 @@ import (
 
 type UserServer struct{}
 
-func (s *UserServer) AuthGoogleCode(
+func (s *UserServer) RegisterUser(
 	ctx context.Context,
-	req *connect.Request[placeNote.AuthGoogleCodeRequest],
-) (*connect.Response[placeNote.AuthGoogleCodeResponse], error) {
-	res := connect.NewResponse(&placeNote.AuthGoogleCodeResponse{
-		AuthGoogleToken: "token",
+	req *connect.Request[placeNote.RegsiterUserRequest],
+) (*connect.Response[placeNote.UserResponse], error) {
+
+	res := connect.NewResponse(&placeNote.UserResponse{
+		Token:         "saaaa",
+		AuthMethod:    placeNote.AuthMethod_EMAIL,
+		UserSettingId: "id",
+		Name:          "name",
 	})
 	return res, nil
+
+	/*
+		return nil, connect.NewError(connect.CodeAlreadyExists, errors.New("AlreadyExists userId"))
+	*/
 }
