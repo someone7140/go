@@ -7,6 +7,7 @@ import (
 	"os"
 	"placeNote/src/gen/proto/placeNoteconnect"
 	"placeNote/src/interceptor"
+	"placeNote/src/placeNoteUtil"
 	"placeNote/src/server"
 
 	"github.com/bufbuild/connect-go"
@@ -34,7 +35,7 @@ func main() {
 	interceptors := connect.WithInterceptors(interceptor.NewValidationInterceptor())
 
 	// 各種サーバーの登録
-	userServerPath, UserServerHandler := placeNoteconnect.NewUserServiceHandler(&server.UserServer{}, interceptors)
+	userServerPath, UserServerHandler := placeNoteconnect.NewUserAccountServiceHandler(&server.UserAccountServer{}, interceptors)
 	mux.Handle(userServerPath, UserServerHandler)
 
 	// CORSの設定
@@ -61,6 +62,10 @@ func main() {
 		AllowedOrigins:   []string{os.Getenv("VIEW_DOMAIN")},
 		AllowCredentials: true,
 	}).Handler(mux)
+
+	// DB接続
+	deferFunc := placeNoteUtil.SetDbConnection()
+	defer deferFunc()
 
 	// サーバの起動
 	http.ListenAndServe(

@@ -14,7 +14,7 @@ type DLOWERQuery struct {
 	moji  string
 }
 
-func main() {
+func DLOWERMain() {
 	var n int
 	fmt.Scan(&n)
 

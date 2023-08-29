@@ -35,75 +35,31 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on RegsiterUserRequest with the rules
+// Validate checks the field values on AuthGoogleAccountRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RegsiterUserRequest) Validate() error {
+func (m *AuthGoogleAccountRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on RegsiterUserRequest with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on AuthGoogleAccountRequest with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// RegsiterUserRequestMultiError, or nil if none found.
-func (m *RegsiterUserRequest) ValidateAll() error {
+// AuthGoogleAccountRequestMultiError, or nil if none found.
+func (m *AuthGoogleAccountRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *RegsiterUserRequest) validate(all bool) error {
+func (m *AuthGoogleAccountRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetAuthToken()) < 1 {
-		err := RegsiterUserRequestValidationError{
-			field:  "AuthToken",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if _, ok := _RegsiterUserRequest_AuthMethod_NotInLookup[m.GetAuthMethod()]; ok {
-		err := RegsiterUserRequestValidationError{
-			field:  "AuthMethod",
-			reason: "value must not be in list [UNKNOWN]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if _, ok := AuthMethod_name[int32(m.GetAuthMethod())]; !ok {
-		err := RegsiterUserRequestValidationError{
-			field:  "AuthMethod",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if utf8.RuneCountInString(m.GetUserSettingId()) < 1 {
-		err := RegsiterUserRequestValidationError{
-			field:  "UserSettingId",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := RegsiterUserRequestValidationError{
-			field:  "Name",
+	if utf8.RuneCountInString(m.GetAuthCode()) < 1 {
+		err := AuthGoogleAccountRequestValidationError{
+			field:  "AuthCode",
 			reason: "value length must be at least 1 runes",
 		}
 		if !all {
@@ -113,19 +69,19 @@ func (m *RegsiterUserRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return RegsiterUserRequestMultiError(errors)
+		return AuthGoogleAccountRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// RegsiterUserRequestMultiError is an error wrapping multiple validation
-// errors returned by RegsiterUserRequest.ValidateAll() if the designated
+// AuthGoogleAccountRequestMultiError is an error wrapping multiple validation
+// errors returned by AuthGoogleAccountRequest.ValidateAll() if the designated
 // constraints aren't met.
-type RegsiterUserRequestMultiError []error
+type AuthGoogleAccountRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m RegsiterUserRequestMultiError) Error() string {
+func (m AuthGoogleAccountRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -134,11 +90,11 @@ func (m RegsiterUserRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m RegsiterUserRequestMultiError) AllErrors() []error { return m }
+func (m AuthGoogleAccountRequestMultiError) AllErrors() []error { return m }
 
-// RegsiterUserRequestValidationError is the validation error returned by
-// RegsiterUserRequest.Validate if the designated constraints aren't met.
-type RegsiterUserRequestValidationError struct {
+// AuthGoogleAccountRequestValidationError is the validation error returned by
+// AuthGoogleAccountRequest.Validate if the designated constraints aren't met.
+type AuthGoogleAccountRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -146,24 +102,24 @@ type RegsiterUserRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e RegsiterUserRequestValidationError) Field() string { return e.field }
+func (e AuthGoogleAccountRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e RegsiterUserRequestValidationError) Reason() string { return e.reason }
+func (e AuthGoogleAccountRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e RegsiterUserRequestValidationError) Cause() error { return e.cause }
+func (e AuthGoogleAccountRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e RegsiterUserRequestValidationError) Key() bool { return e.key }
+func (e AuthGoogleAccountRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e RegsiterUserRequestValidationError) ErrorName() string {
-	return "RegsiterUserRequestValidationError"
+func (e AuthGoogleAccountRequestValidationError) ErrorName() string {
+	return "AuthGoogleAccountRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e RegsiterUserRequestValidationError) Error() string {
+func (e AuthGoogleAccountRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -175,14 +131,14 @@ func (e RegsiterUserRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRegsiterUserRequest.%s: %s%s",
+		"invalid %sAuthGoogleAccountRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = RegsiterUserRequestValidationError{}
+var _ error = AuthGoogleAccountRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -190,28 +146,289 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = RegsiterUserRequestValidationError{}
+} = AuthGoogleAccountRequestValidationError{}
 
-var _RegsiterUserRequest_AuthMethod_NotInLookup = map[AuthMethod]struct{}{
-	0: {},
-}
-
-// Validate checks the field values on UserResponse with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *UserResponse) Validate() error {
+// Validate checks the field values on AuthGoogleAccountResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AuthGoogleAccountResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UserResponse with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UserResponseMultiError, or
-// nil if none found.
-func (m *UserResponse) ValidateAll() error {
+// ValidateAll checks the field values on AuthGoogleAccountResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AuthGoogleAccountResponseMultiError, or nil if none found.
+func (m *AuthGoogleAccountResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UserResponse) validate(all bool) error {
+func (m *AuthGoogleAccountResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Token
+
+	if len(errors) > 0 {
+		return AuthGoogleAccountResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// AuthGoogleAccountResponseMultiError is an error wrapping multiple validation
+// errors returned by AuthGoogleAccountResponse.ValidateAll() if the
+// designated constraints aren't met.
+type AuthGoogleAccountResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AuthGoogleAccountResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AuthGoogleAccountResponseMultiError) AllErrors() []error { return m }
+
+// AuthGoogleAccountResponseValidationError is the validation error returned by
+// AuthGoogleAccountResponse.Validate if the designated constraints aren't met.
+type AuthGoogleAccountResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AuthGoogleAccountResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AuthGoogleAccountResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AuthGoogleAccountResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AuthGoogleAccountResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AuthGoogleAccountResponseValidationError) ErrorName() string {
+	return "AuthGoogleAccountResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AuthGoogleAccountResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAuthGoogleAccountResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AuthGoogleAccountResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AuthGoogleAccountResponseValidationError{}
+
+// Validate checks the field values on RegisterUserAccountRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RegisterUserAccountRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RegisterUserAccountRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RegisterUserAccountRequestMultiError, or nil if none found.
+func (m *RegisterUserAccountRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RegisterUserAccountRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetAuthToken()) < 1 {
+		err := RegisterUserAccountRequestValidationError{
+			field:  "AuthToken",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := _RegisterUserAccountRequest_AuthMethod_NotInLookup[m.GetAuthMethod()]; ok {
+		err := RegisterUserAccountRequestValidationError{
+			field:  "AuthMethod",
+			reason: "value must not be in list [UNKNOWN]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := AuthMethod_name[int32(m.GetAuthMethod())]; !ok {
+		err := RegisterUserAccountRequestValidationError{
+			field:  "AuthMethod",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetUserSettingId()) < 1 {
+		err := RegisterUserAccountRequestValidationError{
+			field:  "UserSettingId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := RegisterUserAccountRequestValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return RegisterUserAccountRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegisterUserAccountRequestMultiError is an error wrapping multiple
+// validation errors returned by RegisterUserAccountRequest.ValidateAll() if
+// the designated constraints aren't met.
+type RegisterUserAccountRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegisterUserAccountRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegisterUserAccountRequestMultiError) AllErrors() []error { return m }
+
+// RegisterUserAccountRequestValidationError is the validation error returned
+// by RegisterUserAccountRequest.Validate if the designated constraints aren't met.
+type RegisterUserAccountRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterUserAccountRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterUserAccountRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterUserAccountRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterUserAccountRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterUserAccountRequestValidationError) ErrorName() string {
+	return "RegisterUserAccountRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterUserAccountRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterUserAccountRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterUserAccountRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterUserAccountRequestValidationError{}
+
+var _RegisterUserAccountRequest_AuthMethod_NotInLookup = map[AuthMethod]struct{}{
+	0: {},
+}
+
+// Validate checks the field values on UserAccountResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UserAccountResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UserAccountResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UserAccountResponseMultiError, or nil if none found.
+func (m *UserAccountResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UserAccountResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -227,18 +444,19 @@ func (m *UserResponse) validate(all bool) error {
 	// no validation rules for Name
 
 	if len(errors) > 0 {
-		return UserResponseMultiError(errors)
+		return UserAccountResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// UserResponseMultiError is an error wrapping multiple validation errors
-// returned by UserResponse.ValidateAll() if the designated constraints aren't met.
-type UserResponseMultiError []error
+// UserAccountResponseMultiError is an error wrapping multiple validation
+// errors returned by UserAccountResponse.ValidateAll() if the designated
+// constraints aren't met.
+type UserAccountResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UserResponseMultiError) Error() string {
+func (m UserAccountResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -247,11 +465,11 @@ func (m UserResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UserResponseMultiError) AllErrors() []error { return m }
+func (m UserAccountResponseMultiError) AllErrors() []error { return m }
 
-// UserResponseValidationError is the validation error returned by
-// UserResponse.Validate if the designated constraints aren't met.
-type UserResponseValidationError struct {
+// UserAccountResponseValidationError is the validation error returned by
+// UserAccountResponse.Validate if the designated constraints aren't met.
+type UserAccountResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -259,22 +477,24 @@ type UserResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e UserResponseValidationError) Field() string { return e.field }
+func (e UserAccountResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UserResponseValidationError) Reason() string { return e.reason }
+func (e UserAccountResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UserResponseValidationError) Cause() error { return e.cause }
+func (e UserAccountResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UserResponseValidationError) Key() bool { return e.key }
+func (e UserAccountResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UserResponseValidationError) ErrorName() string { return "UserResponseValidationError" }
+func (e UserAccountResponseValidationError) ErrorName() string {
+	return "UserAccountResponseValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e UserResponseValidationError) Error() string {
+func (e UserAccountResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -286,14 +506,14 @@ func (e UserResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUserResponse.%s: %s%s",
+		"invalid %sUserAccountResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UserResponseValidationError{}
+var _ error = UserAccountResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -301,4 +521,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UserResponseValidationError{}
+} = UserAccountResponseValidationError{}

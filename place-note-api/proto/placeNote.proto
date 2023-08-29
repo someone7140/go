@@ -6,8 +6,9 @@ import "validate/validate.proto";
 
 package placeNote;
 
-service UserService {
-    rpc RegisterUser(RegsiterUserRequest) returns (UserResponse) {}
+service UserAccountService {
+    rpc AuthGoogleAccount(AuthGoogleAccountRequest) returns (AuthGoogleAccountResponse) {}
+    rpc RegisterUserAccount(RegisterUserAccountRequest) returns (UserAccountResponse) {}
 }
 
 enum AuthMethod {
@@ -16,14 +17,22 @@ enum AuthMethod {
     EMAIL = 2;
   }
 
-message RegsiterUserRequest {
-    string authToken = 1  [(validate.rules).string.min_len = 1];
+message AuthGoogleAccountRequest {
+    string authCode = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AuthGoogleAccountResponse {
+    string token = 1;
+}
+
+message RegisterUserAccountRequest {
+    string authToken = 1 [(validate.rules).string.min_len = 1];
     AuthMethod authMethod = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
     string userSettingId = 3  [(validate.rules).string.min_len = 1];
     string name = 4 [(validate.rules).string.min_len = 1];
 }
 
-message UserResponse {
+message UserAccountResponse {
     string token = 1;
     AuthMethod authMethod = 2;
     string userSettingId = 3;

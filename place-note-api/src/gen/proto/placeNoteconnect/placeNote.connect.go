@@ -21,8 +21,8 @@ import (
 const _ = connect_go.IsAtLeastVersion0_1_0
 
 const (
-	// UserServiceName is the fully-qualified name of the UserService service.
-	UserServiceName = "placeNote.UserService"
+	// UserAccountServiceName is the fully-qualified name of the UserAccountService service.
+	UserAccountServiceName = "placeNote.UserAccountService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,73 +33,100 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// UserServiceRegisterUserProcedure is the fully-qualified name of the UserService's RegisterUser
-	// RPC.
-	UserServiceRegisterUserProcedure = "/placeNote.UserService/RegisterUser"
+	// UserAccountServiceAuthGoogleAccountProcedure is the fully-qualified name of the
+	// UserAccountService's AuthGoogleAccount RPC.
+	UserAccountServiceAuthGoogleAccountProcedure = "/placeNote.UserAccountService/AuthGoogleAccount"
+	// UserAccountServiceRegisterUserAccountProcedure is the fully-qualified name of the
+	// UserAccountService's RegisterUserAccount RPC.
+	UserAccountServiceRegisterUserAccountProcedure = "/placeNote.UserAccountService/RegisterUserAccount"
 )
 
-// UserServiceClient is a client for the placeNote.UserService service.
-type UserServiceClient interface {
-	RegisterUser(context.Context, *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error)
+// UserAccountServiceClient is a client for the placeNote.UserAccountService service.
+type UserAccountServiceClient interface {
+	AuthGoogleAccount(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.AuthGoogleAccountResponse], error)
+	RegisterUserAccount(context.Context, *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error)
 }
 
-// NewUserServiceClient constructs a client for the placeNote.UserService service. By default, it
-// uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses, and sends
-// uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
-// connect.WithGRPCWeb() options.
+// NewUserAccountServiceClient constructs a client for the placeNote.UserAccountService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewUserServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) UserServiceClient {
+func NewUserAccountServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) UserAccountServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	return &userServiceClient{
-		registerUser: connect_go.NewClient[proto.RegsiterUserRequest, proto.UserResponse](
+	return &userAccountServiceClient{
+		authGoogleAccount: connect_go.NewClient[proto.AuthGoogleAccountRequest, proto.AuthGoogleAccountResponse](
 			httpClient,
-			baseURL+UserServiceRegisterUserProcedure,
+			baseURL+UserAccountServiceAuthGoogleAccountProcedure,
+			opts...,
+		),
+		registerUserAccount: connect_go.NewClient[proto.RegisterUserAccountRequest, proto.UserAccountResponse](
+			httpClient,
+			baseURL+UserAccountServiceRegisterUserAccountProcedure,
 			opts...,
 		),
 	}
 }
 
-// userServiceClient implements UserServiceClient.
-type userServiceClient struct {
-	registerUser *connect_go.Client[proto.RegsiterUserRequest, proto.UserResponse]
+// userAccountServiceClient implements UserAccountServiceClient.
+type userAccountServiceClient struct {
+	authGoogleAccount   *connect_go.Client[proto.AuthGoogleAccountRequest, proto.AuthGoogleAccountResponse]
+	registerUserAccount *connect_go.Client[proto.RegisterUserAccountRequest, proto.UserAccountResponse]
 }
 
-// RegisterUser calls placeNote.UserService.RegisterUser.
-func (c *userServiceClient) RegisterUser(ctx context.Context, req *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error) {
-	return c.registerUser.CallUnary(ctx, req)
+// AuthGoogleAccount calls placeNote.UserAccountService.AuthGoogleAccount.
+func (c *userAccountServiceClient) AuthGoogleAccount(ctx context.Context, req *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.AuthGoogleAccountResponse], error) {
+	return c.authGoogleAccount.CallUnary(ctx, req)
 }
 
-// UserServiceHandler is an implementation of the placeNote.UserService service.
-type UserServiceHandler interface {
-	RegisterUser(context.Context, *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error)
+// RegisterUserAccount calls placeNote.UserAccountService.RegisterUserAccount.
+func (c *userAccountServiceClient) RegisterUserAccount(ctx context.Context, req *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error) {
+	return c.registerUserAccount.CallUnary(ctx, req)
 }
 
-// NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
-// on which to mount the handler and the handler itself.
+// UserAccountServiceHandler is an implementation of the placeNote.UserAccountService service.
+type UserAccountServiceHandler interface {
+	AuthGoogleAccount(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.AuthGoogleAccountResponse], error)
+	RegisterUserAccount(context.Context, *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error)
+}
+
+// NewUserAccountServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewUserServiceHandler(svc UserServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	userServiceRegisterUserHandler := connect_go.NewUnaryHandler(
-		UserServiceRegisterUserProcedure,
-		svc.RegisterUser,
+func NewUserAccountServiceHandler(svc UserAccountServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
+	userAccountServiceAuthGoogleAccountHandler := connect_go.NewUnaryHandler(
+		UserAccountServiceAuthGoogleAccountProcedure,
+		svc.AuthGoogleAccount,
 		opts...,
 	)
-	return "/placeNote.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	userAccountServiceRegisterUserAccountHandler := connect_go.NewUnaryHandler(
+		UserAccountServiceRegisterUserAccountProcedure,
+		svc.RegisterUserAccount,
+		opts...,
+	)
+	return "/placeNote.UserAccountService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case UserServiceRegisterUserProcedure:
-			userServiceRegisterUserHandler.ServeHTTP(w, r)
+		case UserAccountServiceAuthGoogleAccountProcedure:
+			userAccountServiceAuthGoogleAccountHandler.ServeHTTP(w, r)
+		case UserAccountServiceRegisterUserAccountProcedure:
+			userAccountServiceRegisterUserAccountHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedUserServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedUserServiceHandler struct{}
+// UnimplementedUserAccountServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedUserAccountServiceHandler struct{}
 
-func (UnimplementedUserServiceHandler) RegisterUser(context.Context, *connect_go.Request[proto.RegsiterUserRequest]) (*connect_go.Response[proto.UserResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserService.RegisterUser is not implemented"))
+func (UnimplementedUserAccountServiceHandler) AuthGoogleAccount(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.AuthGoogleAccountResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserAccountService.AuthGoogleAccount is not implemented"))
+}
+
+func (UnimplementedUserAccountServiceHandler) RegisterUserAccount(context.Context, *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserAccountService.RegisterUserAccount is not implemented"))
 }
