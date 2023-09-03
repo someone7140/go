@@ -36,7 +36,7 @@ func GetJwtAuthDayExpire(day int) int64 {
 // GetStrInfoFromToken トークンから設定した文字列を複合
 func GetStrInfoFromToken(propertyName string, tokenSrt string) (string, *connect.Error) {
 	token, err := jwt.Parse(tokenSrt, func(token *jwt.Token) (interface{}, error) {
-		return []byte("SECRET_KEY"), nil
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
 		return "", connect.NewError(connect.CodeUnauthenticated, errors.New("can not get token info"))

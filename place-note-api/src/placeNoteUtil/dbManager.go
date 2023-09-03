@@ -23,6 +23,7 @@ func SetDbConnection() func() {
 		panic(err)
 	}
 
+	mongoConnection = c
 	deferFunc := func() {
 		c.Disconnect(ctx)
 		cancel()

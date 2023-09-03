@@ -53,8 +53,9 @@ func GetGoogleUserProfileFromAuthCode(authCode string) (*v2.Tokeninfo, *connect.
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("Google認証エラー"))
 	}
-	token, _ := config.Exchange(cxt, authCode)
-	if token == nil {
+	config.RedirectURL = os.Getenv("VIEW_DOMAIN") // 認証コードの取得元をRedirectURLに設定
+	token, err := config.Exchange(cxt, authCode)
+	if token == nil || err != nil {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("Google認証エラー"))
 	}
 

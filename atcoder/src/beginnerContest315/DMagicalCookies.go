@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func main() {
+func DMagicalCookiesMain() {
 	var h, w int
 	fmt.Scan(&h, &w)
 
