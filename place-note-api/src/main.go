@@ -32,7 +32,7 @@ func envLoad() {
 func main() {
 	envLoad()
 	mux := http.NewServeMux()
-	interceptors := connect.WithInterceptors(interceptor.NewValidationInterceptor())
+	interceptors := connect.WithInterceptors(interceptor.NewValidationInterceptor(), interceptor.AuthInterceptor())
 
 	// 各種サーバーの登録
 	userServerPath, UserServerHandler := placeNoteconnect.NewUserAccountServiceHandler(&server.UserAccountServer{}, interceptors)

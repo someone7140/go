@@ -41,6 +41,30 @@ func AuthGoogleUserAccount(authCode string) (*connect.Response[placeNote.AuthGoo
 	}), nil
 }
 
+func LoginGoogleUserAccount(authCode string) (*connect.Response[placeNote.UserAccountResponse], *connect.Error) {
+	userInfo, err := GetGoogleUserProfileFromAuthCode(authCode)
+	if err != nil {
+		return nil, err
+	}
+	// gmailからuserAccount取得
+	userAccount, err := repository.GetUserAccountByGmailRepository(userInfo.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	// idをトークン化
+	idToken, err := GetJwtTokenAuth(UserAccountJwtPropertyName, userAccount.ID, GetJwtAuthMonthExpire(3))
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&placeNote.UserAccountResponse{
+		Token:         idToken,
+		AuthMethod:    userAccount.AuthMethod,
+		UserSettingId: userAccount.UserSettingId,
+		Name:          userAccount.Name,
+	}), nil
+}
+
 func GetGoogleUserProfileFromAuthCode(authCode string) (*v2.Tokeninfo, *connect.Error) {
 	cxt := context.Background()
 	credentialFilePath := "../googleCredential/" + os.Getenv("GOOGLE_CREDENTIAL_FILE")

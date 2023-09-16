@@ -10,6 +10,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// GetUserAccountByUserAccountIdRepository userAccountのIDによるユーザ取得
+func GetUserAccountByUserAccountIdRepository(userAccountId string) (*modelDb.UserAccountsEntity, *connect.Error) {
+	col := placeNoteUtil.GetDbCollection("user_accounts")
+
+	var result modelDb.UserAccountsEntity
+	filter := bson.M{"_id": userAccountId}
+	err := col.FindOne(context.Background(), filter).Decode(&result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return &result, nil
+}
+
 // GetUserAccountByUserSettingIdRepository userSettingIdによるユーザ取得
 func GetUserAccountByUserSettingIdRepository(userSettingId string) (*modelDb.UserAccountsEntity, *connect.Error) {
 	col := placeNoteUtil.GetDbCollection("user_accounts")

@@ -12,6 +12,14 @@ import (
 
 const UserAccountJwtPropertyName = "userAccountId"
 
+type userAccountId int
+
+var UserAccountIdContextKey userAccountId
+
+type userAccountToken int
+
+var UserAccountTokenContextKey userAccountToken
+
 // NewRegistrationUserAccountUseCase ユーザアカウントの新規登録
 func NewRegistrationUserAccountUseCase(req *connect.Request[placeNote.RegisterUserAccountRequest]) (*connect.Response[placeNote.UserAccountResponse], *connect.Error) {
 	reqMsg := req.Msg
@@ -72,6 +80,24 @@ func NewRegistrationUserAccountUseCase(req *connect.Request[placeNote.RegisterUs
 		AuthMethod:    entity.AuthMethod,
 		UserSettingId: entity.UserSettingId,
 		Name:          entity.Name,
+	}), nil
+
+}
+
+// GetUserAccountFromUserAccountIdUseCase ユーザアカウントIDからユーザを取得
+func GetUserAccountFromUserAccountIdUseCase(userAccountId string, token string) (*connect.Response[placeNote.UserAccountResponse], *connect.Error) {
+	//userAccountの取得
+	userAccount, err := repository.GetUserAccountByUserAccountIdRepository(userAccountId)
+	// ユーザが取得できている（すでにidが登録済み）の場合はエラー
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&placeNote.UserAccountResponse{
+		Token:         token,
+		AuthMethod:    userAccount.AuthMethod,
+		UserSettingId: userAccount.UserSettingId,
+		Name:          userAccount.Name,
 	}), nil
 
 }

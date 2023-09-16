@@ -8,6 +8,7 @@ import (
 	context "context"
 	errors "errors"
 	connect_go "github.com/bufbuild/connect-go"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	proto "placeNote/src/gen/proto"
 	strings "strings"
@@ -39,12 +40,20 @@ const (
 	// UserAccountServiceRegisterUserAccountProcedure is the fully-qualified name of the
 	// UserAccountService's RegisterUserAccount RPC.
 	UserAccountServiceRegisterUserAccountProcedure = "/placeNote.UserAccountService/RegisterUserAccount"
+	// UserAccountServiceGetUserAccountFromAuthTokenProcedure is the fully-qualified name of the
+	// UserAccountService's GetUserAccountFromAuthToken RPC.
+	UserAccountServiceGetUserAccountFromAuthTokenProcedure = "/placeNote.UserAccountService/GetUserAccountFromAuthToken"
+	// UserAccountServiceLoginByGoogleProcedure is the fully-qualified name of the UserAccountService's
+	// LoginByGoogle RPC.
+	UserAccountServiceLoginByGoogleProcedure = "/placeNote.UserAccountService/LoginByGoogle"
 )
 
 // UserAccountServiceClient is a client for the placeNote.UserAccountService service.
 type UserAccountServiceClient interface {
 	AuthGoogleAccount(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.AuthGoogleAccountResponse], error)
 	RegisterUserAccount(context.Context, *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error)
+	GetUserAccountFromAuthToken(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.UserAccountResponse], error)
+	LoginByGoogle(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error)
 }
 
 // NewUserAccountServiceClient constructs a client for the placeNote.UserAccountService service. By
@@ -67,13 +76,25 @@ func NewUserAccountServiceClient(httpClient connect_go.HTTPClient, baseURL strin
 			baseURL+UserAccountServiceRegisterUserAccountProcedure,
 			opts...,
 		),
+		getUserAccountFromAuthToken: connect_go.NewClient[emptypb.Empty, proto.UserAccountResponse](
+			httpClient,
+			baseURL+UserAccountServiceGetUserAccountFromAuthTokenProcedure,
+			opts...,
+		),
+		loginByGoogle: connect_go.NewClient[proto.AuthGoogleAccountRequest, proto.UserAccountResponse](
+			httpClient,
+			baseURL+UserAccountServiceLoginByGoogleProcedure,
+			opts...,
+		),
 	}
 }
 
 // userAccountServiceClient implements UserAccountServiceClient.
 type userAccountServiceClient struct {
-	authGoogleAccount   *connect_go.Client[proto.AuthGoogleAccountRequest, proto.AuthGoogleAccountResponse]
-	registerUserAccount *connect_go.Client[proto.RegisterUserAccountRequest, proto.UserAccountResponse]
+	authGoogleAccount           *connect_go.Client[proto.AuthGoogleAccountRequest, proto.AuthGoogleAccountResponse]
+	registerUserAccount         *connect_go.Client[proto.RegisterUserAccountRequest, proto.UserAccountResponse]
+	getUserAccountFromAuthToken *connect_go.Client[emptypb.Empty, proto.UserAccountResponse]
+	loginByGoogle               *connect_go.Client[proto.AuthGoogleAccountRequest, proto.UserAccountResponse]
 }
 
 // AuthGoogleAccount calls placeNote.UserAccountService.AuthGoogleAccount.
@@ -86,10 +107,22 @@ func (c *userAccountServiceClient) RegisterUserAccount(ctx context.Context, req 
 	return c.registerUserAccount.CallUnary(ctx, req)
 }
 
+// GetUserAccountFromAuthToken calls placeNote.UserAccountService.GetUserAccountFromAuthToken.
+func (c *userAccountServiceClient) GetUserAccountFromAuthToken(ctx context.Context, req *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.UserAccountResponse], error) {
+	return c.getUserAccountFromAuthToken.CallUnary(ctx, req)
+}
+
+// LoginByGoogle calls placeNote.UserAccountService.LoginByGoogle.
+func (c *userAccountServiceClient) LoginByGoogle(ctx context.Context, req *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error) {
+	return c.loginByGoogle.CallUnary(ctx, req)
+}
+
 // UserAccountServiceHandler is an implementation of the placeNote.UserAccountService service.
 type UserAccountServiceHandler interface {
 	AuthGoogleAccount(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.AuthGoogleAccountResponse], error)
 	RegisterUserAccount(context.Context, *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error)
+	GetUserAccountFromAuthToken(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.UserAccountResponse], error)
+	LoginByGoogle(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error)
 }
 
 // NewUserAccountServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -108,12 +141,26 @@ func NewUserAccountServiceHandler(svc UserAccountServiceHandler, opts ...connect
 		svc.RegisterUserAccount,
 		opts...,
 	)
+	userAccountServiceGetUserAccountFromAuthTokenHandler := connect_go.NewUnaryHandler(
+		UserAccountServiceGetUserAccountFromAuthTokenProcedure,
+		svc.GetUserAccountFromAuthToken,
+		opts...,
+	)
+	userAccountServiceLoginByGoogleHandler := connect_go.NewUnaryHandler(
+		UserAccountServiceLoginByGoogleProcedure,
+		svc.LoginByGoogle,
+		opts...,
+	)
 	return "/placeNote.UserAccountService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UserAccountServiceAuthGoogleAccountProcedure:
 			userAccountServiceAuthGoogleAccountHandler.ServeHTTP(w, r)
 		case UserAccountServiceRegisterUserAccountProcedure:
 			userAccountServiceRegisterUserAccountHandler.ServeHTTP(w, r)
+		case UserAccountServiceGetUserAccountFromAuthTokenProcedure:
+			userAccountServiceGetUserAccountFromAuthTokenHandler.ServeHTTP(w, r)
+		case UserAccountServiceLoginByGoogleProcedure:
+			userAccountServiceLoginByGoogleHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -129,4 +176,12 @@ func (UnimplementedUserAccountServiceHandler) AuthGoogleAccount(context.Context,
 
 func (UnimplementedUserAccountServiceHandler) RegisterUserAccount(context.Context, *connect_go.Request[proto.RegisterUserAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserAccountService.RegisterUserAccount is not implemented"))
+}
+
+func (UnimplementedUserAccountServiceHandler) GetUserAccountFromAuthToken(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.UserAccountResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserAccountService.GetUserAccountFromAuthToken is not implemented"))
+}
+
+func (UnimplementedUserAccountServiceHandler) LoginByGoogle(context.Context, *connect_go.Request[proto.AuthGoogleAccountRequest]) (*connect_go.Response[proto.UserAccountResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.UserAccountService.LoginByGoogle is not implemented"))
 }

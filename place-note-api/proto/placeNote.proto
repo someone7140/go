@@ -2,6 +2,7 @@ syntax = "proto3";
 
 option go_package = "placeNote/src/gen/proto;placeNote";
 
+import "google/protobuf/empty.proto";
 import "validate/validate.proto";
 
 package placeNote;
@@ -9,6 +10,8 @@ package placeNote;
 service UserAccountService {
     rpc AuthGoogleAccount(AuthGoogleAccountRequest) returns (AuthGoogleAccountResponse) {}
     rpc RegisterUserAccount(RegisterUserAccountRequest) returns (UserAccountResponse) {}
+    rpc GetUserAccountFromAuthToken(google.protobuf.Empty) returns (UserAccountResponse) {}
+    rpc LoginByGoogle(AuthGoogleAccountRequest) returns (UserAccountResponse) {}
 }
 
 enum AuthMethod {
