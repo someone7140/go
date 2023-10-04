@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "placeNote/src/gen/proto;placeNote";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+package placeNote;
+
+service GeolocationService {
+    rpc GetLatLonFromAddress(GetLatLonFromAddressRequest) returns (GetLatLonFromAddressResponse) {}
+}
+
+message GetLatLonFromAddressRequest {
+    string address = 1 [(validate.rules).string.min_len = 1];
+}
+
+message LatLon {
+    double lat = 1;
+    double lon = 2;
+}
+
+message GetLatLonFromAddressResponse {
+    LatLon latLon = 1;
+}
