@@ -10,9 +10,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const userAccountsCollectionName = "user_accounts"
+
 // GetUserAccountByUserAccountIdRepository userAccountのIDによるユーザ取得
 func GetUserAccountByUserAccountIdRepository(userAccountId string) (*modelDb.UserAccountsEntity, *connect.Error) {
-	col := placeNoteUtil.GetDbCollection("user_accounts")
+	col := placeNoteUtil.GetDbCollection(userAccountsCollectionName)
 
 	var result modelDb.UserAccountsEntity
 	filter := bson.M{"_id": userAccountId}
@@ -28,7 +30,7 @@ func GetUserAccountByUserAccountIdRepository(userAccountId string) (*modelDb.Use
 
 // GetUserAccountByUserSettingIdRepository userSettingIdによるユーザ取得
 func GetUserAccountByUserSettingIdRepository(userSettingId string) (*modelDb.UserAccountsEntity, *connect.Error) {
-	col := placeNoteUtil.GetDbCollection("user_accounts")
+	col := placeNoteUtil.GetDbCollection(userAccountsCollectionName)
 
 	var result modelDb.UserAccountsEntity
 	filter := bson.M{"user_setting_id": userSettingId}
@@ -44,7 +46,7 @@ func GetUserAccountByUserSettingIdRepository(userSettingId string) (*modelDb.Use
 
 // GetUserAccountByGmailRepository gmailによるユーザ取得
 func GetUserAccountByGmailRepository(gmail string) (*modelDb.UserAccountsEntity, *connect.Error) {
-	col := placeNoteUtil.GetDbCollection("user_accounts")
+	col := placeNoteUtil.GetDbCollection(userAccountsCollectionName)
 
 	var result modelDb.UserAccountsEntity
 	filter := bson.M{"gmail": gmail}
@@ -60,7 +62,7 @@ func GetUserAccountByGmailRepository(gmail string) (*modelDb.UserAccountsEntity,
 
 // NewRegistrationUserAccountRepository ユーザの新規登録
 func NewRegistrationUserAccountRepository(userEntity modelDb.UserAccountsEntity) *connect.Error {
-	col := placeNoteUtil.GetDbCollection("user_accounts")
+	col := placeNoteUtil.GetDbCollection(userAccountsCollectionName)
 	_, err := col.InsertOne(context.Background(), userEntity)
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, err)

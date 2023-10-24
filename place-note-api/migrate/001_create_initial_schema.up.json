@@ -25,5 +25,24 @@
         "background": true
       }
     ]
+  },
+  {
+    "createIndexes": "post_categories",
+    "indexes": [
+      {
+        "key": {
+          "create_user_account_id": 1
+        },
+        "name": "create_user_account_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "parent_category_id": 1
+        },
+        "name": "parent_category_id_index",
+        "background": true
+      }
+    ]
   }
 ]

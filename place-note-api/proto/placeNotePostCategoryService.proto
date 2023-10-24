@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "placeNote/src/gen/proto;placeNote";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+package placeNote;
+
+service PostCategoryService {
+    rpc AddPostCategory(AddPostCategoryRequest) returns (google.protobuf.Empty) {}
+    rpc UpdatePostCategory(UpdatePostCategoryRequest) returns (google.protobuf.Empty) {}
+    rpc DeletePostCategory(DeletePostCategoryRequest) returns (google.protobuf.Empty) {}
+    rpc GetPostCategoryList(google.protobuf.Empty) returns  (GetPostCategoryListResponse) {}
+}
+
+message AddPostCategoryRequest {
+    string name = 1 [(validate.rules).string.min_len = 1];
+    optional string parentId = 2;
+    optional string memo = 3;
+    optional int32 displayOrder = 4;
+}
+
+message UpdatePostCategoryRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string name = 2 [(validate.rules).string.min_len = 1];
+    optional string parentId = 3;
+    optional string memo = 4;
+    optional int32 displayOrder = 5;
+}
+
+message DeletePostCategoryRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message PostCategory {
+    string id = 1;
+    string name = 2;
+    optional string parentId = 3;
+    optional string memo = 4;
+    optional int32 displayOrder = 5;
+}
+
+message GetPostCategoryListResponse {
+    repeated PostCategory categoryList = 1;
+}

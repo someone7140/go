@@ -35,10 +35,12 @@ func main() {
 	interceptors := connect.WithInterceptors(interceptor.NewValidationInterceptor(), interceptor.AuthInterceptor())
 
 	// 各種サーバーの登録
-	userAccountServerPath, UserAccountServerHandler := placeNoteconnect.NewUserAccountServiceHandler(&server.UserAccountServer{}, interceptors)
-	mux.Handle(userAccountServerPath, UserAccountServerHandler)
-	geolocationServerPath, GeolocationServerHandler := placeNoteconnect.NewGeolocationServiceHandler(&server.GeoLocationServer{}, interceptors)
-	mux.Handle(geolocationServerPath, GeolocationServerHandler)
+	userAccountServerPath, userAccountServerHandler := placeNoteconnect.NewUserAccountServiceHandler(&server.UserAccountServer{}, interceptors)
+	mux.Handle(userAccountServerPath, userAccountServerHandler)
+	geolocationServerPath, geolocationServerHandler := placeNoteconnect.NewGeolocationServiceHandler(&server.GeoLocationServer{}, interceptors)
+	mux.Handle(geolocationServerPath, geolocationServerHandler)
+	postCategoryServerPath, postCategoryServerHandler := placeNoteconnect.NewPostCategoryServiceHandler(&server.PostCategoryServer{}, interceptors)
+	mux.Handle(postCategoryServerPath, postCategoryServerHandler)
 
 	// CORSの設定
 	c := cors.New(cors.Options{
