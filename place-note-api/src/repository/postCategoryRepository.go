@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"math"
 	modelDb "placeNote/src/model/db"
 	"placeNote/src/placeNoteUtil"
 
@@ -80,6 +81,12 @@ func GetPostCategoryListByUserAccountIdRepository(userAccountId string) ([]model
 	matchStage := bson.M{"$match": bson.M{
 		"create_user_account_id": userAccountId},
 	}
+	addSortStage := bson.M{"$addFields": bson.M{
+		"sort_field": bson.M{"$ifNull": bson.A{"$display_order", math.MaxInt32}}},
+	}
+	sortStage := bson.M{"$sort": bson.M{
+		"sort_field": 1},
+	}
 	projectStage := bson.M{"$project": bson.M{
 		"_id":                1,
 		"name":               1,
@@ -87,13 +94,10 @@ func GetPostCategoryListByUserAccountIdRepository(userAccountId string) ([]model
 		"memo":               1,
 		"display_order":      1,
 	}}
-	sortStage := bson.M{"$sort": bson.M{
-		"display_order": 1},
-	}
 
 	cur, err := col.Aggregate(context.Background(),
 		[]bson.M{
-			matchStage, projectStage, sortStage,
+			matchStage, addSortStage, sortStage, projectStage,
 		})
 	if err != nil {
 		return docs, connect.NewError(connect.CodeInternal, err)
