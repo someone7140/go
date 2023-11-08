@@ -54,6 +54,7 @@ func DeletePostCategoryRepository(deleteId string, userAccountId string) *connec
 	}
 	updateSet := bson.M{"$set": bson.M{
 		"parent_category_id": nil,
+		"display_order":      nil,
 	}}
 	_, err := col.UpdateMany(context.Background(), filter, updateSet)
 	if err != nil {

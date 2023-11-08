@@ -44,5 +44,38 @@
         "background": true
       }
     ]
+  },
+  {
+    "createIndexes": "post_places",
+    "indexes": [
+      {
+        "key": {
+          "create_user_account_id": 1
+        },
+        "name": "create_user_account_id_index",
+        "background": true
+      },
+      {
+        "key": {
+          "category_ids": 1
+        },
+        "name": "category_ids_index",
+        "background": true
+      },
+      {
+        "key": {
+          "lat_lon": "2d"
+        },
+        "name": "lat_lon_index",
+        "background": true
+      },
+      {
+        "key": {
+          "prefecture_code": 1
+        },
+        "name": "prefecture_code_index",
+        "background": true
+      }
+    ]
   }
 ]
