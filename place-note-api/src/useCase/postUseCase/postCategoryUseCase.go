@@ -63,16 +63,16 @@ func DeletePostCategory(id string, userAccountId string) *connect.Error {
 	return err
 }
 
-// GetMyPostCategoryList 自分の投稿カテゴリー一覧を取得
-func GetMyPostCategoryList(userAccountId string) (*connect.Response[placeNote.GetPostCategoryListResponse], *connect.Error) {
+// GetPostCategoryList ユーザーの投稿カテゴリー一覧を取得
+func GetPostCategoryList(userAccountId string) (*connect.Response[placeNote.GetPostCategoryListResponse], *connect.Error) {
 
-	categoryEntities, err := repository.GetPostCategoryListByUserAccountIdRepository(userAccountId)
+	categoryEntities, err := repository.GetUserPostCategoryListByUserAccountIdRepository(userAccountId)
 	if err != nil {
 		return nil, err
 	}
-	var categories []*placeNote.PostCategory
+	var categories []*placeNote.PostCategoryResponse
 	for _, entity := range categoryEntities {
-		categories = append(categories, &placeNote.PostCategory{
+		categories = append(categories, &placeNote.PostCategoryResponse{
 			Id:           entity.ID,
 			Name:         entity.Name,
 			ParentId:     entity.ParentCategoryId,
@@ -83,5 +83,22 @@ func GetMyPostCategoryList(userAccountId string) (*connect.Response[placeNote.Ge
 
 	return connect.NewResponse(&placeNote.GetPostCategoryListResponse{
 		CategoryList: categories,
+	}), nil
+}
+
+// GetPostCategoryById ID指定でユーザーの投稿カテゴリーを取得
+func GetPostCategoryById(userAccountId string, categoryId string) (*connect.Response[placeNote.PostCategoryResponse], *connect.Error) {
+
+	entity, err := repository.GetUserPostCategoryByIdRepository(userAccountId, categoryId)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&placeNote.PostCategoryResponse{
+		Id:           entity.ID,
+		Name:         entity.Name,
+		ParentId:     entity.ParentCategoryId,
+		Memo:         entity.Memo,
+		DisplayOrder: entity.DisplayOrder,
 	}), nil
 }

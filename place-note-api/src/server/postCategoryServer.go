@@ -49,7 +49,18 @@ func (s *PostCategoryServer) GetPostCategoryList(
 	ctx context.Context,
 	req *connect.Request[emptypb.Empty],
 ) (*connect.Response[placeNote.GetPostCategoryListResponse], error) {
-	response, err := postUseCase.GetMyPostCategoryList(ctx.Value(userUseCase.UserAccountIdContextKey).(string))
+	response, err := postUseCase.GetPostCategoryList(ctx.Value(userUseCase.UserAccountIdContextKey).(string))
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (s *PostCategoryServer) GetPostCategoryById(
+	ctx context.Context,
+	req *connect.Request[placeNote.GetPostCategoryByIdRequest],
+) (*connect.Response[placeNote.PostCategoryResponse], error) {
+	response, err := postUseCase.GetPostCategoryById(ctx.Value(userUseCase.UserAccountIdContextKey).(string), req.Msg.Id)
 	if err != nil {
 		return nil, err
 	}

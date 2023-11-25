@@ -409,22 +409,135 @@ var _ interface {
 	ErrorName() string
 } = DeletePostCategoryRequestValidationError{}
 
-// Validate checks the field values on PostCategory with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *PostCategory) Validate() error {
+// Validate checks the field values on GetPostCategoryByIdRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetPostCategoryByIdRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PostCategory with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in PostCategoryMultiError, or
-// nil if none found.
-func (m *PostCategory) ValidateAll() error {
+// ValidateAll checks the field values on GetPostCategoryByIdRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetPostCategoryByIdRequestMultiError, or nil if none found.
+func (m *GetPostCategoryByIdRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PostCategory) validate(all bool) error {
+func (m *GetPostCategoryByIdRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetId()) < 1 {
+		err := GetPostCategoryByIdRequestValidationError{
+			field:  "Id",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetPostCategoryByIdRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetPostCategoryByIdRequestMultiError is an error wrapping multiple
+// validation errors returned by GetPostCategoryByIdRequest.ValidateAll() if
+// the designated constraints aren't met.
+type GetPostCategoryByIdRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetPostCategoryByIdRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetPostCategoryByIdRequestMultiError) AllErrors() []error { return m }
+
+// GetPostCategoryByIdRequestValidationError is the validation error returned
+// by GetPostCategoryByIdRequest.Validate if the designated constraints aren't met.
+type GetPostCategoryByIdRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetPostCategoryByIdRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetPostCategoryByIdRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetPostCategoryByIdRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetPostCategoryByIdRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetPostCategoryByIdRequestValidationError) ErrorName() string {
+	return "GetPostCategoryByIdRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetPostCategoryByIdRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetPostCategoryByIdRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetPostCategoryByIdRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetPostCategoryByIdRequestValidationError{}
+
+// Validate checks the field values on PostCategoryResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PostCategoryResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PostCategoryResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PostCategoryResponseMultiError, or nil if none found.
+func (m *PostCategoryResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PostCategoryResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -448,18 +561,19 @@ func (m *PostCategory) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return PostCategoryMultiError(errors)
+		return PostCategoryResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// PostCategoryMultiError is an error wrapping multiple validation errors
-// returned by PostCategory.ValidateAll() if the designated constraints aren't met.
-type PostCategoryMultiError []error
+// PostCategoryResponseMultiError is an error wrapping multiple validation
+// errors returned by PostCategoryResponse.ValidateAll() if the designated
+// constraints aren't met.
+type PostCategoryResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PostCategoryMultiError) Error() string {
+func (m PostCategoryResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -468,11 +582,11 @@ func (m PostCategoryMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PostCategoryMultiError) AllErrors() []error { return m }
+func (m PostCategoryResponseMultiError) AllErrors() []error { return m }
 
-// PostCategoryValidationError is the validation error returned by
-// PostCategory.Validate if the designated constraints aren't met.
-type PostCategoryValidationError struct {
+// PostCategoryResponseValidationError is the validation error returned by
+// PostCategoryResponse.Validate if the designated constraints aren't met.
+type PostCategoryResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -480,22 +594,24 @@ type PostCategoryValidationError struct {
 }
 
 // Field function returns field value.
-func (e PostCategoryValidationError) Field() string { return e.field }
+func (e PostCategoryResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PostCategoryValidationError) Reason() string { return e.reason }
+func (e PostCategoryResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PostCategoryValidationError) Cause() error { return e.cause }
+func (e PostCategoryResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PostCategoryValidationError) Key() bool { return e.key }
+func (e PostCategoryResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PostCategoryValidationError) ErrorName() string { return "PostCategoryValidationError" }
+func (e PostCategoryResponseValidationError) ErrorName() string {
+	return "PostCategoryResponseValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e PostCategoryValidationError) Error() string {
+func (e PostCategoryResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -507,14 +623,14 @@ func (e PostCategoryValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPostCategory.%s: %s%s",
+		"invalid %sPostCategoryResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PostCategoryValidationError{}
+var _ error = PostCategoryResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -522,7 +638,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PostCategoryValidationError{}
+} = PostCategoryResponseValidationError{}
 
 // Validate checks the field values on GetPostCategoryListResponse with the
 // rules defined in the proto definition for this message. If any rules are

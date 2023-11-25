@@ -41,6 +41,8 @@ func main() {
 	mux.Handle(geolocationServerPath, geolocationServerHandler)
 	postCategoryServerPath, postCategoryServerHandler := placeNoteconnect.NewPostCategoryServiceHandler(&server.PostCategoryServer{}, interceptors)
 	mux.Handle(postCategoryServerPath, postCategoryServerHandler)
+	postPlaceServerPath, postPlaceServerHandler := placeNoteconnect.NewPostPlaceServiceHandler(&server.PostPlaceServer{}, interceptors)
+	mux.Handle(postPlaceServerPath, postPlaceServerHandler)
 
 	// CORSの設定
 	c := cors.New(cors.Options{

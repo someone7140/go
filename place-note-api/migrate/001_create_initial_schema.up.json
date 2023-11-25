@@ -64,9 +64,9 @@
       },
       {
         "key": {
-          "lat_lon": "2d"
+          "lon_lat": "2d"
         },
-        "name": "lat_lon_index",
+        "name": "lon_lat_index",
         "background": true
       },
       {

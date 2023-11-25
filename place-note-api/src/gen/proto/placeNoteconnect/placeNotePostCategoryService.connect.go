@@ -46,6 +46,9 @@ const (
 	// PostCategoryServiceGetPostCategoryListProcedure is the fully-qualified name of the
 	// PostCategoryService's GetPostCategoryList RPC.
 	PostCategoryServiceGetPostCategoryListProcedure = "/placeNote.PostCategoryService/GetPostCategoryList"
+	// PostCategoryServiceGetPostCategoryByIdProcedure is the fully-qualified name of the
+	// PostCategoryService's GetPostCategoryById RPC.
+	PostCategoryServiceGetPostCategoryByIdProcedure = "/placeNote.PostCategoryService/GetPostCategoryById"
 )
 
 // PostCategoryServiceClient is a client for the placeNote.PostCategoryService service.
@@ -54,6 +57,7 @@ type PostCategoryServiceClient interface {
 	UpdatePostCategory(context.Context, *connect_go.Request[proto.UpdatePostCategoryRequest]) (*connect_go.Response[emptypb.Empty], error)
 	DeletePostCategory(context.Context, *connect_go.Request[proto.DeletePostCategoryRequest]) (*connect_go.Response[emptypb.Empty], error)
 	GetPostCategoryList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.GetPostCategoryListResponse], error)
+	GetPostCategoryById(context.Context, *connect_go.Request[proto.GetPostCategoryByIdRequest]) (*connect_go.Response[proto.PostCategoryResponse], error)
 }
 
 // NewPostCategoryServiceClient constructs a client for the placeNote.PostCategoryService service.
@@ -86,6 +90,11 @@ func NewPostCategoryServiceClient(httpClient connect_go.HTTPClient, baseURL stri
 			baseURL+PostCategoryServiceGetPostCategoryListProcedure,
 			opts...,
 		),
+		getPostCategoryById: connect_go.NewClient[proto.GetPostCategoryByIdRequest, proto.PostCategoryResponse](
+			httpClient,
+			baseURL+PostCategoryServiceGetPostCategoryByIdProcedure,
+			opts...,
+		),
 	}
 }
 
@@ -95,6 +104,7 @@ type postCategoryServiceClient struct {
 	updatePostCategory  *connect_go.Client[proto.UpdatePostCategoryRequest, emptypb.Empty]
 	deletePostCategory  *connect_go.Client[proto.DeletePostCategoryRequest, emptypb.Empty]
 	getPostCategoryList *connect_go.Client[emptypb.Empty, proto.GetPostCategoryListResponse]
+	getPostCategoryById *connect_go.Client[proto.GetPostCategoryByIdRequest, proto.PostCategoryResponse]
 }
 
 // AddPostCategory calls placeNote.PostCategoryService.AddPostCategory.
@@ -117,12 +127,18 @@ func (c *postCategoryServiceClient) GetPostCategoryList(ctx context.Context, req
 	return c.getPostCategoryList.CallUnary(ctx, req)
 }
 
+// GetPostCategoryById calls placeNote.PostCategoryService.GetPostCategoryById.
+func (c *postCategoryServiceClient) GetPostCategoryById(ctx context.Context, req *connect_go.Request[proto.GetPostCategoryByIdRequest]) (*connect_go.Response[proto.PostCategoryResponse], error) {
+	return c.getPostCategoryById.CallUnary(ctx, req)
+}
+
 // PostCategoryServiceHandler is an implementation of the placeNote.PostCategoryService service.
 type PostCategoryServiceHandler interface {
 	AddPostCategory(context.Context, *connect_go.Request[proto.AddPostCategoryRequest]) (*connect_go.Response[emptypb.Empty], error)
 	UpdatePostCategory(context.Context, *connect_go.Request[proto.UpdatePostCategoryRequest]) (*connect_go.Response[emptypb.Empty], error)
 	DeletePostCategory(context.Context, *connect_go.Request[proto.DeletePostCategoryRequest]) (*connect_go.Response[emptypb.Empty], error)
 	GetPostCategoryList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.GetPostCategoryListResponse], error)
+	GetPostCategoryById(context.Context, *connect_go.Request[proto.GetPostCategoryByIdRequest]) (*connect_go.Response[proto.PostCategoryResponse], error)
 }
 
 // NewPostCategoryServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -151,6 +167,11 @@ func NewPostCategoryServiceHandler(svc PostCategoryServiceHandler, opts ...conne
 		svc.GetPostCategoryList,
 		opts...,
 	)
+	postCategoryServiceGetPostCategoryByIdHandler := connect_go.NewUnaryHandler(
+		PostCategoryServiceGetPostCategoryByIdProcedure,
+		svc.GetPostCategoryById,
+		opts...,
+	)
 	return "/placeNote.PostCategoryService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case PostCategoryServiceAddPostCategoryProcedure:
@@ -161,6 +182,8 @@ func NewPostCategoryServiceHandler(svc PostCategoryServiceHandler, opts ...conne
 			postCategoryServiceDeletePostCategoryHandler.ServeHTTP(w, r)
 		case PostCategoryServiceGetPostCategoryListProcedure:
 			postCategoryServiceGetPostCategoryListHandler.ServeHTTP(w, r)
+		case PostCategoryServiceGetPostCategoryByIdProcedure:
+			postCategoryServiceGetPostCategoryByIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -184,4 +207,8 @@ func (UnimplementedPostCategoryServiceHandler) DeletePostCategory(context.Contex
 
 func (UnimplementedPostCategoryServiceHandler) GetPostCategoryList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.GetPostCategoryListResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.PostCategoryService.GetPostCategoryList is not implemented"))
+}
+
+func (UnimplementedPostCategoryServiceHandler) GetPostCategoryById(context.Context, *connect_go.Request[proto.GetPostCategoryByIdRequest]) (*connect_go.Response[proto.PostCategoryResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.PostCategoryService.GetPostCategoryById is not implemented"))
 }

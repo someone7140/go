@@ -12,6 +12,7 @@ service PostCategoryService {
     rpc UpdatePostCategory(UpdatePostCategoryRequest) returns (google.protobuf.Empty) {}
     rpc DeletePostCategory(DeletePostCategoryRequest) returns (google.protobuf.Empty) {}
     rpc GetPostCategoryList(google.protobuf.Empty) returns  (GetPostCategoryListResponse) {}
+    rpc GetPostCategoryById(GetPostCategoryByIdRequest) returns  (PostCategoryResponse) {}
 }
 
 message AddPostCategoryRequest {
@@ -33,7 +34,11 @@ message DeletePostCategoryRequest {
     string id = 1 [(validate.rules).string.min_len = 1];
 }
 
-message PostCategory {
+message GetPostCategoryByIdRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message PostCategoryResponse {
     string id = 1;
     string name = 2;
     optional string parentId = 3;
@@ -42,5 +47,5 @@ message PostCategory {
 }
 
 message GetPostCategoryListResponse {
-    repeated PostCategory categoryList = 1;
+    repeated PostCategoryResponse categoryList = 1;
 }

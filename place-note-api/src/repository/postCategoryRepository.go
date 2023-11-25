@@ -8,6 +8,7 @@ import (
 
 	"github.com/bufbuild/connect-go"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const postCategoriesCollectionName = "post_categories"
@@ -61,6 +62,9 @@ func DeletePostCategoryRepository(deleteId string, userAccountId string) *connec
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
+	// 場所に設定されているカテゴリーを削除
+	DeleteCategoryFromPlaceRepository(deleteId, userAccountId)
+
 	// 対象カテゴリーを削除
 	deleteFilter := bson.M{
 		"_id":                    deleteId,
@@ -74,8 +78,8 @@ func DeletePostCategoryRepository(deleteId string, userAccountId string) *connec
 	return nil
 }
 
-// GetPostCategoryListByUserAccountIdRepository ユーザが登録した投稿カテゴリー一覧を取得
-func GetPostCategoryListByUserAccountIdRepository(userAccountId string) ([]modelDb.PostCategoriesEntity, *connect.Error) {
+// GetUserPostCategoryListByUserAccountIdRepository ユーザが登録した投稿カテゴリー一覧を取得
+func GetUserPostCategoryListByUserAccountIdRepository(userAccountId string) ([]modelDb.PostCategoriesEntity, *connect.Error) {
 	col := placeNoteUtil.GetDbCollection(postCategoriesCollectionName)
 	var docs []modelDb.PostCategoriesEntity
 
@@ -112,4 +116,23 @@ func GetPostCategoryListByUserAccountIdRepository(userAccountId string) ([]model
 		docs = append(docs, doc)
 	}
 	return docs, nil
+}
+
+// GetUserPostCategoryByIdRepository idによるカテゴリー取得
+func GetUserPostCategoryByIdRepository(userAccountId string, categoryId string) (*modelDb.PostCategoriesEntity, *connect.Error) {
+	col := placeNoteUtil.GetDbCollection(postCategoriesCollectionName)
+
+	var result modelDb.PostCategoriesEntity
+	filter := bson.M{
+		"_id":                    categoryId,
+		"create_user_account_id": userAccountId,
+	}
+	err := col.FindOne(context.Background(), filter).Decode(&result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return &result, nil
 }
