@@ -15,12 +15,12 @@ type PostPlaceServer struct{}
 func (s *PostPlaceServer) AddPostPlace(
 	ctx context.Context,
 	req *connect.Request[placeNote.AddPostPlaceRequest],
-) (*connect.Response[emptypb.Empty], error) {
-	_, err := postUseCase.AddPostPlace(req.Msg, ctx.Value(userUseCase.UserAccountIdContextKey).(string))
+) (*connect.Response[placeNote.AddPostPlaceResponse], error) {
+	uid, err := postUseCase.AddPostPlace(req.Msg, ctx.Value(userUseCase.UserAccountIdContextKey).(string))
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&emptypb.Empty{}), nil
+	return connect.NewResponse(&placeNote.AddPostPlaceResponse{Id: *uid}), nil
 }
 
 func (s *PostPlaceServer) UpdatePostPlace(

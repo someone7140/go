@@ -16,15 +16,24 @@ func AddPostPlace(req *placeNote.AddPostPlaceRequest, userAccountId string) (*st
 		return nil, err
 	}
 	// 登録処理
+	categoryIdList := []string{}
+	if req.CategoryIdList != nil {
+		categoryIdList = req.CategoryIdList
+	}
+	urlList := []string{}
+	if req.UrlList != nil {
+		urlList = req.UrlList
+	}
 	err = repository.AddPostPlaceRepository(modelDb.PostPlacesEntity{
 		ID:                  uid,
 		Name:                req.Name,
 		CreateUserAccountId: userAccountId,
+		Address:             req.Address,
 		LonLat:              getLatLonForEntity(req.LatLon),
 		PrefectureCode:      req.PrefectureCode,
-		CategoryIdList:      &req.CategoryIdList,
+		CategoryIdList:      &categoryIdList,
 		Detail:              req.Detail,
-		UrlList:             &req.UrlList,
+		UrlList:             &urlList,
 	})
 	if err != nil {
 		return nil, err
@@ -36,15 +45,23 @@ func AddPostPlace(req *placeNote.AddPostPlaceRequest, userAccountId string) (*st
 // UpdatePostPlace 場所の追加
 func UpdatePostPlace(req *placeNote.UpdatePostPlaceRequest, userAccountId string) *connect.Error {
 	// 更新処理
+	categoryIdList := []string{}
+	if req.CategoryIdList != nil {
+		categoryIdList = req.CategoryIdList
+	}
+	urlList := []string{}
+	if req.UrlList != nil {
+		urlList = req.UrlList
+	}
 	err := repository.UpdatePostPlaceRepository(modelDb.PostPlacesEntity{
 		ID:                  req.Id,
 		Name:                req.Name,
 		CreateUserAccountId: userAccountId,
 		LonLat:              getLatLonForEntity(req.LatLon),
 		PrefectureCode:      req.PrefectureCode,
-		CategoryIdList:      &req.CategoryIdList,
+		CategoryIdList:      &categoryIdList,
 		Detail:              req.Detail,
-		UrlList:             &req.UrlList,
+		UrlList:             &urlList,
 	})
 	if err != nil {
 		return err

@@ -53,7 +53,7 @@ const (
 
 // PostPlaceServiceClient is a client for the placeNote.PostPlaceService service.
 type PostPlaceServiceClient interface {
-	AddPostPlace(context.Context, *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error)
+	AddPostPlace(context.Context, *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[proto.AddPostPlaceResponse], error)
 	UpdatePostPlace(context.Context, *connect_go.Request[proto.UpdatePostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error)
 	DeletePostPlace(context.Context, *connect_go.Request[proto.DeletePostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error)
 	GetPostPlaceList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.GetPostPlaceListResponse], error)
@@ -70,7 +70,7 @@ type PostPlaceServiceClient interface {
 func NewPostPlaceServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) PostPlaceServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &postPlaceServiceClient{
-		addPostPlace: connect_go.NewClient[proto.AddPostPlaceRequest, emptypb.Empty](
+		addPostPlace: connect_go.NewClient[proto.AddPostPlaceRequest, proto.AddPostPlaceResponse](
 			httpClient,
 			baseURL+PostPlaceServiceAddPostPlaceProcedure,
 			opts...,
@@ -100,7 +100,7 @@ func NewPostPlaceServiceClient(httpClient connect_go.HTTPClient, baseURL string,
 
 // postPlaceServiceClient implements PostPlaceServiceClient.
 type postPlaceServiceClient struct {
-	addPostPlace     *connect_go.Client[proto.AddPostPlaceRequest, emptypb.Empty]
+	addPostPlace     *connect_go.Client[proto.AddPostPlaceRequest, proto.AddPostPlaceResponse]
 	updatePostPlace  *connect_go.Client[proto.UpdatePostPlaceRequest, emptypb.Empty]
 	deletePostPlace  *connect_go.Client[proto.DeletePostPlaceRequest, emptypb.Empty]
 	getPostPlaceList *connect_go.Client[emptypb.Empty, proto.GetPostPlaceListResponse]
@@ -108,7 +108,7 @@ type postPlaceServiceClient struct {
 }
 
 // AddPostPlace calls placeNote.PostPlaceService.AddPostPlace.
-func (c *postPlaceServiceClient) AddPostPlace(ctx context.Context, req *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error) {
+func (c *postPlaceServiceClient) AddPostPlace(ctx context.Context, req *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[proto.AddPostPlaceResponse], error) {
 	return c.addPostPlace.CallUnary(ctx, req)
 }
 
@@ -134,7 +134,7 @@ func (c *postPlaceServiceClient) GetPostPlaceById(ctx context.Context, req *conn
 
 // PostPlaceServiceHandler is an implementation of the placeNote.PostPlaceService service.
 type PostPlaceServiceHandler interface {
-	AddPostPlace(context.Context, *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error)
+	AddPostPlace(context.Context, *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[proto.AddPostPlaceResponse], error)
 	UpdatePostPlace(context.Context, *connect_go.Request[proto.UpdatePostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error)
 	DeletePostPlace(context.Context, *connect_go.Request[proto.DeletePostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error)
 	GetPostPlaceList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[proto.GetPostPlaceListResponse], error)
@@ -193,7 +193,7 @@ func NewPostPlaceServiceHandler(svc PostPlaceServiceHandler, opts ...connect_go.
 // UnimplementedPostPlaceServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedPostPlaceServiceHandler struct{}
 
-func (UnimplementedPostPlaceServiceHandler) AddPostPlace(context.Context, *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[emptypb.Empty], error) {
+func (UnimplementedPostPlaceServiceHandler) AddPostPlace(context.Context, *connect_go.Request[proto.AddPostPlaceRequest]) (*connect_go.Response[proto.AddPostPlaceResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("placeNote.PostPlaceService.AddPostPlace is not implemented"))
 }
 

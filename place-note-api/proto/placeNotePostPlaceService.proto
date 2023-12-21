@@ -9,7 +9,7 @@ import "proto/placeNoteCommon.proto";
 package placeNote;
 
 service PostPlaceService {
-    rpc AddPostPlace(AddPostPlaceRequest) returns (google.protobuf.Empty) {}
+    rpc AddPostPlace(AddPostPlaceRequest) returns (AddPostPlaceResponse) {}
     rpc UpdatePostPlace(UpdatePostPlaceRequest) returns (google.protobuf.Empty) {}
     rpc DeletePostPlace(DeletePostPlaceRequest) returns (google.protobuf.Empty) {}
     rpc GetPostPlaceList(google.protobuf.Empty) returns  (GetPostPlaceListResponse) {}
@@ -43,6 +43,10 @@ message DeletePostPlaceRequest {
 
 message GetPostPlaceByIdRequest {
     string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AddPostPlaceResponse {
+    string id = 1;
 }
 
 message PostPlaceResponse {

@@ -23,7 +23,7 @@ func detectContentCharset(body io.Reader) string {
 	return "utf-8"
 }
 
-func main() {
+func htmlEncodeSampleMain() {
 	// htmlページの取得
 	// webPage := ("https://mayukasports.blogspot.com/")     // UTF-8のサイト
 	webPage := ("http://abehiroshi.la.coocan.jp/top.htm") // Shift_JISのサイト
