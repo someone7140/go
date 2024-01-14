@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func main() {
+func DLoongandTakahashiMain() {
 	var n int
 	fmt.Scan(&n)
 
