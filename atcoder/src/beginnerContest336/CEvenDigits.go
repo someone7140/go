@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func main() {
+func CEvenDigitsMain() {
 	var n int64
 	fmt.Scan(&n)
 
