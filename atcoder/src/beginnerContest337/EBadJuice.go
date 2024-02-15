@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func EBadJuiceMain() {
 	var n int
 	fmt.Scan(&n)
 
