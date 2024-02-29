@@ -14,7 +14,7 @@ type DSuperTakahashiBros struct {
 	x int
 }
 
-func main() {
+func DSuperTakahashiBrosMain() {
 	var n int
 	fmt.Scan(&n)
 
