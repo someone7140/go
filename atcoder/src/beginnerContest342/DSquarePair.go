@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func DSquarePairMain() {
 	var n int
 	fmt.Scan(&n)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
