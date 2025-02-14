@@ -1,0 +1,2 @@
+- `go run github.com/99designs/gqlgen generate`で、graphql のスキーマからソースコードを生成
+- `sqlc generate`で、sql ファイルからソースコードを生成
