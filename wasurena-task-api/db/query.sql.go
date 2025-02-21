@@ -7,7 +7,50 @@ package db
 
 import (
 	"context"
+
+	db_type "wasurena-task-api/db/type"
 )
+
+const createTaskCategory = `-- name: CreateTaskCategory :one
+insert
+	into
+	task_category (
+    id,
+	name,
+	owner_user_id,
+	display_order
+)
+values (
+    $1, 
+    $2, 
+    $3, 
+    $4
+) returning id, name, owner_user_id, display_order
+`
+
+type CreateTaskCategoryParams struct {
+	ID           string
+	Name         string
+	OwnerUserID  string
+	DisplayOrder *int32
+}
+
+func (q *Queries) CreateTaskCategory(ctx context.Context, arg CreateTaskCategoryParams) (TaskCategory, error) {
+	row := q.db.QueryRow(ctx, createTaskCategory,
+		arg.ID,
+		arg.Name,
+		arg.OwnerUserID,
+		arg.DisplayOrder,
+	)
+	var i TaskCategory
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.OwnerUserID,
+		&i.DisplayOrder,
+	)
+	return i, err
+}
 
 const createTaskDefinition = `-- name: CreateTaskDefinition :one
 insert
@@ -18,6 +61,8 @@ insert
 	owner_user_id,
 	display_flag,
 	notification_flag,
+	dead_line_check,
+	dead_line_check_sub_setting,
 	category_id,
 	detail
 )
@@ -28,18 +73,22 @@ values (
     $4,
     $5,
     $6,
-    $7
-) returning id, title, owner_user_id, display_flag, notification_flag, category_id, detail
+    $7,
+    $8,
+    $9
+) returning id, title, owner_user_id, display_flag, notification_flag, category_id, dead_line_check, dead_line_check_sub_setting, detail
 `
 
 type CreateTaskDefinitionParams struct {
-	ID               string
-	Title            string
-	OwnerUserID      string
-	DisplayFlag      bool
-	NotificationFlag bool
-	CategoryID       *string
-	Detail           *string
+	ID                      string
+	Title                   string
+	OwnerUserID             string
+	DisplayFlag             bool
+	NotificationFlag        bool
+	DeadLineCheck           *DeadLineCheckEnum
+	DeadLineCheckSubSetting db_type.Jsonb
+	CategoryID              *string
+	Detail                  *string
 }
 
 func (q *Queries) CreateTaskDefinition(ctx context.Context, arg CreateTaskDefinitionParams) (TaskDefinition, error) {
@@ -49,6 +98,8 @@ func (q *Queries) CreateTaskDefinition(ctx context.Context, arg CreateTaskDefini
 		arg.OwnerUserID,
 		arg.DisplayFlag,
 		arg.NotificationFlag,
+		arg.DeadLineCheck,
+		arg.DeadLineCheckSubSetting,
 		arg.CategoryID,
 		arg.Detail,
 	)
@@ -60,6 +111,8 @@ func (q *Queries) CreateTaskDefinition(ctx context.Context, arg CreateTaskDefini
 		&i.DisplayFlag,
 		&i.NotificationFlag,
 		&i.CategoryID,
+		&i.DeadLineCheck,
+		&i.DeadLineCheckSubSetting,
 		&i.Detail,
 	)
 	return i, err

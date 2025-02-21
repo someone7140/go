@@ -2,19 +2,26 @@
 
 package model
 
+import (
+	"wasurena-task-api/db"
+)
+
 type Mutation struct {
 }
 
-type NewTask struct {
-	Title            string  `json:"title"`
-	DisplayFlag      bool    `json:"displayFlag"`
-	NotificationFlag bool    `json:"notificationFlag"`
-	Detail           *string `json:"detail,omitempty"`
+type NewCategory struct {
+	Name         string `json:"name"`
+	DisplayOrder *int32 `json:"displayOrder,omitempty"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type NewTask struct {
+	Title                   string                `json:"title"`
+	DisplayFlag             bool                  `json:"displayFlag"`
+	NotificationFlag        bool                  `json:"notificationFlag"`
+	CategoryID              *string               `json:"categoryId,omitempty"`
+	DeadLineCheck           *db.DeadLineCheckEnum `json:"deadLineCheck,omitempty"`
+	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
+	Detail                  *string               `json:"detail,omitempty"`
 }
 
 type Query struct {

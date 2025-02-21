@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"wasurena-task-api/db"
 	"wasurena-task-api/graph/model"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -48,8 +49,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateTask func(childComplexity int, input model.NewTask) int
-		CreateTodo func(childComplexity int, input model.NewTodo) int
+		CreateCategory func(childComplexity int, input model.NewCategory) int
+		CreateTask     func(childComplexity int, input model.NewTask) int
 	}
 
 	Query struct {
@@ -70,7 +71,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error)
+	CreateCategory(ctx context.Context, input model.NewCategory) (bool, error)
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
 }
 type QueryResolver interface {
@@ -96,6 +97,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.createCategory":
+		if e.complexity.Mutation.CreateCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createCategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateCategory(childComplexity, args["input"].(model.NewCategory)), true
+
 	case "Mutation.createTask":
 		if e.complexity.Mutation.CreateTask == nil {
 			break
@@ -107,18 +120,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateTask(childComplexity, args["input"].(model.NewTask)), true
-
-	case "Mutation.createTodo":
-		if e.complexity.Mutation.CreateTodo == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createTodo_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateTodo(childComplexity, args["input"].(model.NewTodo)), true
 
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
@@ -177,8 +178,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputNewCategory,
 		ec.unmarshalInputNewTask,
-		ec.unmarshalInputNewTodo,
 	)
 	first := true
 
@@ -295,6 +296,29 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_createCategory_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createCategory_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createCategory_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.NewCategory, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNNewCategory2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewCategory(ctx, tmp)
+	}
+
+	var zeroVal model.NewCategory
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -315,29 +339,6 @@ func (ec *executionContext) field_Mutation_createTask_argsInput(
 	}
 
 	var zeroVal model.NewTask
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_createTodo_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_createTodo_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (model.NewTodo, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNNewTodo2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewTodo(ctx, tmp)
-	}
-
-	var zeroVal model.NewTodo
 	return zeroVal, nil
 }
 
@@ -464,8 +465,8 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createTodo(ctx, field)
+func (ec *executionContext) _Mutation_createCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createCategory(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -478,7 +479,7 @@ func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTodo(rctx, fc.Args["input"].(model.NewTodo))
+		return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["input"].(model.NewCategory))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -490,29 +491,19 @@ func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Todo)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNTodo2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTodo(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createTodo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Todo_id(ctx, field)
-			case "text":
-				return ec.fieldContext_Todo_text(ctx, field)
-			case "done":
-				return ec.fieldContext_Todo_done(ctx, field)
-			case "user":
-				return ec.fieldContext_Todo_user(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -522,7 +513,7 @@ func (ec *executionContext) fieldContext_Mutation_createTodo(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createTodo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2990,6 +2981,40 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputNewCategory(ctx context.Context, obj any) (model.NewCategory, error) {
+	var it model.NewCategory
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "displayOrder"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "displayOrder":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayOrder"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DisplayOrder = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj any) (model.NewTask, error) {
 	var it model.NewTask
 	asMap := map[string]any{}
@@ -2997,7 +3022,7 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj any) 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "displayFlag", "notificationFlag", "detail"}
+	fieldsInOrder := [...]string{"title", "displayFlag", "notificationFlag", "categoryId", "deadLineCheck", "deadLineCheckSubSetting", "detail"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3025,6 +3050,27 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj any) 
 				return it, err
 			}
 			it.NotificationFlag = data
+		case "categoryId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CategoryID = data
+		case "deadLineCheck":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadLineCheck"))
+			data, err := ec.unmarshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeadLineCheck = data
+		case "deadLineCheckSubSetting":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadLineCheckSubSetting"))
+			data, err := ec.unmarshalOMap2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeadLineCheckSubSetting = data
 		case "detail":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("detail"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -3032,40 +3078,6 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj any) 
 				return it, err
 			}
 			it.Detail = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj any) (model.NewTodo, error) {
-	var it model.NewTodo
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"text", "userId"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "text":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Text = data
-		case "userId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UserID = data
 		}
 	}
 
@@ -3099,9 +3111,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createTodo":
+		case "createCategory":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createTodo(ctx, field)
+				return ec._Mutation_createCategory(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3671,13 +3683,13 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) unmarshalNNewTask2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewTask(ctx context.Context, v any) (model.NewTask, error) {
-	res, err := ec.unmarshalInputNewTask(ctx, v)
+func (ec *executionContext) unmarshalNNewCategory2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewCategory(ctx context.Context, v any) (model.NewCategory, error) {
+	res, err := ec.unmarshalInputNewCategory(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewTodo2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewTodo(ctx context.Context, v any) (model.NewTodo, error) {
-	res, err := ec.unmarshalInputNewTodo(ctx, v)
+func (ec *executionContext) unmarshalNNewTask2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewTask(ctx context.Context, v any) (model.NewTask, error) {
+	res, err := ec.unmarshalInputNewTask(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -3694,10 +3706,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNTodo2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTodo(ctx context.Context, sel ast.SelectionSet, v model.Todo) graphql.Marshaler {
-	return ec._Todo(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNTodo2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTodoᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Todo) graphql.Marshaler {
@@ -4040,6 +4048,76 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum(ctx context.Context, v any) (*db.DeadLineCheckEnum, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum[tmp]
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum(ctx context.Context, sel ast.SelectionSet, v *db.DeadLineCheckEnum) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(marshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum[*v])
+	return res
+}
+
+var (
+	unmarshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum = map[string]db.DeadLineCheckEnum{
+		"DailyOnce":         db.DeadLineCheckEnumDailyOnce,
+		"DailyHour":         db.DeadLineCheckEnumDailyHour,
+		"WeeklyDay":         db.DeadLineCheckEnumWeeklyDay,
+		"WeeklyDayInterval": db.DeadLineCheckEnumWeeklyDayInterval,
+		"MonthOnce":         db.DeadLineCheckEnumMonthOnce,
+		"MonthDate":         db.DeadLineCheckEnumMonthDate,
+		"YearOnceDate":      db.DeadLineCheckEnumYearOnceDate,
+	}
+	marshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum = map[db.DeadLineCheckEnum]string{
+		db.DeadLineCheckEnumDailyOnce:         "DailyOnce",
+		db.DeadLineCheckEnumDailyHour:         "DailyHour",
+		db.DeadLineCheckEnumWeeklyDay:         "WeeklyDay",
+		db.DeadLineCheckEnumWeeklyDayInterval: "WeeklyDayInterval",
+		db.DeadLineCheckEnumMonthOnce:         "MonthOnce",
+		db.DeadLineCheckEnumMonthDate:         "MonthDate",
+		db.DeadLineCheckEnumYearOnceDate:      "YearOnceDate",
+	}
+)
+
+func (ec *executionContext) unmarshalOInt2ᚖint32(ctx context.Context, v any) (*int32, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt32(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint32(ctx context.Context, sel ast.SelectionSet, v *int32) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt32(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v any) (map[string]any, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalMap(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]any) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalMap(v)
 	return res
 }
 

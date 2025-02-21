@@ -131,7 +131,7 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid 
+  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid
   # but you can override this to provide your own GraphQL UUID implementation
   UUID:
     model:
@@ -153,3 +153,20 @@ models:
     model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
+  DeadLineCheck:
+    model: ./db.DeadLineCheckEnum
+    enum_values:
+      DailyOnce:
+        value: ./db.DeadLineCheckEnumDailyOnce
+      DailyHour:
+        value: ./db.DeadLineCheckEnumDailyHour
+      WeeklyDay:
+        value: ./db.DeadLineCheckEnumWeeklyDay
+      WeeklyDayInterval:
+        value: ./db.DeadLineCheckEnumWeeklyDayInterval
+      MonthOnce:
+        value: ./db.DeadLineCheckEnumMonthOnce
+      MonthDate:
+        value: ./db.DeadLineCheckEnumMonthDate
+      YearOnceDate:
+        value: ./db.DeadLineCheckEnumYearOnceDate

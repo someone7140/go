@@ -11,9 +11,9 @@ import (
 	"wasurena-task-api/service"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateCategory is the resolver for the createCategory field.
+func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (bool, error) {
+	return service.CreateCategoryService(ctx, input)
 }
 
 // CreateTask is the resolver for the createTask field.

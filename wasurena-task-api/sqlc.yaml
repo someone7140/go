@@ -9,3 +9,13 @@ sql:
         out: "db"
         sql_package: "pgx/v5"
         emit_pointers_for_null_types: true
+        overrides:
+          - column: "task_definition.dead_line_check_sub_setting"
+            go_type:
+              import: wasurena-task-api/db/type
+              package: "db_type"
+              type: "Jsonb"
+          - column: "task_definition.dead_line_check"
+            go_type:
+              type: "DeadLineCheckEnum"
+              pointer: true
