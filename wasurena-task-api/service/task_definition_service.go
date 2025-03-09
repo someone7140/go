@@ -11,6 +11,7 @@ import (
 
 func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 	id := xid.New()
+
 	create_data := db.CreateTaskDefinitionParams{
 		ID:                      id.String(),
 		Title:                   input.Title,
@@ -22,7 +23,7 @@ func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 		DeadLineCheckSubSetting: input.DeadLineCheckSubSetting,
 		Detail:                  input.Detail,
 	}
-	_, err := middleware.GetDbConnection(ctx).CreateTaskDefinition(ctx, create_data)
+	_, err := middleware.GetDbQueries(ctx).CreateTaskDefinition(ctx, create_data)
 
 	if err != nil {
 		return false, err

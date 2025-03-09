@@ -38,3 +38,29 @@ values (
     $8,
     $9
 ) returning *;
+-- name: SelectLatestTaskExecuteForNotify :many
+select
+	def.*,
+	(case
+		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
+		else exec.execute_date_time::timestamptz
+	end) as latest_date_time
+from
+		task_definition def
+left outer join 
+	(
+	select
+			task_definition_id,
+			max(execute_date_time) as execute_date_time
+	from
+			task_execute
+	group by
+			task_definition_id) exec on
+		def.id = exec.task_definition_id
+where
+		def.notification_flag = true
+	and def.dead_line_check is not null
+order by
+		owner_user_id,
+		id;
+

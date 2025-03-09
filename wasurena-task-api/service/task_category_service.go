@@ -17,7 +17,7 @@ func CreateCategoryService(ctx context.Context, input model.NewCategory) (bool, 
 		OwnerUserID:  "dummy_user",
 		DisplayOrder: input.DisplayOrder,
 	}
-	_, err := middleware.GetDbConnection(ctx).CreateTaskCategory(ctx, create_data)
+	_, err := middleware.GetDbQueries(ctx).CreateTaskCategory(ctx, create_data)
 
 	if err != nil {
 		return false, err

@@ -7,6 +7,7 @@ package db
 import (
 	"database/sql/driver"
 	"fmt"
+	"time"
 
 	db_type "wasurena-task-api/db/type"
 )
@@ -75,4 +76,12 @@ type TaskDefinition struct {
 	DeadLineCheck           *DeadLineCheckEnum
 	DeadLineCheckSubSetting db_type.Jsonb
 	Detail                  *string
+}
+
+type TaskExecute struct {
+	ID               string
+	TaskDefinitionID string
+	ExecuteUserID    string
+	ExecuteDateTime  time.Time
+	Memo             *string
 }

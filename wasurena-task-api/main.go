@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
+	"wasurena-task-api/db"
 	"wasurena-task-api/graph"
 	"wasurena-task-api/middleware"
 
@@ -17,8 +17,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/vektah/gqlparser/v2/ast"
 
-	"github.com/go-chi/chi"
-	"github.com/go-co-op/gocron/v2"
+	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -39,47 +38,16 @@ func main() {
 	// DBの接続設定
 	ctx := context.Background()
 	conn, err := pgx.Connect(ctx, os.Getenv("DB_CONNECT"))
+	queries := db.New(conn)
 	if err != nil {
 		log.Fatal("Error Db Connect")
 	}
 	defer conn.Close(ctx)
 
 	router := chi.NewRouter()
-	router.Use(middleware.WithDbQueries(conn))
+	router.Use(middleware.WithDbQueries(queries))
 
-	// cronのタスク
-	scheduler, err := gocron.NewScheduler()
-	if err != nil {
-		log.Fatal("Error scheduler")
-	}
-	_, err = scheduler.NewJob(
-		gocron.DurationJob(
-			10*time.Second,
-		),
-		gocron.NewTask(
-			func() {
-				print("test10")
-			},
-		),
-	)
-	if err != nil {
-		log.Fatal("Error Job")
-	}
-	_, err = scheduler.NewJob(
-		gocron.DurationJob(
-			5*time.Second,
-		),
-		gocron.NewTask(
-			func() {
-				print("test5")
-			},
-		),
-	)
-	if err != nil {
-		log.Fatal("Error Job")
-	}
-
-	scheduler.Start()
+	// テスト用
 
 	// GraphQLのルート設定
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
@@ -99,7 +67,6 @@ func main() {
 
 	err = http.ListenAndServe(":"+port, router)
 	if err != nil {
-		scheduler.Shutdown()
 		panic(err)
 	}
 }

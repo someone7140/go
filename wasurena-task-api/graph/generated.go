@@ -49,8 +49,9 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateCategory func(childComplexity int, input model.NewCategory) int
-		CreateTask     func(childComplexity int, input model.NewTask) int
+		CreateCategory            func(childComplexity int, input model.NewCategory) int
+		CreateTask                func(childComplexity int, input model.NewTask) int
+		ExecuteScheduleCheckBatch func(childComplexity int, token string) int
 	}
 
 	Query struct {
@@ -71,6 +72,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
+	ExecuteScheduleCheckBatch(ctx context.Context, token string) (bool, error)
 	CreateCategory(ctx context.Context, input model.NewCategory) (bool, error)
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
 }
@@ -120,6 +122,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateTask(childComplexity, args["input"].(model.NewTask)), true
+
+	case "Mutation.executeScheduleCheckBatch":
+		if e.complexity.Mutation.ExecuteScheduleCheckBatch == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_executeScheduleCheckBatch_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ExecuteScheduleCheckBatch(childComplexity, args["token"].(string)), true
 
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
@@ -342,6 +356,29 @@ func (ec *executionContext) field_Mutation_createTask_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_executeScheduleCheckBatch_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_executeScheduleCheckBatch_argsToken(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["token"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_executeScheduleCheckBatch_argsToken(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+	if tmp, ok := rawArgs["token"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -464,6 +501,61 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Mutation_executeScheduleCheckBatch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_executeScheduleCheckBatch(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ExecuteScheduleCheckBatch(rctx, fc.Args["token"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_executeScheduleCheckBatch(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_executeScheduleCheckBatch_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Mutation_createCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createCategory(ctx, field)
@@ -3111,6 +3203,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "executeScheduleCheckBatch":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_executeScheduleCheckBatch(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createCategory":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createCategory(ctx, field)

@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	db_type "wasurena-task-api/db/type"
 )
@@ -116,4 +117,75 @@ func (q *Queries) CreateTaskDefinition(ctx context.Context, arg CreateTaskDefini
 		&i.Detail,
 	)
 	return i, err
+}
+
+const selectLatestTaskExecuteForNotify = `-- name: SelectLatestTaskExecuteForNotify :many
+select
+	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
+	(case
+		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
+		else exec.execute_date_time::timestamptz
+	end) as latest_date_time
+from
+		task_definition def
+left outer join 
+	(
+	select
+			task_definition_id,
+			max(execute_date_time) as execute_date_time
+	from
+			task_execute
+	group by
+			task_definition_id) exec on
+		def.id = exec.task_definition_id
+where
+		def.notification_flag = true
+	and def.dead_line_check is not null
+order by
+		owner_user_id,
+		id
+`
+
+type SelectLatestTaskExecuteForNotifyRow struct {
+	ID                      string
+	Title                   string
+	OwnerUserID             string
+	DisplayFlag             bool
+	NotificationFlag        bool
+	CategoryID              *string
+	DeadLineCheck           *DeadLineCheckEnum
+	DeadLineCheckSubSetting db_type.Jsonb
+	Detail                  *string
+	LatestDateTime          time.Time
+}
+
+func (q *Queries) SelectLatestTaskExecuteForNotify(ctx context.Context) ([]SelectLatestTaskExecuteForNotifyRow, error) {
+	rows, err := q.db.Query(ctx, selectLatestTaskExecuteForNotify)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SelectLatestTaskExecuteForNotifyRow
+	for rows.Next() {
+		var i SelectLatestTaskExecuteForNotifyRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.OwnerUserID,
+			&i.DisplayFlag,
+			&i.NotificationFlag,
+			&i.CategoryID,
+			&i.DeadLineCheck,
+			&i.DeadLineCheckSubSetting,
+			&i.Detail,
+			&i.LatestDateTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
