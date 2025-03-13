@@ -45,8 +45,14 @@ input NewTask {
   detail: String
 }
 
+input NewTaskExecute {
+  taskDefinitionId: String!
+  memo: String
+}
+
 type Mutation {
   executeScheduleCheckBatch(token: String!): Boolean!
   createCategory(input: NewCategory!): Boolean!
   createTask(input: NewTask!): Boolean!
+  createTaskExecute(input: NewTaskExecute!): Boolean!
 }

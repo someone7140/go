@@ -26,6 +26,11 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 	return service.CreateTaskService(ctx, input)
 }
 
+// CreateTaskExecute is the resolver for the createTaskExecute field.
+func (r *mutationResolver) CreateTaskExecute(ctx context.Context, input model.NewTaskExecute) (bool, error) {
+	return service.CreateTaskExecuteService(ctx, input)
+}
+
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: Todos - todos"))

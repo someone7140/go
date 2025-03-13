@@ -24,6 +24,11 @@ type NewTask struct {
 	Detail                  *string               `json:"detail,omitempty"`
 }
 
+type NewTaskExecute struct {
+	TaskDefinitionID string  `json:"taskDefinitionId"`
+	Memo             *string `json:"memo,omitempty"`
+}
+
 type Query struct {
 }
 

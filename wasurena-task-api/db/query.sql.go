@@ -119,6 +119,123 @@ func (q *Queries) CreateTaskDefinition(ctx context.Context, arg CreateTaskDefini
 	return i, err
 }
 
+const createTaskExecute = `-- name: CreateTaskExecute :one
+insert
+	into
+	task_execute (
+    id,
+	task_definition_id,
+	execute_user_id,
+	execute_date_time,
+	memo
+)
+values (
+    $1, 
+    $2, 
+    $3, 
+    $4,
+    $5
+) returning id, task_definition_id, execute_user_id, execute_date_time, memo
+`
+
+type CreateTaskExecuteParams struct {
+	ID               string
+	TaskDefinitionID string
+	ExecuteUserID    string
+	ExecuteDateTime  time.Time
+	Memo             *string
+}
+
+func (q *Queries) CreateTaskExecute(ctx context.Context, arg CreateTaskExecuteParams) (TaskExecute, error) {
+	row := q.db.QueryRow(ctx, createTaskExecute,
+		arg.ID,
+		arg.TaskDefinitionID,
+		arg.ExecuteUserID,
+		arg.ExecuteDateTime,
+		arg.Memo,
+	)
+	var i TaskExecute
+	err := row.Scan(
+		&i.ID,
+		&i.TaskDefinitionID,
+		&i.ExecuteUserID,
+		&i.ExecuteDateTime,
+		&i.Memo,
+	)
+	return i, err
+}
+
+const selectLatestTaskExecuteForHourlyNotify = `-- name: SelectLatestTaskExecuteForHourlyNotify :many
+select
+	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
+	(case
+		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
+		else exec.execute_date_time::timestamptz
+	end) as latest_date_time
+from
+		task_definition def
+left outer join 
+	(
+	select
+			task_definition_id,
+			max(execute_date_time) as execute_date_time
+	from
+			task_execute
+	group by
+			task_definition_id) exec on
+		def.id = exec.task_definition_id
+where
+		def.notification_flag = true
+	and def.dead_line_check = 'DailyHour'
+order by
+		owner_user_id,
+		id
+`
+
+type SelectLatestTaskExecuteForHourlyNotifyRow struct {
+	ID                      string
+	Title                   string
+	OwnerUserID             string
+	DisplayFlag             bool
+	NotificationFlag        bool
+	CategoryID              *string
+	DeadLineCheck           *DeadLineCheckEnum
+	DeadLineCheckSubSetting db_type.Jsonb
+	Detail                  *string
+	LatestDateTime          time.Time
+}
+
+func (q *Queries) SelectLatestTaskExecuteForHourlyNotify(ctx context.Context) ([]SelectLatestTaskExecuteForHourlyNotifyRow, error) {
+	rows, err := q.db.Query(ctx, selectLatestTaskExecuteForHourlyNotify)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SelectLatestTaskExecuteForHourlyNotifyRow
+	for rows.Next() {
+		var i SelectLatestTaskExecuteForHourlyNotifyRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.OwnerUserID,
+			&i.DisplayFlag,
+			&i.NotificationFlag,
+			&i.CategoryID,
+			&i.DeadLineCheck,
+			&i.DeadLineCheckSubSetting,
+			&i.Detail,
+			&i.LatestDateTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const selectLatestTaskExecuteForNotify = `-- name: SelectLatestTaskExecuteForNotify :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
