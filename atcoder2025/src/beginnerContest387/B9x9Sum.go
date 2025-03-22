@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func main() {
+func B9x9SumMain() {
 	var n int
 	fmt.Scan(&n)
 

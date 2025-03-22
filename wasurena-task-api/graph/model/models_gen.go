@@ -6,6 +6,11 @@ import (
 	"wasurena-task-api/db"
 )
 
+type CreateUserRegisterTokenResponse struct {
+	Token    string `json:"token"`
+	LineName string `json:"lineName"`
+}
+
 type Mutation struct {
 }
 
@@ -27,6 +32,12 @@ type NewTask struct {
 type NewTaskExecute struct {
 	TaskDefinitionID string  `json:"taskDefinitionId"`
 	Memo             *string `json:"memo,omitempty"`
+}
+
+type NewUserAccount struct {
+	AuthToken     string `json:"authToken"`
+	UserSettingID string `json:"userSettingId"`
+	UserName      string `json:"userName"`
 }
 
 type Query struct {

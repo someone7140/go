@@ -85,3 +85,12 @@ type TaskExecute struct {
 	ExecuteDateTime  time.Time
 	Memo             *string
 }
+
+type UserAccount struct {
+	ID              string
+	UserSettingID   string
+	LineID          string
+	UserName        string
+	ImageUrl        *string
+	IsLineBotFollow bool
+}

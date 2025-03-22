@@ -88,7 +88,6 @@ where
 order by
 		owner_user_id,
 		id;
-
 -- name: CreateTaskExecute :one
 insert
 	into
@@ -98,6 +97,30 @@ insert
 	execute_user_id,
 	execute_date_time,
 	memo
+)
+values (
+    $1, 
+    $2, 
+    $3, 
+    $4,
+    $5
+) returning *;
+-- name: SelectUserAccountByUserSettingId :one
+select
+	*
+from
+	user_accounts
+where
+	user_setting_id = $1;
+-- name: CreateUserAccount :one
+insert
+	into
+	user_accounts (
+    id,
+	user_setting_id,
+	line_id,
+	user_name,
+	image_url
 )
 values (
     $1, 

@@ -1,7 +1,16 @@
+create table user_accounts (
+  id varchar(255) primary key,
+  user_setting_id varchar(255) not null unique,
+  line_id varchar(255) not null unique,
+  user_name varchar(255) not null,
+  image_url varchar(255),
+  is_line_bot_follow boolean not null default false
+);
+
 create table task_category (
   id varchar(255) primary key,
   name varchar(255) not null,
-  owner_user_id varchar(255) not null,
+  owner_user_id varchar(255) not null references user_accounts(id),
   display_order integer
 );
 
@@ -21,7 +30,7 @@ create type dead_line_check_enum as enum (
 create table task_definition (
   id varchar(255) primary key,
   title varchar(255) not null,
-  owner_user_id varchar(255) not null,
+  owner_user_id varchar(255) not null references user_accounts(id),
   display_flag boolean not null,
   notification_flag boolean not null,
   category_id varchar(255),

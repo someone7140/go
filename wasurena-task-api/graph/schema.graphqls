@@ -50,9 +50,24 @@ input NewTaskExecute {
   memo: String
 }
 
+input NewUserAccount {
+  authToken: String!
+  userSettingId: String!
+  userName: String!
+}
+
+type CreateUserRegisterTokenResponse {
+  token: String!
+  lineName: String!
+}
+
 type Mutation {
   executeScheduleCheckBatch(token: String!): Boolean!
   createCategory(input: NewCategory!): Boolean!
   createTask(input: NewTask!): Boolean!
   createTaskExecute(input: NewTaskExecute!): Boolean!
+  createUserAccount(input: NewUserAccount!): Boolean!
+  createUserRegisterToken(
+    lineAuthCode: String!
+  ): CreateUserRegisterTokenResponse
 }

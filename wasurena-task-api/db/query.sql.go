@@ -165,6 +165,53 @@ func (q *Queries) CreateTaskExecute(ctx context.Context, arg CreateTaskExecutePa
 	return i, err
 }
 
+const createUserAccount = `-- name: CreateUserAccount :one
+insert
+	into
+	user_accounts (
+    id,
+	user_setting_id,
+	line_id,
+	user_name,
+	image_url
+)
+values (
+    $1, 
+    $2, 
+    $3, 
+    $4,
+    $5
+) returning id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+`
+
+type CreateUserAccountParams struct {
+	ID            string
+	UserSettingID string
+	LineID        string
+	UserName      string
+	ImageUrl      *string
+}
+
+func (q *Queries) CreateUserAccount(ctx context.Context, arg CreateUserAccountParams) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, createUserAccount,
+		arg.ID,
+		arg.UserSettingID,
+		arg.LineID,
+		arg.UserName,
+		arg.ImageUrl,
+	)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
+}
+
 const selectLatestTaskExecuteForHourlyNotify = `-- name: SelectLatestTaskExecuteForHourlyNotify :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
@@ -305,4 +352,27 @@ func (q *Queries) SelectLatestTaskExecuteForNotify(ctx context.Context) ([]Selec
 		return nil, err
 	}
 	return items, nil
+}
+
+const selectUserAccountByUserSettingId = `-- name: SelectUserAccountByUserSettingId :one
+select
+	id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+from
+	user_accounts
+where
+	user_setting_id = $1
+`
+
+func (q *Queries) SelectUserAccountByUserSettingId(ctx context.Context, userSettingID string) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, selectUserAccountByUserSettingId, userSettingID)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
 }
