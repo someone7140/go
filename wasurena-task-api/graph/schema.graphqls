@@ -16,10 +16,6 @@ type User {
   name: String!
 }
 
-type Query {
-  todos: [Todo!]!
-}
-
 input NewCategory {
   name: String!
   displayOrder: Int
@@ -61,13 +57,15 @@ type CreateUserRegisterTokenResponse {
   lineName: String!
 }
 
+type Query {
+  todos: [Todo!]!
+  getUserRegisterToken(lineAuthCode: String!): CreateUserRegisterTokenResponse
+}
+
 type Mutation {
   executeScheduleCheckBatch(token: String!): Boolean!
   createCategory(input: NewCategory!): Boolean!
   createTask(input: NewTask!): Boolean!
   createTaskExecute(input: NewTaskExecute!): Boolean!
   createUserAccount(input: NewUserAccount!): Boolean!
-  createUserRegisterToken(
-    lineAuthCode: String!
-  ): CreateUserRegisterTokenResponse
 }

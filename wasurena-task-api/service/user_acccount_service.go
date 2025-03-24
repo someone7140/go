@@ -31,7 +31,7 @@ func CreateUserAccount(ctx context.Context, input model.NewUserAccount) (bool, e
 	return true, err
 }
 
-func CreateUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
+func GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
 	// 認証コードからLINEのユーザ情報を取得しトークン化する
 	lineInfo, err := domain.GetLineUserInfoFromAuthCode(lineAuthCode)
 	if err != nil {

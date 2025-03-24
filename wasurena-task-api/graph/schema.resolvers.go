@@ -36,14 +36,14 @@ func (r *mutationResolver) CreateUserAccount(ctx context.Context, input model.Ne
 	return service.CreateUserAccount(ctx, input)
 }
 
-// CreateUserRegisterToken is the resolver for the createUserRegisterToken field.
-func (r *mutationResolver) CreateUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
-	return service.CreateUserRegisterToken(ctx, lineAuthCode)
-}
-
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: Todos - todos"))
+}
+
+// GetUserRegisterToken is the resolver for the getUserRegisterToken field.
+func (r *queryResolver) GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
+	return service.GetUserRegisterToken(ctx, lineAuthCode)
 }
 
 // Mutation returns MutationResolver implementation.

@@ -18,6 +18,7 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -35,6 +36,8 @@ func main() {
 		port = defaultPort
 	}
 
+	router := chi.NewRouter()
+
 	// DBの接続設定
 	ctx := context.Background()
 	conn, err := pgx.Connect(ctx, os.Getenv("DB_CONNECT"))
@@ -43,11 +46,24 @@ func main() {
 		log.Fatal("Error Db Connect")
 	}
 	defer conn.Close(ctx)
-
-	router := chi.NewRouter()
 	router.Use(middleware.WithDbQueries(queries))
-
-	// テスト用
+	// CORSの設定
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedMethods: []string{"DELETE",
+			"GET",
+			"OPTIONS",
+			"PATCH",
+			"POST",
+			"PUT"},
+		AllowedHeaders: []string{"accept",
+			"authorization",
+			"content-type",
+			"user-agent",
+			"x-csrftoken",
+			"x-requested-with"},
+		AllowCredentials: true,
+	}))
 
 	// GraphQLのルート設定
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
@@ -62,8 +78,8 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New[string](100),
 	})
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
 	err = http.ListenAndServe(":"+port, router)
 	if err != nil {

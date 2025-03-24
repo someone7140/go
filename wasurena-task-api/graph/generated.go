@@ -58,12 +58,12 @@ type ComplexityRoot struct {
 		CreateTask                func(childComplexity int, input model.NewTask) int
 		CreateTaskExecute         func(childComplexity int, input model.NewTaskExecute) int
 		CreateUserAccount         func(childComplexity int, input model.NewUserAccount) int
-		CreateUserRegisterToken   func(childComplexity int, lineAuthCode string) int
 		ExecuteScheduleCheckBatch func(childComplexity int, token string) int
 	}
 
 	Query struct {
-		Todos func(childComplexity int) int
+		GetUserRegisterToken func(childComplexity int, lineAuthCode string) int
+		Todos                func(childComplexity int) int
 	}
 
 	Todo struct {
@@ -85,10 +85,10 @@ type MutationResolver interface {
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
 	CreateTaskExecute(ctx context.Context, input model.NewTaskExecute) (bool, error)
 	CreateUserAccount(ctx context.Context, input model.NewUserAccount) (bool, error)
-	CreateUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error)
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]*model.Todo, error)
+	GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error)
 }
 
 type executableSchema struct {
@@ -172,18 +172,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateUserAccount(childComplexity, args["input"].(model.NewUserAccount)), true
 
-	case "Mutation.createUserRegisterToken":
-		if e.complexity.Mutation.CreateUserRegisterToken == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createUserRegisterToken_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateUserRegisterToken(childComplexity, args["lineAuthCode"].(string)), true
-
 	case "Mutation.executeScheduleCheckBatch":
 		if e.complexity.Mutation.ExecuteScheduleCheckBatch == nil {
 			break
@@ -195,6 +183,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ExecuteScheduleCheckBatch(childComplexity, args["token"].(string)), true
+
+	case "Query.getUserRegisterToken":
+		if e.complexity.Query.GetUserRegisterToken == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserRegisterToken_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserRegisterToken(childComplexity, args["lineAuthCode"].(string)), true
 
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
@@ -465,29 +465,6 @@ func (ec *executionContext) field_Mutation_createUserAccount_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createUserRegisterToken_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_createUserRegisterToken_argsLineAuthCode(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["lineAuthCode"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_createUserRegisterToken_argsLineAuthCode(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("lineAuthCode"))
-	if tmp, ok := rawArgs["lineAuthCode"]; ok {
-		return ec.unmarshalNString2string(ctx, tmp)
-	}
-
-	var zeroVal string
-	return zeroVal, nil
-}
-
 func (ec *executionContext) field_Mutation_executeScheduleCheckBatch_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -527,6 +504,29 @@ func (ec *executionContext) field_Query___type_argsName(
 ) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getUserRegisterToken_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_getUserRegisterToken_argsLineAuthCode(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["lineAuthCode"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getUserRegisterToken_argsLineAuthCode(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("lineAuthCode"))
+	if tmp, ok := rawArgs["lineAuthCode"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -997,64 +997,6 @@ func (ec *executionContext) fieldContext_Mutation_createUserAccount(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createUserRegisterToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createUserRegisterToken(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUserRegisterToken(rctx, fc.Args["lineAuthCode"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.CreateUserRegisterTokenResponse)
-	fc.Result = res
-	return ec.marshalOCreateUserRegisterTokenResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐCreateUserRegisterTokenResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createUserRegisterToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "token":
-				return ec.fieldContext_CreateUserRegisterTokenResponse_token(ctx, field)
-			case "lineName":
-				return ec.fieldContext_CreateUserRegisterTokenResponse_lineName(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type CreateUserRegisterTokenResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createUserRegisterToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_todos(ctx, field)
 	if err != nil {
@@ -1105,6 +1047,64 @@ func (ec *executionContext) fieldContext_Query_todos(_ context.Context, field gr
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUserRegisterToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserRegisterToken(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserRegisterToken(rctx, fc.Args["lineAuthCode"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreateUserRegisterTokenResponse)
+	fc.Result = res
+	return ec.marshalOCreateUserRegisterTokenResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐCreateUserRegisterTokenResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserRegisterToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_CreateUserRegisterTokenResponse_token(ctx, field)
+			case "lineName":
+				return ec.fieldContext_CreateUserRegisterTokenResponse_lineName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateUserRegisterTokenResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUserRegisterToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3745,10 +3745,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createUserRegisterToken":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createUserRegisterToken(ctx, field)
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3804,6 +3800,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUserRegisterToken":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserRegisterToken(ctx, field)
 				return res
 			}
 
