@@ -212,77 +212,6 @@ func (q *Queries) CreateUserAccount(ctx context.Context, arg CreateUserAccountPa
 	return i, err
 }
 
-const selectLatestTaskExecuteForHourlyNotify = `-- name: SelectLatestTaskExecuteForHourlyNotify :many
-select
-	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
-	(case
-		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
-		else exec.execute_date_time::timestamptz
-	end) as latest_date_time
-from
-		task_definition def
-left outer join 
-	(
-	select
-			task_definition_id,
-			max(execute_date_time) as execute_date_time
-	from
-			task_execute
-	group by
-			task_definition_id) exec on
-		def.id = exec.task_definition_id
-where
-		def.notification_flag = true
-	and def.dead_line_check = 'DailyHour'
-order by
-		owner_user_id,
-		id
-`
-
-type SelectLatestTaskExecuteForHourlyNotifyRow struct {
-	ID                      string
-	Title                   string
-	OwnerUserID             string
-	DisplayFlag             bool
-	NotificationFlag        bool
-	CategoryID              *string
-	DeadLineCheck           *DeadLineCheckEnum
-	DeadLineCheckSubSetting db_type.Jsonb
-	Detail                  *string
-	LatestDateTime          time.Time
-}
-
-func (q *Queries) SelectLatestTaskExecuteForHourlyNotify(ctx context.Context) ([]SelectLatestTaskExecuteForHourlyNotifyRow, error) {
-	rows, err := q.db.Query(ctx, selectLatestTaskExecuteForHourlyNotify)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []SelectLatestTaskExecuteForHourlyNotifyRow
-	for rows.Next() {
-		var i SelectLatestTaskExecuteForHourlyNotifyRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Title,
-			&i.OwnerUserID,
-			&i.DisplayFlag,
-			&i.NotificationFlag,
-			&i.CategoryID,
-			&i.DeadLineCheck,
-			&i.DeadLineCheckSubSetting,
-			&i.Detail,
-			&i.LatestDateTime,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const selectLatestTaskExecuteForNotify = `-- name: SelectLatestTaskExecuteForNotify :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
@@ -352,6 +281,52 @@ func (q *Queries) SelectLatestTaskExecuteForNotify(ctx context.Context) ([]Selec
 		return nil, err
 	}
 	return items, nil
+}
+
+const selectUserAccountById = `-- name: SelectUserAccountById :one
+select
+	id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+from
+	user_accounts
+where
+	id = $1
+`
+
+func (q *Queries) SelectUserAccountById(ctx context.Context, id string) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, selectUserAccountById, id)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
+}
+
+const selectUserAccountByLineId = `-- name: SelectUserAccountByLineId :one
+select
+	id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+from
+	user_accounts
+where
+	line_id = $1
+`
+
+func (q *Queries) SelectUserAccountByLineId(ctx context.Context, lineID string) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, selectUserAccountByLineId, lineID)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
 }
 
 const selectUserAccountByUserSettingId = `-- name: SelectUserAccountByUserSettingId :one

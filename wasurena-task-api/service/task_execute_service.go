@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"time"
+	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph/model"
-	"wasurena-task-api/middleware"
 
 	"github.com/rs/xid"
 )
@@ -19,14 +19,14 @@ func CreateTaskExecuteService(ctx context.Context, input model.NewTaskExecute) (
 	}
 	now := time.Now().In(jst)
 
-	create_data := db.CreateTaskExecuteParams{
+	createData := db.CreateTaskExecuteParams{
 		ID:               id.String(),
 		TaskDefinitionID: input.TaskDefinitionID,
 		ExecuteUserID:    "dummy_user",
 		ExecuteDateTime:  now,
 		Memo:             input.Memo,
 	}
-	_, err = middleware.GetDbQueries(ctx).CreateTaskExecute(ctx, create_data)
+	_, err = custom_middleware.GetDbQueries(ctx).CreateTaskExecute(ctx, createData)
 
 	if err != nil {
 		return false, err

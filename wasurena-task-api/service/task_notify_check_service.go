@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
 	"time"
+	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/domain"
-	"wasurena-task-api/middleware"
+
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // contextのcloneのための定義
@@ -24,7 +25,11 @@ func Clone(ctx context.Context) context.Context   { return customContext{ctx} }
 func CheckDailyNotify(ctx context.Context, token string) (bool, error) {
 	// tokenの確認
 	if token != os.Getenv("BATCH_TOKEN") {
-		return false, errors.New("unauthorized token")
+		return false, &gqlerror.Error{
+			Message: "token authorize error",
+			Extensions: map[string]interface{}{
+				"code": "401",
+			}}
 	}
 	// contextをclone
 	newCtx := Clone(ctx)
@@ -44,8 +49,7 @@ func execCheckDailyNotify(ctx context.Context) {
 	now := time.Now().In(jst)
 	var checkList []domain.TaskDeadLineCheckTarget
 
-	// 0時の場合だけ全部の定義を対象にする予定（TODO）
-	notifies, err := middleware.GetDbQueries(ctx).SelectLatestTaskExecuteForNotify(ctx)
+	notifies, err := custom_middleware.GetDbQueries(ctx).SelectLatestTaskExecuteForNotify(ctx)
 	if err != nil {
 		log.Fatal(err)
 		return

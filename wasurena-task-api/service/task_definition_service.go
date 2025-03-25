@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
+	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph/model"
-	"wasurena-task-api/middleware"
 
 	"github.com/rs/xid"
 )
@@ -12,7 +12,7 @@ import (
 func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 	id := xid.New()
 
-	create_data := db.CreateTaskDefinitionParams{
+	createData := db.CreateTaskDefinitionParams{
 		ID:                      id.String(),
 		Title:                   input.Title,
 		OwnerUserID:             "dummy_user",
@@ -23,7 +23,7 @@ func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 		DeadLineCheckSubSetting: input.DeadLineCheckSubSetting,
 		Detail:                  input.Detail,
 	}
-	_, err := middleware.GetDbQueries(ctx).CreateTaskDefinition(ctx, create_data)
+	_, err := custom_middleware.GetDbQueries(ctx).CreateTaskDefinition(ctx, createData)
 
 	if err != nil {
 		return false, err

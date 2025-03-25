@@ -54,3 +54,11 @@ type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
+
+type UserAccountResponse struct {
+	Token           string  `json:"token"`
+	UserSettingID   string  `json:"userSettingId"`
+	UserName        string  `json:"userName"`
+	ImageURL        *string `json:"imageUrl,omitempty"`
+	IsLineBotFollow bool    `json:"isLineBotFollow"`
+}

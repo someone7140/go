@@ -63,31 +63,6 @@ where
 order by
 		owner_user_id,
 		id;
--- name: SelectLatestTaskExecuteForHourlyNotify :many
-select
-	def.*,
-	(case
-		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
-		else exec.execute_date_time::timestamptz
-	end) as latest_date_time
-from
-		task_definition def
-left outer join 
-	(
-	select
-			task_definition_id,
-			max(execute_date_time) as execute_date_time
-	from
-			task_execute
-	group by
-			task_definition_id) exec on
-		def.id = exec.task_definition_id
-where
-		def.notification_flag = true
-	and def.dead_line_check = 'DailyHour'
-order by
-		owner_user_id,
-		id;
 -- name: CreateTaskExecute :one
 insert
 	into
@@ -112,6 +87,20 @@ from
 	user_accounts
 where
 	user_setting_id = $1;
+-- name: SelectUserAccountByLineId :one
+select
+	*
+from
+	user_accounts
+where
+	line_id = $1;
+-- name: SelectUserAccountById :one
+select
+	*
+from
+	user_accounts
+where
+	id = $1;
 -- name: CreateUserAccount :one
 insert
 	into

@@ -57,6 +57,14 @@ type CreateUserRegisterTokenResponse {
   lineName: String!
 }
 
+type UserAccountResponse {
+  token: String!
+  userSettingId: String!
+  userName: String!
+  imageUrl: String
+  isLineBotFollow: Boolean!
+}
+
 type Query {
   todos: [Todo!]!
   getUserRegisterToken(lineAuthCode: String!): CreateUserRegisterTokenResponse
@@ -67,5 +75,5 @@ type Mutation {
   createCategory(input: NewCategory!): Boolean!
   createTask(input: NewTask!): Boolean!
   createTaskExecute(input: NewTaskExecute!): Boolean!
-  createUserAccount(input: NewUserAccount!): Boolean!
+  createUserAccount(input: NewUserAccount!): UserAccountResponse
 }

@@ -1,8 +1,10 @@
-package middleware
+package custom_middleware
 
 import (
 	"context"
-	"net/http"
+
+	"github.com/labstack/echo/v4"
+
 	"wasurena-task-api/db"
 )
 
@@ -11,12 +13,16 @@ type contextKey string
 const dbQueriesContextKey contextKey = "pgx_queries"
 
 // pgxのクエリをコンテキストに追加するミドルウェア
-func WithDbQueries(queries *db.Queries) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := context.WithValue(r.Context(), dbQueriesContextKey, queries)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
+func WithDbQueries(queries *db.Queries) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		{
+			return func(c echo.Context) error {
+				ctx := context.WithValue(c.Request().Context(), dbQueriesContextKey, c)
+				c.SetRequest(c.Request().WithContext(ctx))
+				err := next(c)
+				return err
+			}
+		}
 	}
 }
 

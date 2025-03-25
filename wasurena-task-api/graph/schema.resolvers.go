@@ -32,7 +32,7 @@ func (r *mutationResolver) CreateTaskExecute(ctx context.Context, input model.Ne
 }
 
 // CreateUserAccount is the resolver for the createUserAccount field.
-func (r *mutationResolver) CreateUserAccount(ctx context.Context, input model.NewUserAccount) (bool, error) {
+func (r *mutationResolver) CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error) {
 	return service.CreateUserAccount(ctx, input)
 }
 

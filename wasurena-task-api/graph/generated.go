@@ -77,6 +77,14 @@ type ComplexityRoot struct {
 		ID   func(childComplexity int) int
 		Name func(childComplexity int) int
 	}
+
+	UserAccountResponse struct {
+		ImageURL        func(childComplexity int) int
+		IsLineBotFollow func(childComplexity int) int
+		Token           func(childComplexity int) int
+		UserName        func(childComplexity int) int
+		UserSettingID   func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -84,7 +92,7 @@ type MutationResolver interface {
 	CreateCategory(ctx context.Context, input model.NewCategory) (bool, error)
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
 	CreateTaskExecute(ctx context.Context, input model.NewTaskExecute) (bool, error)
-	CreateUserAccount(ctx context.Context, input model.NewUserAccount) (bool, error)
+	CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error)
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]*model.Todo, error)
@@ -244,6 +252,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Name(childComplexity), true
+
+	case "UserAccountResponse.imageUrl":
+		if e.complexity.UserAccountResponse.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.UserAccountResponse.ImageURL(childComplexity), true
+
+	case "UserAccountResponse.isLineBotFollow":
+		if e.complexity.UserAccountResponse.IsLineBotFollow == nil {
+			break
+		}
+
+		return e.complexity.UserAccountResponse.IsLineBotFollow(childComplexity), true
+
+	case "UserAccountResponse.token":
+		if e.complexity.UserAccountResponse.Token == nil {
+			break
+		}
+
+		return e.complexity.UserAccountResponse.Token(childComplexity), true
+
+	case "UserAccountResponse.userName":
+		if e.complexity.UserAccountResponse.UserName == nil {
+			break
+		}
+
+		return e.complexity.UserAccountResponse.UserName(childComplexity), true
+
+	case "UserAccountResponse.userSettingId":
+		if e.complexity.UserAccountResponse.UserSettingID == nil {
+			break
+		}
+
+		return e.complexity.UserAccountResponse.UserSettingID(childComplexity), true
 
 	}
 	return 0, false
@@ -963,14 +1006,11 @@ func (ec *executionContext) _Mutation_createUserAccount(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.UserAccountResponse)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOUserAccountResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUserAccountResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createUserAccount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -980,7 +1020,19 @@ func (ec *executionContext) fieldContext_Mutation_createUserAccount(ctx context.
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_UserAccountResponse_token(ctx, field)
+			case "userSettingId":
+				return ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+			case "userName":
+				return ec.fieldContext_UserAccountResponse_userName(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+			case "isLineBotFollow":
+				return ec.fieldContext_UserAccountResponse_isLineBotFollow(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAccountResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -1505,6 +1557,223 @@ func (ec *executionContext) fieldContext_User_name(_ context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAccountResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.UserAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAccountResponse_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAccountResponse_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAccountResponse_userSettingId(ctx context.Context, field graphql.CollectedField, obj *model.UserAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserSettingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAccountResponse_userSettingId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAccountResponse_userName(ctx context.Context, field graphql.CollectedField, obj *model.UserAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAccountResponse_userName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAccountResponse_userName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAccountResponse_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.UserAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAccountResponse_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAccountResponse_isLineBotFollow(ctx context.Context, field graphql.CollectedField, obj *model.UserAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAccountResponse_isLineBotFollow(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsLineBotFollow, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAccountResponse_isLineBotFollow(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3742,9 +4011,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUserAccount(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3931,6 +4197,62 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "name":
 			out.Values[i] = ec._User_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userAccountResponseImplementors = []string{"UserAccountResponse"}
+
+func (ec *executionContext) _UserAccountResponse(ctx context.Context, sel ast.SelectionSet, obj *model.UserAccountResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userAccountResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserAccountResponse")
+		case "token":
+			out.Values[i] = ec._UserAccountResponse_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userSettingId":
+			out.Values[i] = ec._UserAccountResponse_userSettingId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userName":
+			out.Values[i] = ec._UserAccountResponse_userName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "imageUrl":
+			out.Values[i] = ec._UserAccountResponse_imageUrl(ctx, field, obj)
+		case "isLineBotFollow":
+			out.Values[i] = ec._UserAccountResponse_isLineBotFollow(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4789,6 +5111,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOUserAccountResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUserAccountResponse(ctx context.Context, sel ast.SelectionSet, v *model.UserAccountResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UserAccountResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

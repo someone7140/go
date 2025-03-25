@@ -2,22 +2,22 @@ package service
 
 import (
 	"context"
+	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph/model"
-	"wasurena-task-api/middleware"
 
 	"github.com/rs/xid"
 )
 
 func CreateCategoryService(ctx context.Context, input model.NewCategory) (bool, error) {
 	id := xid.New()
-	create_data := db.CreateTaskCategoryParams{
+	createData := db.CreateTaskCategoryParams{
 		ID:           id.String(),
 		Name:         input.Name,
 		OwnerUserID:  "dummy_user",
 		DisplayOrder: input.DisplayOrder,
 	}
-	_, err := middleware.GetDbQueries(ctx).CreateTaskCategory(ctx, create_data)
+	_, err := custom_middleware.GetDbQueries(ctx).CreateTaskCategory(ctx, createData)
 
 	if err != nil {
 		return false, err

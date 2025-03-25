@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
+	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph"
-	"wasurena-task-api/middleware"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -17,9 +16,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/vektah/gqlparser/v2/ast"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const defaultPort = "8080"
@@ -36,7 +35,8 @@ func main() {
 		port = defaultPort
 	}
 
-	router := chi.NewRouter()
+	ech := echo.New()
+	ech.Use(middleware.Recover())
 
 	// DBの接続設定
 	ctx := context.Background()
@@ -46,22 +46,27 @@ func main() {
 		log.Fatal("Error Db Connect")
 	}
 	defer conn.Close(ctx)
-	router.Use(middleware.WithDbQueries(queries))
+	ech.Use(custom_middleware.WithDbQueries(queries))
+
 	// CORSの設定
-	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"https://*", "http://*"},
-		AllowedMethods: []string{"DELETE",
+	ech.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{os.Getenv("FRONTEND_DOMAIN")},
+		AllowMethods: []string{
+			"DELETE",
 			"GET",
 			"OPTIONS",
 			"PATCH",
 			"POST",
-			"PUT"},
-		AllowedHeaders: []string{"accept",
+			"PUT",
+		},
+		AllowHeaders: []string{
+			"accept",
 			"authorization",
 			"content-type",
 			"user-agent",
 			"x-csrftoken",
-			"x-requested-with"},
+			"x-requested-with",
+		},
 		AllowCredentials: true,
 	}))
 
@@ -78,10 +83,17 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New[string](100),
 	})
-	router.Handle("/query", srv)
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
-	err = http.ListenAndServe(":"+port, router)
+	ech.POST("/query", func(c echo.Context) error {
+		srv.ServeHTTP(c.Response(), c.Request())
+		return nil
+	})
+	ech.GET("/playground", func(c echo.Context) error {
+		playground.Handler("GraphQL playground", "/query").ServeHTTP(c.Response(), c.Request())
+		return nil
+	})
+
+	err = ech.Start(":" + port)
 	if err != nil {
 		panic(err)
 	}
