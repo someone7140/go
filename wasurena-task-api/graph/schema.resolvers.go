@@ -43,7 +43,17 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 
 // GetUserRegisterToken is the resolver for the getUserRegisterToken field.
 func (r *queryResolver) GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
-	return service.GetUserRegisterToken(ctx, lineAuthCode)
+	return service.GetUserRegisterTokenFromLineAuthCode(ctx, lineAuthCode)
+}
+
+// GetRegisteredUser is the resolver for the getRegisteredUser field.
+func (r *queryResolver) GetRegisteredUser(ctx context.Context, lineAuthCode string) (*model.UserAccountResponse, error) {
+	return service.GetUserAccountFromLineAuthCode(ctx, lineAuthCode)
+}
+
+// GetUserAccountFromAuthHeader is the resolver for the getUserAccountFromAuthHeader field.
+func (r *queryResolver) GetUserAccountFromAuthHeader(ctx context.Context) (*model.UserAccountResponse, error) {
+	return service.GetUserAccountFromContext(ctx)
 }
 
 // Mutation returns MutationResolver implementation.

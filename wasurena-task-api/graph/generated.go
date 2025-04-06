@@ -45,6 +45,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	IsAuthenticated func(ctx context.Context, obj any, next graphql.Resolver) (res any, err error)
 }
 
 type ComplexityRoot struct {
@@ -62,8 +63,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetUserRegisterToken func(childComplexity int, lineAuthCode string) int
-		Todos                func(childComplexity int) int
+		GetRegisteredUser            func(childComplexity int, lineAuthCode string) int
+		GetUserAccountFromAuthHeader func(childComplexity int) int
+		GetUserRegisterToken         func(childComplexity int, lineAuthCode string) int
+		Todos                        func(childComplexity int) int
 	}
 
 	Todo struct {
@@ -97,6 +100,8 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]*model.Todo, error)
 	GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error)
+	GetRegisteredUser(ctx context.Context, lineAuthCode string) (*model.UserAccountResponse, error)
+	GetUserAccountFromAuthHeader(ctx context.Context) (*model.UserAccountResponse, error)
 }
 
 type executableSchema struct {
@@ -191,6 +196,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ExecuteScheduleCheckBatch(childComplexity, args["token"].(string)), true
+
+	case "Query.getRegisteredUser":
+		if e.complexity.Query.GetRegisteredUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getRegisteredUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetRegisteredUser(childComplexity, args["lineAuthCode"].(string)), true
+
+	case "Query.getUserAccountFromAuthHeader":
+		if e.complexity.Query.GetUserAccountFromAuthHeader == nil {
+			break
+		}
+
+		return e.complexity.Query.GetUserAccountFromAuthHeader(childComplexity), true
 
 	case "Query.getUserRegisterToken":
 		if e.complexity.Query.GetUserRegisterToken == nil {
@@ -547,6 +571,29 @@ func (ec *executionContext) field_Query___type_argsName(
 ) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getRegisteredUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_getRegisteredUser_argsLineAuthCode(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["lineAuthCode"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getRegisteredUser_argsLineAuthCode(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("lineAuthCode"))
+	if tmp, ok := rawArgs["lineAuthCode"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -1157,6 +1204,145 @@ func (ec *executionContext) fieldContext_Query_getUserRegisterToken(ctx context.
 	if fc.Args, err = ec.field_Query_getUserRegisterToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getRegisteredUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getRegisteredUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetRegisteredUser(rctx, fc.Args["lineAuthCode"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAccountResponse)
+	fc.Result = res
+	return ec.marshalOUserAccountResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUserAccountResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getRegisteredUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_UserAccountResponse_token(ctx, field)
+			case "userSettingId":
+				return ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+			case "userName":
+				return ec.fieldContext_UserAccountResponse_userName(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+			case "isLineBotFollow":
+				return ec.fieldContext_UserAccountResponse_isLineBotFollow(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAccountResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getRegisteredUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUserAccountFromAuthHeader(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserAccountFromAuthHeader(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetUserAccountFromAuthHeader(rctx)
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal *model.UserAccountResponse
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UserAccountResponse); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *wasurena-task-api/graph/model.UserAccountResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAccountResponse)
+	fc.Result = res
+	return ec.marshalOUserAccountResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUserAccountResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserAccountFromAuthHeader(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_UserAccountResponse_token(ctx, field)
+			case "userSettingId":
+				return ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+			case "userName":
+				return ec.fieldContext_UserAccountResponse_userName(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+			case "isLineBotFollow":
+				return ec.fieldContext_UserAccountResponse_isLineBotFollow(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAccountResponse", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -4085,6 +4271,44 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getUserRegisterToken(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getRegisteredUser":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getRegisteredUser(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUserAccountFromAuthHeader":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserAccountFromAuthHeader(ctx, field)
 				return res
 			}
 

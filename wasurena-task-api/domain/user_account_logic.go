@@ -1,11 +1,9 @@
 package domain
 
 import (
-	"context"
 	"errors"
 	"os"
 	"time"
-	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -13,9 +11,9 @@ import (
 
 type UserAccount db.UserAccount
 
-// トークンからユーザ情報を取得
-func GetUserAccountInfoFromToken(ctx context.Context, tokenInput string) (*UserAccount, error) {
-	token, err := jwt.Parse(tokenInput, func(token *jwt.Token) (interface{}, error) {
+// トークンからユーザIDを取得
+func GetUserAccountIdFromToken(t string) (*string, error) {
+	token, err := jwt.Parse(string(t), func(token *jwt.Token) (any, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
@@ -31,17 +29,11 @@ func GetUserAccountInfoFromToken(ctx context.Context, tokenInput string) (*UserA
 		return nil, errors.New("expire token")
 	}
 
-	// userIdをキーにクエリ発行
-	userAccountDb, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountById(ctx, claims["userId"].(string))
-	if err != nil {
-		return nil, err
-	}
-	userAccount := UserAccount(userAccountDb)
-
-	return &userAccount, nil
+	userAccountId := claims["userId"].(string)
+	return &userAccountId, nil
 }
 
-// ユーザ情報をトークン化して返す
+// ユーザIDをトークン化して返す
 func (u UserAccount) GetAccountUserToken() (string, error) {
 	token := jwt.New(jwt.GetSigningMethod("HS256"))
 	// 期限は3ヶ月にする

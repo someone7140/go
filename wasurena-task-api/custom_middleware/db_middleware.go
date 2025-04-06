@@ -8,16 +8,16 @@ import (
 	"wasurena-task-api/db"
 )
 
-type contextKey string
+type contextDbKey string
 
-const dbQueriesContextKey contextKey = "pgx_queries"
+const dbQueriesContextKey contextDbKey = "pgxQueries"
 
 // pgxのクエリをコンテキストに追加するミドルウェア
 func WithDbQueries(queries *db.Queries) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		{
 			return func(c echo.Context) error {
-				ctx := context.WithValue(c.Request().Context(), dbQueriesContextKey, c)
+				ctx := context.WithValue(c.Request().Context(), dbQueriesContextKey, queries)
 				c.SetRequest(c.Request().WithContext(ctx))
 				err := next(c)
 				return err

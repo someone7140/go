@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -20,13 +19,13 @@ type LineUserInfo struct {
 }
 
 // 認証コードからLINEのユーザ情報を取得
-func GetLineUserInfoFromAuthCode(code string) (*LineUserInfo, error) {
+func GetLineUserInfoFromAuthCode(code string, redirectUrl string) (*LineUserInfo, error) {
 	ctx := context.Background()
 	oauth2Config := &oauth2.Config{
 		ClientID:     os.Getenv("LINE_CLIENT_ID"),
 		ClientSecret: os.Getenv("LINE_SECRET_ID"),
 		Scopes:       []string{"profile", "openid"},
-		RedirectURL:  fmt.Sprintf("%s%s", os.Getenv("FRONTEND_DOMAIN"), os.Getenv("LINE_AUTH_REDIRECT_PATH")),
+		RedirectURL:  redirectUrl,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://access.line.me/oauth2/v2.1/authorize",
 			TokenURL: "https://api.line.me/oauth2/v2.1/token",

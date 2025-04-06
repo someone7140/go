@@ -8,6 +8,7 @@ import (
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
@@ -15,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/joho/godotenv"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
@@ -46,7 +48,10 @@ func main() {
 		log.Fatal("Error Db Connect")
 	}
 	defer conn.Close(ctx)
+
+	// ミドルウェアの設定
 	ech.Use(custom_middleware.WithDbQueries(queries))
+	ech.Use(custom_middleware.WithUserAccountId())
 
 	// CORSの設定
 	ech.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -70,8 +75,19 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	// GraphQLのルート設定
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	// GraphQLのディレクティブ設定
+	graphQLConfig := graph.Config{Resolvers: &graph.Resolver{}}
+	graphQLConfig.Directives.IsAuthenticated = func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+		if custom_middleware.GeUserAccountId(ctx) == nil {
+			return nil, &gqlerror.Error{
+				Message: "Authentication Error",
+				Extensions: map[string]any{
+					"code": 401,
+				}}
+		}
+		return next(ctx)
+	}
+	srv := handler.New(graph.NewExecutableSchema(graphQLConfig))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})

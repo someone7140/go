@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 	"wasurena-task-api/domain"
 	"wasurena-task-api/graph/model"
 
-	"database/sql"
-
+	"github.com/jackc/pgx/v5"
 	"github.com/rs/xid"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
@@ -17,15 +18,15 @@ func CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.
 	// UserSettingIDが重複してるかチェック
 	_, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountByUserSettingId(ctx, input.UserSettingID)
 	if err != nil {
-		if err != sql.ErrNoRows {
+		if err != pgx.ErrNoRows {
 			return nil, err
 		}
 	} else {
 		// ユーザが取得できていたら重複エラー
 		return nil, &gqlerror.Error{
 			Message: "Dupilicate userSettingId",
-			Extensions: map[string]interface{}{
-				"code": "400",
+			Extensions: map[string]any{
+				"code": 400,
 			}}
 	}
 
@@ -37,15 +38,15 @@ func CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.
 	// LINE_IDの重複チェック
 	_, err = custom_middleware.GetDbQueries(ctx).SelectUserAccountByLineId(ctx, lineUser.UserID)
 	if err != nil {
-		if err != sql.ErrNoRows {
+		if err != pgx.ErrNoRows {
 			return nil, err
 		}
 	} else {
 		// ユーザが取得できていたら重複エラー
 		return nil, &gqlerror.Error{
 			Message: "Dupilicate lineId",
-			Extensions: map[string]interface{}{
-				"code": "403",
+			Extensions: map[string]any{
+				"code": 403,
 			}}
 	}
 
@@ -78,12 +79,30 @@ func CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.
 	}, err
 }
 
-func GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
+// LINEの認証コードから登録用トークンを返す
+func GetUserRegisterTokenFromLineAuthCode(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
 	// 認証コードからLINEのユーザ情報を取得しトークン化する
-	lineInfo, err := domain.GetLineUserInfoFromAuthCode(lineAuthCode)
+	lineInfo, err := domain.GetLineUserInfoFromAuthCode(
+		lineAuthCode,
+		fmt.Sprintf("%s%s", os.Getenv("FRONTEND_DOMAIN"), os.Getenv("LINE_AUTH_REGISTER_REDIRECT_PATH")))
 	if err != nil {
 		return nil, err
 	}
+
+	_, err = custom_middleware.GetDbQueries(ctx).SelectUserAccountByLineId(ctx, lineInfo.UserID)
+	if err != nil {
+		if err != pgx.ErrNoRows {
+			return nil, err
+		}
+	} else {
+		// ユーザが取得できていたら重複エラー
+		return nil, &gqlerror.Error{
+			Message: "Dupilicate lineId",
+			Extensions: map[string]any{
+				"code": 403,
+			}}
+	}
+
 	token, err := lineInfo.GetLineUserToken()
 	if err != nil {
 		return nil, err
@@ -93,4 +112,59 @@ func GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.Crea
 		Token:    token,
 		LineName: lineInfo.DisplayName,
 	}, err
+}
+
+// Contextの認証情報からユーザ情報を返す
+func GetUserAccountFromContext(ctx context.Context) (*model.UserAccountResponse, error) {
+	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccount, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountById(ctx, *userAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserAccountResponse{
+		Token:           "", // tokenは新たには発行しない
+		UserSettingID:   userAccount.UserSettingID,
+		UserName:        userAccount.UserName,
+		ImageURL:        userAccount.ImageUrl,
+		IsLineBotFollow: userAccount.IsLineBotFollow,
+	}, nil
+}
+
+// LINEの認証コードからユーザ情報を取得
+func GetUserAccountFromLineAuthCode(ctx context.Context, lineAuthCode string) (*model.UserAccountResponse, error) {
+	// 認証コードからLINEのユーザ情報を取得
+	lineInfo, err := domain.GetLineUserInfoFromAuthCode(
+		lineAuthCode,
+		fmt.Sprintf("%s%s", os.Getenv("FRONTEND_DOMAIN"), os.Getenv("LINE_AUTH_LOGIN_REDIRECT_PATH")))
+	if err != nil {
+		return nil, err
+	}
+	userAccountDb, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountByLineId(ctx, lineInfo.UserID)
+	if err != nil {
+		if err != pgx.ErrNoRows {
+			return nil, &gqlerror.Error{
+				Message: "Can not find userAccount",
+				Extensions: map[string]any{
+					"code": 404,
+				}}
+		} else {
+			return nil, err
+		}
+	}
+
+	// レスポンス構築
+	userAccount := domain.UserAccount(userAccountDb)
+	userToken, err := userAccount.GetAccountUserToken()
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserAccountResponse{
+		Token:           userToken,
+		UserSettingID:   userAccount.UserSettingID,
+		UserName:        userAccount.UserName,
+		ImageURL:        userAccount.ImageUrl,
+		IsLineBotFollow: userAccount.IsLineBotFollow,
+	}, nil
 }

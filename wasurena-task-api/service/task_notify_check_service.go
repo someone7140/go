@@ -27,8 +27,8 @@ func CheckDailyNotify(ctx context.Context, token string) (bool, error) {
 	if token != os.Getenv("BATCH_TOKEN") {
 		return false, &gqlerror.Error{
 			Message: "token authorize error",
-			Extensions: map[string]interface{}{
-				"code": "401",
+			Extensions: map[string]any{
+				"code": 401,
 			}}
 	}
 	// contextをclone
@@ -80,5 +80,4 @@ func execCheckDailyNotify(ctx context.Context) {
 
 	// 通知（TODO）
 	fmt.Println(notificationUserMap)
-
 }
