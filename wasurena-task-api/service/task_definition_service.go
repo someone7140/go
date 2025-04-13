@@ -11,11 +11,11 @@ import (
 
 func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 	id := xid.New()
-
+	userAccountId := custom_middleware.GeUserAccountId(ctx)
 	createData := db.CreateTaskDefinitionParams{
 		ID:                      id.String(),
 		Title:                   input.Title,
-		OwnerUserID:             "dummy_user",
+		OwnerUserID:             *userAccountId,
 		DisplayFlag:             input.DisplayFlag,
 		NotificationFlag:        input.NotificationFlag,
 		CategoryID:              input.CategoryID,

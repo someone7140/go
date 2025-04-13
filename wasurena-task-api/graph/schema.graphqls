@@ -76,8 +76,8 @@ type Query {
 
 type Mutation {
   executeScheduleCheckBatch(token: String!): Boolean!
-  createCategory(input: NewCategory!): Boolean!
-  createTask(input: NewTask!): Boolean!
-  createTaskExecute(input: NewTaskExecute!): Boolean!
+  createCategory(input: NewCategory!): Boolean! @isAuthenticated
+  createTask(input: NewTask!): Boolean! @isAuthenticated
+  createTaskExecute(input: NewTaskExecute!): Boolean! @isAuthenticated
   createUserAccount(input: NewUserAccount!): UserAccountResponse
 }

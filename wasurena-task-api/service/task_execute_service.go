@@ -12,6 +12,7 @@ import (
 
 func CreateTaskExecuteService(ctx context.Context, input model.NewTaskExecute) (bool, error) {
 	id := xid.New()
+	userAccountId := custom_middleware.GeUserAccountId(ctx)
 	// 現在時刻を取得
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
@@ -22,7 +23,7 @@ func CreateTaskExecuteService(ctx context.Context, input model.NewTaskExecute) (
 	createData := db.CreateTaskExecuteParams{
 		ID:               id.String(),
 		TaskDefinitionID: input.TaskDefinitionID,
-		ExecuteUserID:    "dummy_user",
+		ExecuteUserID:    *userAccountId,
 		ExecuteDateTime:  now,
 		Memo:             input.Memo,
 	}
