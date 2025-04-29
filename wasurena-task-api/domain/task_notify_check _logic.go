@@ -32,7 +32,7 @@ func (deadLineCheck TaskDeadLineCheck) GetNotifyUserMap() (map[string][]db.DeadL
 		// チェック処理
 		checkResult := false
 		if check.DeadLineCheck == db.DeadLineCheckEnumDailyOnce {
-			checkResult = true
+			checkResult = checkDailyOnce(check, deadLineCheck.NowDateTime)
 		} else if check.DeadLineCheck == db.DeadLineCheckEnumDailyHour {
 			checkResult = checkDailyHour(check, deadLineCheck.NowDateTime)
 		}
@@ -58,4 +58,10 @@ func checkDailyHour(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
 	diffHour := now.Sub(checkTarget.ExecLatestDateTime).Hours()
 
 	return diffHour < hourInterval
+}
+
+// hour単位のタスクの期限が超過していないか
+func checkDailyOnce(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
+	diffHour := now.Sub(checkTarget.ExecLatestDateTime).Hours()
+	return diffHour <= 24
 }

@@ -118,3 +118,11 @@ values (
     $4,
     $5
 ) returning *;
+-- name: UpdateUserAccountLineBotFollow :one
+update
+	user_accounts
+set
+	is_line_bot_follow = $2
+where
+	id = $1
+returning *;

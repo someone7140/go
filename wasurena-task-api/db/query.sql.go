@@ -351,3 +351,32 @@ func (q *Queries) SelectUserAccountByUserSettingId(ctx context.Context, userSett
 	)
 	return i, err
 }
+
+const updateUserAccountLineBotFollow = `-- name: UpdateUserAccountLineBotFollow :one
+update
+	user_accounts
+set
+	is_line_bot_follow = $2
+where
+	id = $1
+returning id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+`
+
+type UpdateUserAccountLineBotFollowParams struct {
+	ID              string
+	IsLineBotFollow bool
+}
+
+func (q *Queries) UpdateUserAccountLineBotFollow(ctx context.Context, arg UpdateUserAccountLineBotFollowParams) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, updateUserAccountLineBotFollow, arg.ID, arg.IsLineBotFollow)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
+}

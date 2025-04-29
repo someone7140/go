@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func DTakahashitheWallBreakerMain() {
 	var h, w int
 	fmt.Scan(&h, &w)
 

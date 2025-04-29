@@ -8,6 +8,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/line/line-bot-sdk-go/v8 v8.13.1
 	github.com/rs/xid v1.6.0
 	github.com/vektah/gqlparser/v2 v2.5.23
 )

@@ -22,8 +22,8 @@ type LineUserInfo struct {
 func GetLineUserInfoFromAuthCode(code string, redirectUrl string) (*LineUserInfo, error) {
 	ctx := context.Background()
 	oauth2Config := &oauth2.Config{
-		ClientID:     os.Getenv("LINE_CLIENT_ID"),
-		ClientSecret: os.Getenv("LINE_SECRET_ID"),
+		ClientID:     os.Getenv("LINE_AUTH_CLIENT_ID"),
+		ClientSecret: os.Getenv("LINE_AUTH_SECRET_ID"),
 		Scopes:       []string{"profile", "openid"},
 		RedirectURL:  redirectUrl,
 		Endpoint: oauth2.Endpoint{

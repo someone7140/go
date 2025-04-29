@@ -7,6 +7,7 @@ import (
 	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph"
+	"wasurena-task-api/rest_handler"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -100,6 +101,7 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
+	// GraphQLのパス設定
 	ech.POST("/query", func(c echo.Context) error {
 		srv.ServeHTTP(c.Response(), c.Request())
 		return nil
@@ -108,6 +110,8 @@ func main() {
 		playground.Handler("GraphQL playground", "/query").ServeHTTP(c.Response(), c.Request())
 		return nil
 	})
+	// LINEのコールバック用パス
+	ech.POST("/line_callback", rest_handler.LineCallBackHander)
 
 	err = ech.Start(":" + port)
 	if err != nil {
