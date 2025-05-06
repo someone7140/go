@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"wasurena-task-api/graph/model"
 	"wasurena-task-api/service"
 )
@@ -18,7 +17,12 @@ func (r *mutationResolver) ExecuteScheduleCheckBatch(ctx context.Context, token 
 
 // CreateCategory is the resolver for the createCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (bool, error) {
-	return service.CreateCategoryService(ctx, input)
+	return service.CreateTaskCategoryService(ctx, input)
+}
+
+// DeleteCategory is the resolver for the deleteCategory field.
+func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool, error) {
+	return service.DeleteTaskCategoryService(ctx, id)
 }
 
 // CreateTask is the resolver for the createTask field.
@@ -36,11 +40,6 @@ func (r *mutationResolver) CreateUserAccount(ctx context.Context, input model.Ne
 	return service.CreateUserAccount(ctx, input)
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
-}
-
 // GetUserRegisterToken is the resolver for the getUserRegisterToken field.
 func (r *queryResolver) GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
 	return service.GetUserRegisterTokenFromLineAuthCode(ctx, lineAuthCode)
@@ -54,6 +53,11 @@ func (r *queryResolver) GetRegisteredUser(ctx context.Context, lineAuthCode stri
 // GetUserAccountFromAuthHeader is the resolver for the getUserAccountFromAuthHeader field.
 func (r *queryResolver) GetUserAccountFromAuthHeader(ctx context.Context) (*model.UserAccountResponse, error) {
 	return service.GetUserAccountFromContext(ctx)
+}
+
+// GetTaskCategories is the resolver for the getTaskCategories field.
+func (r *queryResolver) GetTaskCategories(ctx context.Context) ([]*model.TaskCategoryResponse, error) {
+	return service.GetTaskCategoriesService(ctx)
 }
 
 // Mutation returns MutationResolver implementation.

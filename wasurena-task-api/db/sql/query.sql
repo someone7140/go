@@ -13,6 +13,25 @@ values (
     $3, 
     $4
 ) returning *;
+-- name: SelectTaskCategories :many
+select
+	*
+from
+	task_category cate
+where
+	cate.owner_user_id = $1
+order by
+	cate.display_order nulls last
+limit 200;
+-- name: DeleteTaskCategory :one
+delete
+from
+	task_category cate
+where
+	cate.id = $1
+	and
+	cate.owner_user_id = $2
+returning *;
 -- name: CreateTaskDefinition :one
 insert
 	into
@@ -38,6 +57,24 @@ values (
     $8,
     $9
 ) returning *;
+-- name: UpdateAllTaskNotificationFlagByUser :many
+update
+	task_definition
+set
+	notification_flag = $2
+where
+	owner_user_id = $1
+returning *;
+-- name: UpdateAllTaskCategoryNull :many
+update
+	task_definition
+set
+	category_id = null
+where
+	category_id = $1
+	and
+	owner_user_id = $2
+returning *;
 -- name: SelectLatestTaskExecuteForNotify :many
 select
 	def.*,

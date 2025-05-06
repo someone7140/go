@@ -212,6 +212,34 @@ func (q *Queries) CreateUserAccount(ctx context.Context, arg CreateUserAccountPa
 	return i, err
 }
 
+const deleteTaskCategory = `-- name: DeleteTaskCategory :one
+delete
+from
+	task_category cate
+where
+	cate.id = $1
+	and
+	cate.owner_user_id = $2
+returning id, name, owner_user_id, display_order
+`
+
+type DeleteTaskCategoryParams struct {
+	ID          string
+	OwnerUserID string
+}
+
+func (q *Queries) DeleteTaskCategory(ctx context.Context, arg DeleteTaskCategoryParams) (TaskCategory, error) {
+	row := q.db.QueryRow(ctx, deleteTaskCategory, arg.ID, arg.OwnerUserID)
+	var i TaskCategory
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.OwnerUserID,
+		&i.DisplayOrder,
+	)
+	return i, err
+}
+
 const selectLatestTaskExecuteForNotify = `-- name: SelectLatestTaskExecuteForNotify :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
@@ -272,6 +300,43 @@ func (q *Queries) SelectLatestTaskExecuteForNotify(ctx context.Context) ([]Selec
 			&i.DeadLineCheckSubSetting,
 			&i.Detail,
 			&i.LatestDateTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const selectTaskCategories = `-- name: SelectTaskCategories :many
+select
+	id, name, owner_user_id, display_order
+from
+	task_category cate
+where
+	cate.owner_user_id = $1
+order by
+	cate.display_order nulls last
+limit 200
+`
+
+func (q *Queries) SelectTaskCategories(ctx context.Context, ownerUserID string) ([]TaskCategory, error) {
+	rows, err := q.db.Query(ctx, selectTaskCategories, ownerUserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TaskCategory
+	for rows.Next() {
+		var i TaskCategory
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.OwnerUserID,
+			&i.DisplayOrder,
 		); err != nil {
 			return nil, err
 		}
@@ -350,6 +415,98 @@ func (q *Queries) SelectUserAccountByUserSettingId(ctx context.Context, userSett
 		&i.IsLineBotFollow,
 	)
 	return i, err
+}
+
+const updateAllTaskCategoryNull = `-- name: UpdateAllTaskCategoryNull :many
+update
+	task_definition
+set
+	category_id = null
+where
+	category_id = $1
+	and
+	owner_user_id = $2
+returning id, title, owner_user_id, display_flag, notification_flag, category_id, dead_line_check, dead_line_check_sub_setting, detail
+`
+
+type UpdateAllTaskCategoryNullParams struct {
+	CategoryID  *string
+	OwnerUserID string
+}
+
+func (q *Queries) UpdateAllTaskCategoryNull(ctx context.Context, arg UpdateAllTaskCategoryNullParams) ([]TaskDefinition, error) {
+	rows, err := q.db.Query(ctx, updateAllTaskCategoryNull, arg.CategoryID, arg.OwnerUserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TaskDefinition
+	for rows.Next() {
+		var i TaskDefinition
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.OwnerUserID,
+			&i.DisplayFlag,
+			&i.NotificationFlag,
+			&i.CategoryID,
+			&i.DeadLineCheck,
+			&i.DeadLineCheckSubSetting,
+			&i.Detail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateAllTaskNotificationFlagByUser = `-- name: UpdateAllTaskNotificationFlagByUser :many
+update
+	task_definition
+set
+	notification_flag = $2
+where
+	owner_user_id = $1
+returning id, title, owner_user_id, display_flag, notification_flag, category_id, dead_line_check, dead_line_check_sub_setting, detail
+`
+
+type UpdateAllTaskNotificationFlagByUserParams struct {
+	OwnerUserID      string
+	NotificationFlag bool
+}
+
+func (q *Queries) UpdateAllTaskNotificationFlagByUser(ctx context.Context, arg UpdateAllTaskNotificationFlagByUserParams) ([]TaskDefinition, error) {
+	rows, err := q.db.Query(ctx, updateAllTaskNotificationFlagByUser, arg.OwnerUserID, arg.NotificationFlag)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TaskDefinition
+	for rows.Next() {
+		var i TaskDefinition
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.OwnerUserID,
+			&i.DisplayFlag,
+			&i.NotificationFlag,
+			&i.CategoryID,
+			&i.DeadLineCheck,
+			&i.DeadLineCheckSubSetting,
+			&i.Detail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const updateUserAccountLineBotFollow = `-- name: UpdateUserAccountLineBotFollow :one

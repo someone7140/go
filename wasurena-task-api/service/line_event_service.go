@@ -38,7 +38,7 @@ func FollowEvent(
 
 	}
 
-	// DBのフラグを更新
+	// ユーザのレコードの通知フラグを更新
 	_, err = custom_middleware.GetDbQueries(ctx).UpdateUserAccountLineBotFollow(
 		ctx, db.UpdateUserAccountLineBotFollowParams{
 			ID:              user.ID,
@@ -74,12 +74,20 @@ func UnFollowEvent(
 
 	}
 
-	// DBのフラグを更新
+	// ユーザのレコードの通知フラグを更新
 	_, err = custom_middleware.GetDbQueries(ctx).UpdateUserAccountLineBotFollow(
 		ctx, db.UpdateUserAccountLineBotFollowParams{
 			ID:              user.ID,
 			IsLineBotFollow: false,
 		})
-
+	if err != nil {
+		return err
+	}
+	// タスクのレコードの通知フラグを全てOFFで更新
+	_, err = custom_middleware.GetDbQueries(ctx).UpdateAllTaskNotificationFlagByUser(
+		ctx, db.UpdateAllTaskNotificationFlagByUserParams{
+			OwnerUserID:      user.ID,
+			NotificationFlag: false,
+		})
 	return err
 }

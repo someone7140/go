@@ -6,18 +6,6 @@ scalar Map
 
 directive @isAuthenticated on FIELD_DEFINITION
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
-}
-
 input NewCategory {
   name: String!
   displayOrder: Int
@@ -67,16 +55,23 @@ type UserAccountResponse {
   isLineBotFollow: Boolean!
 }
 
+type TaskCategoryResponse {
+  id: String!
+  name: String!
+  displayOrder: Int
+}
+
 type Query {
-  todos: [Todo!]!
   getUserRegisterToken(lineAuthCode: String!): CreateUserRegisterTokenResponse
   getRegisteredUser(lineAuthCode: String!): UserAccountResponse
   getUserAccountFromAuthHeader: UserAccountResponse @isAuthenticated
+  getTaskCategories: [TaskCategoryResponse!] @isAuthenticated
 }
 
 type Mutation {
   executeScheduleCheckBatch(token: String!): Boolean!
   createCategory(input: NewCategory!): Boolean! @isAuthenticated
+  deleteCategory(id: String!): Boolean! @isAuthenticated
   createTask(input: NewTask!): Boolean! @isAuthenticated
   createTaskExecute(input: NewTaskExecute!): Boolean! @isAuthenticated
   createUserAccount(input: NewUserAccount!): UserAccountResponse

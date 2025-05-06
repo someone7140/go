@@ -9,7 +9,7 @@ import (
 	"github.com/line/line-bot-sdk-go/v8/linebot/webhook"
 )
 
-func LineCallBackHander(c echo.Context) error {
+func LineCallBackHandler(c echo.Context) error {
 	// bot作成
 	bot, err := linebot.New(
 		os.Getenv("LINE_MESSAGE_SECRET"),
@@ -39,7 +39,6 @@ func LineCallBackHander(c echo.Context) error {
 					bot,
 					e,
 				)
-				return err
 			}
 		case webhook.UnfollowEvent:
 			source := e.Source
@@ -53,10 +52,9 @@ func LineCallBackHander(c echo.Context) error {
 					bot,
 					e,
 				)
-				return err
 			}
 		}
 	}
 
-	return nil
+	return err
 }

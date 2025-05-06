@@ -43,16 +43,10 @@ type NewUserAccount struct {
 type Query struct {
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type TaskCategoryResponse struct {
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	DisplayOrder *int32 `json:"displayOrder,omitempty"`
 }
 
 type UserAccountResponse struct {

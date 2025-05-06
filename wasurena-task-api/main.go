@@ -111,7 +111,7 @@ func main() {
 		return nil
 	})
 	// LINEのコールバック用パス
-	ech.POST("/line_callback", rest_handler.LineCallBackHander)
+	ech.POST("/line_callback", rest_handler.LineCallBackHandler)
 
 	err = ech.Start(":" + port)
 	if err != nil {

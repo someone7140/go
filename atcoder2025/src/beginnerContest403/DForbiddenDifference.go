@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func main() {
+func DForbiddenDifferenceMain() {
 	var n, d int
 	fmt.Scan(&n, &d)
 
