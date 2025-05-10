@@ -49,6 +49,18 @@ type TaskCategoryResponse struct {
 	DisplayOrder *int32 `json:"displayOrder,omitempty"`
 }
 
+type TaskDefinitionResponse struct {
+	ID                      string                `json:"id"`
+	Title                   string                `json:"title"`
+	DisplayFlag             bool                  `json:"displayFlag"`
+	NotificationFlag        bool                  `json:"notificationFlag"`
+	CategoryID              *string               `json:"categoryId,omitempty"`
+	CategoryName            *string               `json:"categoryName,omitempty"`
+	DeadLineCheck           *db.DeadLineCheckEnum `json:"deadLineCheck,omitempty"`
+	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
+	Detail                  *string               `json:"detail,omitempty"`
+}
+
 type UserAccountResponse struct {
 	Token           string  `json:"token"`
 	UserSettingID   string  `json:"userSettingId"`

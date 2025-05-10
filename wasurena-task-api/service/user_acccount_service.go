@@ -140,6 +140,8 @@ func GetUserAccountFromLineAuthCode(ctx context.Context, lineAuthCode string) (*
 	if err != nil {
 		return nil, err
 	}
+
+	// DBからユーザ情報取得
 	userAccountDb, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountByLineId(ctx, lineInfo.UserID)
 	if err != nil {
 		if err != pgx.ErrNoRows {
@@ -152,6 +154,16 @@ func GetUserAccountFromLineAuthCode(ctx context.Context, lineAuthCode string) (*
 			return nil, err
 		}
 	}
+
+	// イメージ画像のURLを更新
+	_, err = custom_middleware.GetDbQueries(ctx).UpdateUserImageUrl(ctx, db.UpdateUserImageUrlParams{
+		ID:       userAccountDb.ID,
+		ImageUrl: &lineInfo.PictureURL,
+	})
+	if err != nil {
+		return nil, err
+	}
+	userAccountDb.ImageUrl = &lineInfo.PictureURL
 
 	// レスポンス構築
 	userAccount := domain.UserAccount(userAccountDb)

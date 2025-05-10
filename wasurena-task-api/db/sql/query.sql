@@ -98,8 +98,22 @@ where
 		def.notification_flag = true
 	and def.dead_line_check is not null
 order by
-		owner_user_id,
-		id;
+		def.owner_user_id,
+		def.id;
+-- name: SelectTaskDefinitionList :many
+select
+	def.*,
+	task_category.name as category_name
+from
+		task_definition def
+left outer join task_category on
+		task_category.id = def.category_id
+where
+	def.owner_user_id = $1
+order by
+		task_category.display_order nulls last,
+		def.id desc
+limit 300;
 -- name: CreateTaskExecute :one
 insert
 	into
@@ -160,6 +174,14 @@ update
 	user_accounts
 set
 	is_line_bot_follow = $2
+where
+	id = $1
+returning *;
+-- name: UpdateUserImageUrl :one
+update
+	user_accounts
+set
+	image_url = $2
 where
 	id = $1
 returning *;

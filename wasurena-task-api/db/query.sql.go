@@ -263,8 +263,8 @@ where
 		def.notification_flag = true
 	and def.dead_line_check is not null
 order by
-		owner_user_id,
-		id
+		def.owner_user_id,
+		def.id
 `
 
 type SelectLatestTaskExecuteForNotifyRow struct {
@@ -337,6 +337,66 @@ func (q *Queries) SelectTaskCategories(ctx context.Context, ownerUserID string) 
 			&i.Name,
 			&i.OwnerUserID,
 			&i.DisplayOrder,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const selectTaskDefinitionList = `-- name: SelectTaskDefinitionList :many
+select
+	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
+	task_category.name as category_name
+from
+		task_definition def
+left outer join task_category on
+		task_category.id = def.category_id
+where
+	def.owner_user_id = $1
+order by
+		task_category.display_order nulls last,
+		def.id desc
+limit 300
+`
+
+type SelectTaskDefinitionListRow struct {
+	ID                      string
+	Title                   string
+	OwnerUserID             string
+	DisplayFlag             bool
+	NotificationFlag        bool
+	CategoryID              *string
+	DeadLineCheck           *DeadLineCheckEnum
+	DeadLineCheckSubSetting db_type.Jsonb
+	Detail                  *string
+	CategoryName            *string
+}
+
+func (q *Queries) SelectTaskDefinitionList(ctx context.Context, ownerUserID string) ([]SelectTaskDefinitionListRow, error) {
+	rows, err := q.db.Query(ctx, selectTaskDefinitionList, ownerUserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SelectTaskDefinitionListRow
+	for rows.Next() {
+		var i SelectTaskDefinitionListRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.OwnerUserID,
+			&i.DisplayFlag,
+			&i.NotificationFlag,
+			&i.CategoryID,
+			&i.DeadLineCheck,
+			&i.DeadLineCheckSubSetting,
+			&i.Detail,
+			&i.CategoryName,
 		); err != nil {
 			return nil, err
 		}
@@ -526,6 +586,35 @@ type UpdateUserAccountLineBotFollowParams struct {
 
 func (q *Queries) UpdateUserAccountLineBotFollow(ctx context.Context, arg UpdateUserAccountLineBotFollowParams) (UserAccount, error) {
 	row := q.db.QueryRow(ctx, updateUserAccountLineBotFollow, arg.ID, arg.IsLineBotFollow)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
+}
+
+const updateUserImageUrl = `-- name: UpdateUserImageUrl :one
+update
+	user_accounts
+set
+	image_url = $2
+where
+	id = $1
+returning id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+`
+
+type UpdateUserImageUrlParams struct {
+	ID       string
+	ImageUrl *string
+}
+
+func (q *Queries) UpdateUserImageUrl(ctx context.Context, arg UpdateUserImageUrlParams) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, updateUserImageUrl, arg.ID, arg.ImageUrl)
 	var i UserAccount
 	err := row.Scan(
 		&i.ID,

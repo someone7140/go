@@ -47,7 +47,7 @@ func execCheckDailyNotify(ctx context.Context) {
 		return
 	}
 	now := time.Now().In(jst)
-	var checkList []domain.TaskDeadLineCheckTarget
+	checkList := []domain.TaskDeadLineCheckTarget{}
 
 	notifies, err := custom_middleware.GetDbQueries(ctx).SelectLatestTaskExecuteForNotify(ctx)
 	if err != nil {

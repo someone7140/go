@@ -25,28 +25,34 @@ type CheckSubSettingDailyHour struct {
 }
 
 // タスクの期限が超過しているユーザのリストを取得
-func (deadLineCheck TaskDeadLineCheck) GetNotifyUserMap() (map[string][]db.DeadLineCheckEnum, error) {
+func (deadLineCheck TaskDeadLineCheck) GetNotifyUserMap() (map[string][]TaskDeadLineCheckTarget, error) {
 
-	userNotifyMap := map[string][]db.DeadLineCheckEnum{}
+	userNotifyMap := map[string][]TaskDeadLineCheckTarget{}
 	for _, check := range deadLineCheck.CheckTargetList {
 		// チェック処理
-		checkResult := false
-		if check.DeadLineCheck == db.DeadLineCheckEnumDailyOnce {
-			checkResult = checkDailyOnce(check, deadLineCheck.NowDateTime)
-		} else if check.DeadLineCheck == db.DeadLineCheckEnumDailyHour {
-			checkResult = checkDailyHour(check, deadLineCheck.NowDateTime)
-		}
-
+		checkResult := checkTaskDeadLine(check, deadLineCheck.NowDateTime)
+		// 期限が超過している場合はユーザーごとにmapに追加
 		if !checkResult {
 			userNotifies, ok := userNotifyMap[check.OwnerUserID]
 			if ok {
-				userNotifyMap[check.OwnerUserID] = append(userNotifies, check.DeadLineCheck)
+				userNotifyMap[check.OwnerUserID] = append(userNotifies, check)
 			} else {
-				userNotifyMap[check.OwnerUserID] = []db.DeadLineCheckEnum{check.DeadLineCheck}
+				userNotifyMap[check.OwnerUserID] = []TaskDeadLineCheckTarget{check}
 			}
 		}
 	}
 	return userNotifyMap, nil
+}
+
+// タスクの期限超過チェック
+func checkTaskDeadLine(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
+	if checkTarget.DeadLineCheck == db.DeadLineCheckEnumDailyOnce {
+		return checkDailyOnce(checkTarget, now)
+	}
+	if checkTarget.DeadLineCheck == db.DeadLineCheckEnumDailyHour {
+		return checkDailyHour(checkTarget, now)
+	}
+	return false
 }
 
 // hour単位のタスクの期限が超過していないか
