@@ -10,6 +10,7 @@ import (
 	"github.com/rs/xid"
 )
 
+// タスクの実行履歴を追加する
 func CreateTaskExecuteService(ctx context.Context, input model.NewTaskExecute) (bool, error) {
 	id := xid.New()
 	userAccountId := custom_middleware.GeUserAccountId(ctx)

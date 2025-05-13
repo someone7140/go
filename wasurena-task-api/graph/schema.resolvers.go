@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"wasurena-task-api/graph/model"
 	"wasurena-task-api/service"
 )
@@ -28,6 +29,11 @@ func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool,
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (bool, error) {
 	return service.CreateTaskService(ctx, input)
+}
+
+// DeleteTask is the resolver for the deleteTask field.
+func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (bool, error) {
+	return service.DeleteTaskDefinitionService(ctx, id)
 }
 
 // CreateTaskExecute is the resolver for the createTaskExecute field.
@@ -63,6 +69,11 @@ func (r *queryResolver) GetTaskCategories(ctx context.Context) ([]*model.TaskCat
 // GetTaskDefinitions is the resolver for the getTaskDefinitions field.
 func (r *queryResolver) GetTaskDefinitions(ctx context.Context) ([]*model.TaskDefinitionResponse, error) {
 	return service.GetTaskDefinitionService(ctx)
+}
+
+// GetTaskCheckDisplayList is the resolver for the getTaskCheckDisplayList field.
+func (r *queryResolver) GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskDefinitionResponse, error) {
+	panic(fmt.Errorf("not implemented: GetTaskCheckDisplayList - getTaskCheckDisplayList"))
 }
 
 // Mutation returns MutationResolver implementation.

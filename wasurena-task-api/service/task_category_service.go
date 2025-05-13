@@ -9,6 +9,7 @@ import (
 	"github.com/rs/xid"
 )
 
+// カテゴリーを追加する
 func CreateTaskCategoryService(ctx context.Context, input model.NewCategory) (bool, error) {
 	id := xid.New()
 	userAccountId := custom_middleware.GeUserAccountId(ctx)
@@ -27,6 +28,7 @@ func CreateTaskCategoryService(ctx context.Context, input model.NewCategory) (bo
 	return true, err
 }
 
+// カテゴリーを取得する
 func GetTaskCategoriesService(ctx context.Context) ([]*model.TaskCategoryResponse, error) {
 	userAccountId := custom_middleware.GeUserAccountId(ctx)
 
@@ -47,6 +49,7 @@ func GetTaskCategoriesService(ctx context.Context) ([]*model.TaskCategoryRespons
 	return responseSlice, err
 }
 
+// カテゴリーを削除する
 func DeleteTaskCategoryService(ctx context.Context, id string) (bool, error) {
 	userAccountId := custom_middleware.GeUserAccountId(ctx)
 

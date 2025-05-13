@@ -14,6 +14,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
+// ユーザーのアカウントを追加する
 func CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error) {
 	// UserSettingIDが重複してるかチェック
 	_, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountByUserSettingId(ctx, input.UserSettingID)

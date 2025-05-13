@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph/model"
 
@@ -60,12 +61,14 @@ type ComplexityRoot struct {
 		CreateTaskExecute         func(childComplexity int, input model.NewTaskExecute) int
 		CreateUserAccount         func(childComplexity int, input model.NewUserAccount) int
 		DeleteCategory            func(childComplexity int, id string) int
+		DeleteTask                func(childComplexity int, id string) int
 		ExecuteScheduleCheckBatch func(childComplexity int, token string) int
 	}
 
 	Query struct {
 		GetRegisteredUser            func(childComplexity int, lineAuthCode string) int
 		GetTaskCategories            func(childComplexity int) int
+		GetTaskCheckDisplayList      func(childComplexity int) int
 		GetTaskDefinitions           func(childComplexity int) int
 		GetUserAccountFromAuthHeader func(childComplexity int) int
 		GetUserRegisterToken         func(childComplexity int, lineAuthCode string) int
@@ -75,6 +78,20 @@ type ComplexityRoot struct {
 		DisplayOrder func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Name         func(childComplexity int) int
+	}
+
+	TaskCheckDisplayResponse struct {
+		CategoryID              func(childComplexity int) int
+		CategoryName            func(childComplexity int) int
+		DeadLineCheck           func(childComplexity int) int
+		DeadLineCheckSubSetting func(childComplexity int) int
+		Detail                  func(childComplexity int) int
+		DisplayFlag             func(childComplexity int) int
+		ID                      func(childComplexity int) int
+		IsExceedDeadLine        func(childComplexity int) int
+		LatestExecDateTime      func(childComplexity int) int
+		NotificationFlag        func(childComplexity int) int
+		Title                   func(childComplexity int) int
 	}
 
 	TaskDefinitionResponse struct {
@@ -103,6 +120,7 @@ type MutationResolver interface {
 	CreateCategory(ctx context.Context, input model.NewCategory) (bool, error)
 	DeleteCategory(ctx context.Context, id string) (bool, error)
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
+	DeleteTask(ctx context.Context, id string) (bool, error)
 	CreateTaskExecute(ctx context.Context, input model.NewTaskExecute) (bool, error)
 	CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error)
 }
@@ -112,6 +130,7 @@ type QueryResolver interface {
 	GetUserAccountFromAuthHeader(ctx context.Context) (*model.UserAccountResponse, error)
 	GetTaskCategories(ctx context.Context) ([]*model.TaskCategoryResponse, error)
 	GetTaskDefinitions(ctx context.Context) ([]*model.TaskDefinitionResponse, error)
+	GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskDefinitionResponse, error)
 }
 
 type executableSchema struct {
@@ -207,6 +226,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteCategory(childComplexity, args["id"].(string)), true
 
+	case "Mutation.deleteTask":
+		if e.complexity.Mutation.DeleteTask == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTask_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTask(childComplexity, args["id"].(string)), true
+
 	case "Mutation.executeScheduleCheckBatch":
 		if e.complexity.Mutation.ExecuteScheduleCheckBatch == nil {
 			break
@@ -237,6 +268,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetTaskCategories(childComplexity), true
+
+	case "Query.getTaskCheckDisplayList":
+		if e.complexity.Query.GetTaskCheckDisplayList == nil {
+			break
+		}
+
+		return e.complexity.Query.GetTaskCheckDisplayList(childComplexity), true
 
 	case "Query.getTaskDefinitions":
 		if e.complexity.Query.GetTaskDefinitions == nil {
@@ -284,6 +322,83 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TaskCategoryResponse.Name(childComplexity), true
+
+	case "TaskCheckDisplayResponse.categoryId":
+		if e.complexity.TaskCheckDisplayResponse.CategoryID == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.CategoryID(childComplexity), true
+
+	case "TaskCheckDisplayResponse.categoryName":
+		if e.complexity.TaskCheckDisplayResponse.CategoryName == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.CategoryName(childComplexity), true
+
+	case "TaskCheckDisplayResponse.deadLineCheck":
+		if e.complexity.TaskCheckDisplayResponse.DeadLineCheck == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.DeadLineCheck(childComplexity), true
+
+	case "TaskCheckDisplayResponse.deadLineCheckSubSetting":
+		if e.complexity.TaskCheckDisplayResponse.DeadLineCheckSubSetting == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.DeadLineCheckSubSetting(childComplexity), true
+
+	case "TaskCheckDisplayResponse.detail":
+		if e.complexity.TaskCheckDisplayResponse.Detail == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.Detail(childComplexity), true
+
+	case "TaskCheckDisplayResponse.displayFlag":
+		if e.complexity.TaskCheckDisplayResponse.DisplayFlag == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.DisplayFlag(childComplexity), true
+
+	case "TaskCheckDisplayResponse.id":
+		if e.complexity.TaskCheckDisplayResponse.ID == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.ID(childComplexity), true
+
+	case "TaskCheckDisplayResponse.isExceedDeadLine":
+		if e.complexity.TaskCheckDisplayResponse.IsExceedDeadLine == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.IsExceedDeadLine(childComplexity), true
+
+	case "TaskCheckDisplayResponse.latestExecDateTime":
+		if e.complexity.TaskCheckDisplayResponse.LatestExecDateTime == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.LatestExecDateTime(childComplexity), true
+
+	case "TaskCheckDisplayResponse.notificationFlag":
+		if e.complexity.TaskCheckDisplayResponse.NotificationFlag == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.NotificationFlag(childComplexity), true
+
+	case "TaskCheckDisplayResponse.title":
+		if e.complexity.TaskCheckDisplayResponse.Title == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.Title(childComplexity), true
 
 	case "TaskDefinitionResponse.categoryId":
 		if e.complexity.TaskDefinitionResponse.CategoryID == nil {
@@ -614,6 +729,29 @@ func (ec *executionContext) field_Mutation_deleteCategory_args(ctx context.Conte
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_deleteCategory_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteTask_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteTask_argsID(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (string, error) {
@@ -1192,6 +1330,83 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_deleteTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTask(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteTask(rctx, fc.Args["id"].(string))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal bool
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTask(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTask_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createTaskExecute(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createTaskExecute(ctx, field)
 	if err != nil {
@@ -1684,6 +1899,89 @@ func (ec *executionContext) fieldContext_Query_getTaskDefinitions(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getTaskCheckDisplayList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTaskCheckDisplayList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetTaskCheckDisplayList(rctx)
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal []*model.TaskDefinitionResponse
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.TaskDefinitionResponse); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*wasurena-task-api/graph/model.TaskDefinitionResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TaskDefinitionResponse)
+	fc.Result = res
+	return ec.marshalOTaskDefinitionResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskDefinitionResponseᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTaskCheckDisplayList(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TaskDefinitionResponse_id(ctx, field)
+			case "title":
+				return ec.fieldContext_TaskDefinitionResponse_title(ctx, field)
+			case "displayFlag":
+				return ec.fieldContext_TaskDefinitionResponse_displayFlag(ctx, field)
+			case "notificationFlag":
+				return ec.fieldContext_TaskDefinitionResponse_notificationFlag(ctx, field)
+			case "categoryId":
+				return ec.fieldContext_TaskDefinitionResponse_categoryId(ctx, field)
+			case "categoryName":
+				return ec.fieldContext_TaskDefinitionResponse_categoryName(ctx, field)
+			case "deadLineCheck":
+				return ec.fieldContext_TaskDefinitionResponse_deadLineCheck(ctx, field)
+			case "deadLineCheckSubSetting":
+				return ec.fieldContext_TaskDefinitionResponse_deadLineCheckSubSetting(ctx, field)
+			case "detail":
+				return ec.fieldContext_TaskDefinitionResponse_detail(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskDefinitionResponse", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -1939,6 +2237,472 @@ func (ec *executionContext) fieldContext_TaskCategoryResponse_displayOrder(_ con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_title(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_displayFlag(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_displayFlag(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DisplayFlag, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_displayFlag(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_notificationFlag(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_notificationFlag(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NotificationFlag, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_notificationFlag(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_categoryId(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_categoryId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CategoryID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_categoryId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_categoryName(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_categoryName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CategoryName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_categoryName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_deadLineCheck(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_deadLineCheck(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeadLineCheck, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.DeadLineCheckEnum)
+	fc.Result = res
+	return ec.marshalODeadLineCheck2ᚖwasurenaᚑtaskᚑapiᚋdbᚐDeadLineCheckEnum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_deadLineCheck(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DeadLineCheck does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_deadLineCheckSubSetting(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_deadLineCheckSubSetting(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeadLineCheckSubSetting, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]any)
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_deadLineCheckSubSetting(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_detail(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_detail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Detail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_detail(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_latestExecDateTime(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_latestExecDateTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LatestExecDateTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_latestExecDateTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_isExceedDeadLine(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_isExceedDeadLine(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsExceedDeadLine, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_isExceedDeadLine(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4770,6 +5534,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "deleteTask":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTask(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createTaskExecute":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createTaskExecute(ctx, field)
@@ -4918,6 +5689,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getTaskCheckDisplayList":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTaskCheckDisplayList(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -4972,6 +5762,77 @@ func (ec *executionContext) _TaskCategoryResponse(ctx context.Context, sel ast.S
 			}
 		case "displayOrder":
 			out.Values[i] = ec._TaskCategoryResponse_displayOrder(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var taskCheckDisplayResponseImplementors = []string{"TaskCheckDisplayResponse"}
+
+func (ec *executionContext) _TaskCheckDisplayResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TaskCheckDisplayResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, taskCheckDisplayResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TaskCheckDisplayResponse")
+		case "id":
+			out.Values[i] = ec._TaskCheckDisplayResponse_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "title":
+			out.Values[i] = ec._TaskCheckDisplayResponse_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "displayFlag":
+			out.Values[i] = ec._TaskCheckDisplayResponse_displayFlag(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "notificationFlag":
+			out.Values[i] = ec._TaskCheckDisplayResponse_notificationFlag(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "categoryId":
+			out.Values[i] = ec._TaskCheckDisplayResponse_categoryId(ctx, field, obj)
+		case "categoryName":
+			out.Values[i] = ec._TaskCheckDisplayResponse_categoryName(ctx, field, obj)
+		case "deadLineCheck":
+			out.Values[i] = ec._TaskCheckDisplayResponse_deadLineCheck(ctx, field, obj)
+		case "deadLineCheckSubSetting":
+			out.Values[i] = ec._TaskCheckDisplayResponse_deadLineCheckSubSetting(ctx, field, obj)
+		case "detail":
+			out.Values[i] = ec._TaskCheckDisplayResponse_detail(ctx, field, obj)
+		case "latestExecDateTime":
+			out.Values[i] = ec._TaskCheckDisplayResponse_latestExecDateTime(ctx, field, obj)
+		case "isExceedDeadLine":
+			out.Values[i] = ec._TaskCheckDisplayResponse_isExceedDeadLine(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5998,6 +6859,24 @@ func (ec *executionContext) marshalOTaskDefinitionResponse2ᚕᚖwasurenaᚑtask
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v any) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalTime(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOUserAccountResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUserAccountResponse(ctx context.Context, sel ast.SelectionSet, v *model.UserAccountResponse) graphql.Marshaler {

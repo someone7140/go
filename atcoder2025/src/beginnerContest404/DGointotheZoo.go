@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func DGointotheZooMain() {
 	var n, m int
 	fmt.Scan(&n, &m)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)

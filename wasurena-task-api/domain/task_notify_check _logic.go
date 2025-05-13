@@ -12,7 +12,7 @@ type TaskDeadLineCheckTarget struct {
 	DeadLineCheck           db.DeadLineCheckEnum
 	DeadLineCheckSubSetting db_type.Jsonb
 	OwnerUserID             string
-	ExecLatestDateTime      time.Time
+	LatestExecDateTime      time.Time
 }
 
 type TaskDeadLineCheck struct {
@@ -25,7 +25,7 @@ type CheckSubSettingDailyHour struct {
 }
 
 // タスクの期限が超過しているユーザのリストを取得
-func (deadLineCheck TaskDeadLineCheck) GetNotifyUserMap() (map[string][]TaskDeadLineCheckTarget, error) {
+func (deadLineCheck TaskDeadLineCheck) GetNotifyUserMap() map[string][]TaskDeadLineCheckTarget {
 
 	userNotifyMap := map[string][]TaskDeadLineCheckTarget{}
 	for _, check := range deadLineCheck.CheckTargetList {
@@ -41,7 +41,22 @@ func (deadLineCheck TaskDeadLineCheck) GetNotifyUserMap() (map[string][]TaskDead
 			}
 		}
 	}
-	return userNotifyMap, nil
+	return userNotifyMap
+}
+
+// タスクの期限が超過しているリストを生成
+func (deadLineCheck TaskDeadLineCheck) GetExceededTaskList() []TaskDeadLineCheckTarget {
+
+	exceededTaskList := []TaskDeadLineCheckTarget{}
+	for _, check := range deadLineCheck.CheckTargetList {
+		// チェック処理
+		checkResult := checkTaskDeadLine(check, deadLineCheck.NowDateTime)
+		// 期限が超過している場合はリストに追加
+		if !checkResult {
+			exceededTaskList = append(exceededTaskList, check)
+		}
+	}
+	return exceededTaskList
 }
 
 // タスクの期限超過チェック
@@ -61,13 +76,13 @@ func checkDailyHour(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
 	if !ok {
 		return false
 	}
-	diffHour := now.Sub(checkTarget.ExecLatestDateTime).Hours()
+	diffHour := now.Sub(checkTarget.LatestExecDateTime).Hours()
 
 	return diffHour < hourInterval
 }
 
 // hour単位のタスクの期限が超過していないか
 func checkDailyOnce(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
-	diffHour := now.Sub(checkTarget.ExecLatestDateTime).Hours()
+	diffHour := now.Sub(checkTarget.LatestExecDateTime).Hours()
 	return diffHour <= 24
 }

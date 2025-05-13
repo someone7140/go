@@ -81,7 +81,7 @@ select
 	(case
 		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
 		else exec.execute_date_time::timestamptz
-	end) as latest_date_time
+	end) as latest_exec_date_time
 from
 		task_definition def
 left outer join 
@@ -114,6 +114,48 @@ order by
 		task_category.display_order nulls last,
 		def.id desc
 limit 300;
+-- name: SelectTaskCheckDisplayList :many
+select
+	def.*,
+	(case
+		when exec.execute_date_time is null then '1999-12-31 15:00:00+00'::timestamptz
+		else exec.execute_date_time::timestamptz
+	end) as latest_exec_date_time,
+	cate.name as category_name
+from
+		task_definition def
+left outer join 
+	(
+	select
+			task_definition_id,
+			max(execute_date_time) as execute_date_time
+	from
+			task_execute
+	group by
+			task_definition_id) exec on
+		def.id = exec.task_definition_id
+left outer join task_category cate on
+		cate.id = def.category_id
+where
+		def.display_flag = true
+	and
+		def.owner_user_id = $1
+order by
+	case
+		when def.dead_line_check is null then 1
+		else 0
+	end,
+		cate.display_order nulls last,
+		exec.execute_date_time;
+-- name: DeleteTaskDefinition :one
+delete
+from
+	task_definition def
+where
+	def.id = $1
+	and
+	def.owner_user_id = $2
+returning *;
 -- name: CreateTaskExecute :one
 insert
 	into
@@ -131,6 +173,19 @@ values (
     $4,
     $5
 ) returning *;
+-- name: DeleteTaskExecuteByDefinitionId :many
+delete
+from
+	task_execute exe
+		using
+	 task_definition def
+where
+	def.id = exe.task_definition_id
+	and
+	exe.task_definition_id = $1
+	and
+	def.owner_user_id = $2
+returning *;
 -- name: SelectUserAccountByUserSettingId :one
 select
 	*

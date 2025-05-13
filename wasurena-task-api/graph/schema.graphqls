@@ -3,6 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 scalar Map
+scalar Time
 
 directive @isAuthenticated on FIELD_DEFINITION
 
@@ -73,12 +74,27 @@ type TaskDefinitionResponse {
   detail: String
 }
 
+type TaskCheckDisplayResponse {
+  id: String!
+  title: String!
+  displayFlag: Boolean!
+  notificationFlag: Boolean!
+  categoryId: String
+  categoryName: String
+  deadLineCheck: DeadLineCheck
+  deadLineCheckSubSetting: Map
+  detail: String
+  latestExecDateTime: Time
+  isExceedDeadLine: Boolean!
+}
+
 type Query {
   getUserRegisterToken(lineAuthCode: String!): CreateUserRegisterTokenResponse
   getRegisteredUser(lineAuthCode: String!): UserAccountResponse
   getUserAccountFromAuthHeader: UserAccountResponse @isAuthenticated
   getTaskCategories: [TaskCategoryResponse!] @isAuthenticated
   getTaskDefinitions: [TaskDefinitionResponse!] @isAuthenticated
+  getTaskCheckDisplayList: [TaskDefinitionResponse!] @isAuthenticated
 }
 
 type Mutation {
@@ -86,6 +102,7 @@ type Mutation {
   createCategory(input: NewCategory!): Boolean! @isAuthenticated
   deleteCategory(id: String!): Boolean! @isAuthenticated
   createTask(input: NewTask!): Boolean! @isAuthenticated
+  deleteTask(id: String!): Boolean! @isAuthenticated
   createTaskExecute(input: NewTaskExecute!): Boolean! @isAuthenticated
   createUserAccount(input: NewUserAccount!): UserAccountResponse
 }

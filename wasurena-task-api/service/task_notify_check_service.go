@@ -62,7 +62,7 @@ func execCheckDailyNotify(ctx context.Context) {
 				DeadLineCheck:           *notify.DeadLineCheck,
 				DeadLineCheckSubSetting: notify.DeadLineCheckSubSetting,
 				OwnerUserID:             notify.OwnerUserID,
-				ExecLatestDateTime:      notify.LatestDateTime,
+				LatestExecDateTime:      notify.LatestExecDateTime,
 			})
 		}
 	}
@@ -72,11 +72,7 @@ func execCheckDailyNotify(ctx context.Context) {
 		NowDateTime:     now,
 	}
 	// 通知対象ユーザの取得
-	notificationUserMap, err := deadLineCheck.GetNotifyUserMap()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	notificationUserMap := deadLineCheck.GetNotifyUserMap()
 
 	// 通知（TODO）
 	fmt.Println(notificationUserMap)

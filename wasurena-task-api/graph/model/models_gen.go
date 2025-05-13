@@ -3,6 +3,7 @@
 package model
 
 import (
+	"time"
 	"wasurena-task-api/db"
 )
 
@@ -47,6 +48,20 @@ type TaskCategoryResponse struct {
 	ID           string `json:"id"`
 	Name         string `json:"name"`
 	DisplayOrder *int32 `json:"displayOrder,omitempty"`
+}
+
+type TaskCheckDisplayResponse struct {
+	ID                      string                `json:"id"`
+	Title                   string                `json:"title"`
+	DisplayFlag             bool                  `json:"displayFlag"`
+	NotificationFlag        bool                  `json:"notificationFlag"`
+	CategoryID              *string               `json:"categoryId,omitempty"`
+	CategoryName            *string               `json:"categoryName,omitempty"`
+	DeadLineCheck           *db.DeadLineCheckEnum `json:"deadLineCheck,omitempty"`
+	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
+	Detail                  *string               `json:"detail,omitempty"`
+	LatestExecDateTime      *time.Time            `json:"latestExecDateTime,omitempty"`
+	IsExceedDeadLine        bool                  `json:"isExceedDeadLine"`
 }
 
 type TaskDefinitionResponse struct {
