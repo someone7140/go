@@ -62,16 +62,18 @@ type ComplexityRoot struct {
 		CreateUserAccount         func(childComplexity int, input model.NewUserAccount) int
 		DeleteCategory            func(childComplexity int, id string) int
 		DeleteTask                func(childComplexity int, id string) int
+		DeleteTaskExecute         func(childComplexity int, taskExecuteID string) int
 		ExecuteScheduleCheckBatch func(childComplexity int, token string) int
 	}
 
 	Query struct {
-		GetRegisteredUser            func(childComplexity int, lineAuthCode string) int
-		GetTaskCategories            func(childComplexity int) int
-		GetTaskCheckDisplayList      func(childComplexity int) int
-		GetTaskDefinitions           func(childComplexity int) int
-		GetUserAccountFromAuthHeader func(childComplexity int) int
-		GetUserRegisterToken         func(childComplexity int, lineAuthCode string) int
+		GetRegisteredUser                func(childComplexity int, lineAuthCode string) int
+		GetTaskCategories                func(childComplexity int) int
+		GetTaskCheckDisplayList          func(childComplexity int) int
+		GetTaskDefinitions               func(childComplexity int) int
+		GetTaskExecuteListByDefinitionID func(childComplexity int, taskDefinitionID string) int
+		GetUserAccountFromAuthHeader     func(childComplexity int) int
+		GetUserRegisterToken             func(childComplexity int, lineAuthCode string) int
 	}
 
 	TaskCategoryResponse struct {
@@ -106,6 +108,13 @@ type ComplexityRoot struct {
 		Title                   func(childComplexity int) int
 	}
 
+	TaskExecuteResponse struct {
+		ExecuteDateTime  func(childComplexity int) int
+		ID               func(childComplexity int) int
+		Memo             func(childComplexity int) int
+		TaskDefinitionID func(childComplexity int) int
+	}
+
 	UserAccountResponse struct {
 		ImageURL        func(childComplexity int) int
 		IsLineBotFollow func(childComplexity int) int
@@ -122,6 +131,7 @@ type MutationResolver interface {
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
 	DeleteTask(ctx context.Context, id string) (bool, error)
 	CreateTaskExecute(ctx context.Context, input model.NewTaskExecute) (bool, error)
+	DeleteTaskExecute(ctx context.Context, taskExecuteID string) (bool, error)
 	CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error)
 }
 type QueryResolver interface {
@@ -130,7 +140,8 @@ type QueryResolver interface {
 	GetUserAccountFromAuthHeader(ctx context.Context) (*model.UserAccountResponse, error)
 	GetTaskCategories(ctx context.Context) ([]*model.TaskCategoryResponse, error)
 	GetTaskDefinitions(ctx context.Context) ([]*model.TaskDefinitionResponse, error)
-	GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskDefinitionResponse, error)
+	GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskCheckDisplayResponse, error)
+	GetTaskExecuteListByDefinitionID(ctx context.Context, taskDefinitionID string) ([]*model.TaskExecuteResponse, error)
 }
 
 type executableSchema struct {
@@ -238,6 +249,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteTask(childComplexity, args["id"].(string)), true
 
+	case "Mutation.deleteTaskExecute":
+		if e.complexity.Mutation.DeleteTaskExecute == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTaskExecute_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTaskExecute(childComplexity, args["taskExecuteId"].(string)), true
+
 	case "Mutation.executeScheduleCheckBatch":
 		if e.complexity.Mutation.ExecuteScheduleCheckBatch == nil {
 			break
@@ -282,6 +305,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetTaskDefinitions(childComplexity), true
+
+	case "Query.getTaskExecuteListByDefinitionId":
+		if e.complexity.Query.GetTaskExecuteListByDefinitionID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTaskExecuteListByDefinitionId_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTaskExecuteListByDefinitionID(childComplexity, args["taskDefinitionId"].(string)), true
 
 	case "Query.getUserAccountFromAuthHeader":
 		if e.complexity.Query.GetUserAccountFromAuthHeader == nil {
@@ -462,6 +497,34 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TaskDefinitionResponse.Title(childComplexity), true
+
+	case "TaskExecuteResponse.executeDateTime":
+		if e.complexity.TaskExecuteResponse.ExecuteDateTime == nil {
+			break
+		}
+
+		return e.complexity.TaskExecuteResponse.ExecuteDateTime(childComplexity), true
+
+	case "TaskExecuteResponse.id":
+		if e.complexity.TaskExecuteResponse.ID == nil {
+			break
+		}
+
+		return e.complexity.TaskExecuteResponse.ID(childComplexity), true
+
+	case "TaskExecuteResponse.memo":
+		if e.complexity.TaskExecuteResponse.Memo == nil {
+			break
+		}
+
+		return e.complexity.TaskExecuteResponse.Memo(childComplexity), true
+
+	case "TaskExecuteResponse.taskDefinitionId":
+		if e.complexity.TaskExecuteResponse.TaskDefinitionID == nil {
+			break
+		}
+
+		return e.complexity.TaskExecuteResponse.TaskDefinitionID(childComplexity), true
 
 	case "UserAccountResponse.imageUrl":
 		if e.complexity.UserAccountResponse.ImageURL == nil {
@@ -741,6 +804,29 @@ func (ec *executionContext) field_Mutation_deleteCategory_argsID(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteTaskExecute_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteTaskExecute_argsTaskExecuteID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["taskExecuteId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteTaskExecute_argsTaskExecuteID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("taskExecuteId"))
+	if tmp, ok := rawArgs["taskExecuteId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteTask_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -826,6 +912,29 @@ func (ec *executionContext) field_Query_getRegisteredUser_argsLineAuthCode(
 ) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("lineAuthCode"))
 	if tmp, ok := rawArgs["lineAuthCode"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getTaskExecuteListByDefinitionId_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_getTaskExecuteListByDefinitionId_argsTaskDefinitionID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["taskDefinitionId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getTaskExecuteListByDefinitionId_argsTaskDefinitionID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("taskDefinitionId"))
+	if tmp, ok := rawArgs["taskDefinitionId"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -1484,6 +1593,83 @@ func (ec *executionContext) fieldContext_Mutation_createTaskExecute(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_deleteTaskExecute(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTaskExecute(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteTaskExecute(rctx, fc.Args["taskExecuteId"].(string))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal bool
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTaskExecute(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTaskExecute_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createUserAccount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createUserAccount(ctx, field)
 	if err != nil {
@@ -1919,7 +2105,7 @@ func (ec *executionContext) _Query_getTaskCheckDisplayList(ctx context.Context, 
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.IsAuthenticated == nil {
-				var zeroVal []*model.TaskDefinitionResponse
+				var zeroVal []*model.TaskCheckDisplayResponse
 				return zeroVal, errors.New("directive isAuthenticated is not implemented")
 			}
 			return ec.directives.IsAuthenticated(ctx, nil, directive0)
@@ -1932,10 +2118,10 @@ func (ec *executionContext) _Query_getTaskCheckDisplayList(ctx context.Context, 
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]*model.TaskDefinitionResponse); ok {
+		if data, ok := tmp.([]*model.TaskCheckDisplayResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*wasurena-task-api/graph/model.TaskDefinitionResponse`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*wasurena-task-api/graph/model.TaskCheckDisplayResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1944,9 +2130,9 @@ func (ec *executionContext) _Query_getTaskCheckDisplayList(ctx context.Context, 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.TaskDefinitionResponse)
+	res := resTmp.([]*model.TaskCheckDisplayResponse)
 	fc.Result = res
-	return ec.marshalOTaskDefinitionResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskDefinitionResponseᚄ(ctx, field.Selections, res)
+	return ec.marshalOTaskCheckDisplayResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCheckDisplayResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getTaskCheckDisplayList(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1958,26 +2144,114 @@ func (ec *executionContext) fieldContext_Query_getTaskCheckDisplayList(_ context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_TaskDefinitionResponse_id(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_id(ctx, field)
 			case "title":
-				return ec.fieldContext_TaskDefinitionResponse_title(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_title(ctx, field)
 			case "displayFlag":
-				return ec.fieldContext_TaskDefinitionResponse_displayFlag(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_displayFlag(ctx, field)
 			case "notificationFlag":
-				return ec.fieldContext_TaskDefinitionResponse_notificationFlag(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_notificationFlag(ctx, field)
 			case "categoryId":
-				return ec.fieldContext_TaskDefinitionResponse_categoryId(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_categoryId(ctx, field)
 			case "categoryName":
-				return ec.fieldContext_TaskDefinitionResponse_categoryName(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_categoryName(ctx, field)
 			case "deadLineCheck":
-				return ec.fieldContext_TaskDefinitionResponse_deadLineCheck(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_deadLineCheck(ctx, field)
 			case "deadLineCheckSubSetting":
-				return ec.fieldContext_TaskDefinitionResponse_deadLineCheckSubSetting(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_deadLineCheckSubSetting(ctx, field)
 			case "detail":
-				return ec.fieldContext_TaskDefinitionResponse_detail(ctx, field)
+				return ec.fieldContext_TaskCheckDisplayResponse_detail(ctx, field)
+			case "latestExecDateTime":
+				return ec.fieldContext_TaskCheckDisplayResponse_latestExecDateTime(ctx, field)
+			case "isExceedDeadLine":
+				return ec.fieldContext_TaskCheckDisplayResponse_isExceedDeadLine(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type TaskDefinitionResponse", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TaskCheckDisplayResponse", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getTaskExecuteListByDefinitionId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTaskExecuteListByDefinitionId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetTaskExecuteListByDefinitionID(rctx, fc.Args["taskDefinitionId"].(string))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal []*model.TaskExecuteResponse
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.TaskExecuteResponse); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*wasurena-task-api/graph/model.TaskExecuteResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TaskExecuteResponse)
+	fc.Result = res
+	return ec.marshalOTaskExecuteResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskExecuteResponseᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTaskExecuteListByDefinitionId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TaskExecuteResponse_id(ctx, field)
+			case "taskDefinitionId":
+				return ec.fieldContext_TaskExecuteResponse_taskDefinitionId(ctx, field)
+			case "executeDateTime":
+				return ec.fieldContext_TaskExecuteResponse_executeDateTime(ctx, field)
+			case "memo":
+				return ec.fieldContext_TaskExecuteResponse_memo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskExecuteResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTaskExecuteListByDefinitionId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3079,6 +3353,179 @@ func (ec *executionContext) _TaskDefinitionResponse_detail(ctx context.Context, 
 func (ec *executionContext) fieldContext_TaskDefinitionResponse_detail(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TaskDefinitionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskExecuteResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.TaskExecuteResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskExecuteResponse_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskExecuteResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskExecuteResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskExecuteResponse_taskDefinitionId(ctx context.Context, field graphql.CollectedField, obj *model.TaskExecuteResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskExecuteResponse_taskDefinitionId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TaskDefinitionID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskExecuteResponse_taskDefinitionId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskExecuteResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskExecuteResponse_executeDateTime(ctx context.Context, field graphql.CollectedField, obj *model.TaskExecuteResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskExecuteResponse_executeDateTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExecuteDateTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskExecuteResponse_executeDateTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskExecuteResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskExecuteResponse_memo(ctx context.Context, field graphql.CollectedField, obj *model.TaskExecuteResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskExecuteResponse_memo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Memo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskExecuteResponse_memo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskExecuteResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5548,6 +5995,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "deleteTaskExecute":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTaskExecute(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createUserAccount":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUserAccount(ctx, field)
@@ -5699,6 +6153,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getTaskCheckDisplayList(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getTaskExecuteListByDefinitionId":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTaskExecuteListByDefinitionId(ctx, field)
 				return res
 			}
 
@@ -5897,6 +6370,57 @@ func (ec *executionContext) _TaskDefinitionResponse(ctx context.Context, sel ast
 			out.Values[i] = ec._TaskDefinitionResponse_deadLineCheckSubSetting(ctx, field, obj)
 		case "detail":
 			out.Values[i] = ec._TaskDefinitionResponse_detail(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var taskExecuteResponseImplementors = []string{"TaskExecuteResponse"}
+
+func (ec *executionContext) _TaskExecuteResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TaskExecuteResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, taskExecuteResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TaskExecuteResponse")
+		case "id":
+			out.Values[i] = ec._TaskExecuteResponse_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "taskDefinitionId":
+			out.Values[i] = ec._TaskExecuteResponse_taskDefinitionId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "executeDateTime":
+			out.Values[i] = ec._TaskExecuteResponse_executeDateTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "memo":
+			out.Values[i] = ec._TaskExecuteResponse_memo(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6373,6 +6897,16 @@ func (ec *executionContext) marshalNTaskCategoryResponse2ᚖwasurenaᚑtaskᚑap
 	return ec._TaskCategoryResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTaskCheckDisplayResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCheckDisplayResponse(ctx context.Context, sel ast.SelectionSet, v *model.TaskCheckDisplayResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TaskCheckDisplayResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNTaskDefinitionResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskDefinitionResponse(ctx context.Context, sel ast.SelectionSet, v *model.TaskDefinitionResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -6381,6 +6915,32 @@ func (ec *executionContext) marshalNTaskDefinitionResponse2ᚖwasurenaᚑtaskᚑ
 		return graphql.Null
 	}
 	return ec._TaskDefinitionResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTaskExecuteResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskExecuteResponse(ctx context.Context, sel ast.SelectionSet, v *model.TaskExecuteResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TaskExecuteResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalTime(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -6814,6 +7374,53 @@ func (ec *executionContext) marshalOTaskCategoryResponse2ᚕᚖwasurenaᚑtask�
 	return ret
 }
 
+func (ec *executionContext) marshalOTaskCheckDisplayResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCheckDisplayResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TaskCheckDisplayResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTaskCheckDisplayResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCheckDisplayResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalOTaskDefinitionResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskDefinitionResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TaskDefinitionResponse) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -6842,6 +7449,53 @@ func (ec *executionContext) marshalOTaskDefinitionResponse2ᚕᚖwasurenaᚑtask
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNTaskDefinitionResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskDefinitionResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOTaskExecuteResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskExecuteResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TaskExecuteResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTaskExecuteResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskExecuteResponse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

@@ -186,6 +186,25 @@ where
 	and
 	def.owner_user_id = $2
 returning *;
+-- name: SelectTaskExecuteByDefinitionId :many
+select
+	*
+from
+	task_execute exec
+where
+	exec.execute_user_id = $1
+	and exec.task_definition_id = $2
+order by
+	exec.execute_date_time desc;
+-- name: DeleteTaskExecuteById :one
+delete
+from
+	task_execute exe
+where
+	exe.id = $1
+	and
+	exe.execute_user_id = $2
+returning *;
 -- name: SelectUserAccountByUserSettingId :one
 select
 	*

@@ -79,7 +79,7 @@ func main() {
 	// GraphQLのディレクティブ設定
 	graphQLConfig := graph.Config{Resolvers: &graph.Resolver{}}
 	graphQLConfig.Directives.IsAuthenticated = func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-		if custom_middleware.GeUserAccountId(ctx) == nil {
+		if custom_middleware.GeUserAccountID(ctx) == nil {
 			return nil, &gqlerror.Error{
 				Message: "Authentication Error",
 				Extensions: map[string]any{

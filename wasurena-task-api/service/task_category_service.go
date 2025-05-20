@@ -12,12 +12,12 @@ import (
 // カテゴリーを追加する
 func CreateTaskCategoryService(ctx context.Context, input model.NewCategory) (bool, error) {
 	id := xid.New()
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
 
 	createData := db.CreateTaskCategoryParams{
 		ID:           id.String(),
 		Name:         input.Name,
-		OwnerUserID:  *userAccountId,
+		OwnerUserID:  *userAccountID,
 		DisplayOrder: input.DisplayOrder,
 	}
 	_, err := custom_middleware.GetDbQueries(ctx).CreateTaskCategory(ctx, createData)
@@ -30,9 +30,9 @@ func CreateTaskCategoryService(ctx context.Context, input model.NewCategory) (bo
 
 // カテゴリーを取得する
 func GetTaskCategoriesService(ctx context.Context) ([]*model.TaskCategoryResponse, error) {
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
 
-	categories, err := custom_middleware.GetDbQueries(ctx).SelectTaskCategories(ctx, *userAccountId)
+	categories, err := custom_middleware.GetDbQueries(ctx).SelectTaskCategories(ctx, *userAccountID)
 	if err != nil {
 		return []*model.TaskCategoryResponse{}, err
 	}
@@ -51,12 +51,12 @@ func GetTaskCategoriesService(ctx context.Context) ([]*model.TaskCategoryRespons
 
 // カテゴリーを削除する
 func DeleteTaskCategoryService(ctx context.Context, id string) (bool, error) {
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
 
 	// タスク定義のカテゴリーをnullにする
 	updateTaskData := db.UpdateAllTaskCategoryNullParams{
 		CategoryID:  &id,
-		OwnerUserID: *userAccountId,
+		OwnerUserID: *userAccountID,
 	}
 	_, err := custom_middleware.GetDbQueries(ctx).UpdateAllTaskCategoryNull(ctx, updateTaskData)
 	if err != nil {
@@ -66,7 +66,7 @@ func DeleteTaskCategoryService(ctx context.Context, id string) (bool, error) {
 	// カテゴリーのレコード削除
 	deleteCategoryData := db.DeleteTaskCategoryParams{
 		ID:          id,
-		OwnerUserID: *userAccountId,
+		OwnerUserID: *userAccountID,
 	}
 	_, err = custom_middleware.GetDbQueries(ctx).DeleteTaskCategory(ctx, deleteCategoryData)
 	if err != nil {

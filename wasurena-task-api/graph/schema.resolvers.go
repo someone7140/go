@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"wasurena-task-api/graph/model"
 	"wasurena-task-api/service"
 )
@@ -41,6 +40,11 @@ func (r *mutationResolver) CreateTaskExecute(ctx context.Context, input model.Ne
 	return service.CreateTaskExecuteService(ctx, input)
 }
 
+// DeleteTaskExecute is the resolver for the deleteTaskExecute field.
+func (r *mutationResolver) DeleteTaskExecute(ctx context.Context, taskExecuteID string) (bool, error) {
+	return service.DeleteTaskExecuteService(ctx, taskExecuteID)
+}
+
 // CreateUserAccount is the resolver for the createUserAccount field.
 func (r *mutationResolver) CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error) {
 	return service.CreateUserAccount(ctx, input)
@@ -72,8 +76,13 @@ func (r *queryResolver) GetTaskDefinitions(ctx context.Context) ([]*model.TaskDe
 }
 
 // GetTaskCheckDisplayList is the resolver for the getTaskCheckDisplayList field.
-func (r *queryResolver) GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskDefinitionResponse, error) {
-	panic(fmt.Errorf("not implemented: GetTaskCheckDisplayList - getTaskCheckDisplayList"))
+func (r *queryResolver) GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskCheckDisplayResponse, error) {
+	return service.GetTaskCheckDisplayListService(ctx)
+}
+
+// GetTaskExecuteListByDefinitionID is the resolver for the getTaskExecuteListByDefinitionId field.
+func (r *queryResolver) GetTaskExecuteListByDefinitionID(ctx context.Context, taskDefinitionID string) ([]*model.TaskExecuteResponse, error) {
+	return service.GetTaskExecuteListByDefinitionIDService(ctx, taskDefinitionID)
 }
 
 // Mutation returns MutationResolver implementation.

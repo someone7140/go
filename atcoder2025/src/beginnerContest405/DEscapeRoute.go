@@ -13,7 +13,7 @@ type DEscapeRouteRdrZahyou struct {
 	w int
 }
 
-func main() {
+func DEscapeRouteMain() {
 	var h, w int
 	fmt.Scan(&h, &w)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)

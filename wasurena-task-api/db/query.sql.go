@@ -319,6 +319,35 @@ func (q *Queries) DeleteTaskExecuteByDefinitionId(ctx context.Context, arg Delet
 	return items, nil
 }
 
+const deleteTaskExecuteById = `-- name: DeleteTaskExecuteById :one
+delete
+from
+	task_execute exe
+where
+	exe.id = $1
+	and
+	exe.execute_user_id = $2
+returning id, task_definition_id, execute_user_id, execute_date_time, memo
+`
+
+type DeleteTaskExecuteByIdParams struct {
+	ID            string
+	ExecuteUserID string
+}
+
+func (q *Queries) DeleteTaskExecuteById(ctx context.Context, arg DeleteTaskExecuteByIdParams) (TaskExecute, error) {
+	row := q.db.QueryRow(ctx, deleteTaskExecuteById, arg.ID, arg.ExecuteUserID)
+	var i TaskExecute
+	err := row.Scan(
+		&i.ID,
+		&i.TaskDefinitionID,
+		&i.ExecuteUserID,
+		&i.ExecuteDateTime,
+		&i.Memo,
+	)
+	return i, err
+}
+
 const selectLatestTaskExecuteForNotify = `-- name: SelectLatestTaskExecuteForNotify :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
@@ -557,6 +586,49 @@ func (q *Queries) SelectTaskDefinitionList(ctx context.Context, ownerUserID stri
 			&i.DeadLineCheckSubSetting,
 			&i.Detail,
 			&i.CategoryName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const selectTaskExecuteByDefinitionId = `-- name: SelectTaskExecuteByDefinitionId :many
+select
+	id, task_definition_id, execute_user_id, execute_date_time, memo
+from
+	task_execute exec
+where
+	exec.execute_user_id = $1
+	and exec.task_definition_id = $2
+order by
+	exec.execute_date_time desc
+`
+
+type SelectTaskExecuteByDefinitionIdParams struct {
+	ExecuteUserID    string
+	TaskDefinitionID string
+}
+
+func (q *Queries) SelectTaskExecuteByDefinitionId(ctx context.Context, arg SelectTaskExecuteByDefinitionIdParams) ([]TaskExecute, error) {
+	rows, err := q.db.Query(ctx, selectTaskExecuteByDefinitionId, arg.ExecuteUserID, arg.TaskDefinitionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TaskExecute
+	for rows.Next() {
+		var i TaskExecute
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskDefinitionID,
+			&i.ExecuteUserID,
+			&i.ExecuteDateTime,
+			&i.Memo,
 		); err != nil {
 			return nil, err
 		}

@@ -76,6 +76,13 @@ type TaskDefinitionResponse struct {
 	Detail                  *string               `json:"detail,omitempty"`
 }
 
+type TaskExecuteResponse struct {
+	ID               string    `json:"id"`
+	TaskDefinitionID string    `json:"taskDefinitionId"`
+	ExecuteDateTime  time.Time `json:"executeDateTime"`
+	Memo             *string   `json:"memo,omitempty"`
+}
+
 type UserAccountResponse struct {
 	Token           string  `json:"token"`
 	UserSettingID   string  `json:"userSettingId"`

@@ -15,11 +15,11 @@ import (
 // タスク定義を追加する
 func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 	id := xid.New()
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
 	createData := db.CreateTaskDefinitionParams{
 		ID:                      id.String(),
 		Title:                   input.Title,
-		OwnerUserID:             *userAccountId,
+		OwnerUserID:             *userAccountID,
 		DisplayFlag:             input.DisplayFlag,
 		NotificationFlag:        input.NotificationFlag,
 		CategoryID:              input.CategoryID,
@@ -37,8 +37,8 @@ func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 
 // タスク定義を取得する
 func GetTaskDefinitionService(ctx context.Context) ([]*model.TaskDefinitionResponse, error) {
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
-	selectResults, err := custom_middleware.GetDbQueries(ctx).SelectTaskDefinitionList(ctx, *userAccountId)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+	selectResults, err := custom_middleware.GetDbQueries(ctx).SelectTaskDefinitionList(ctx, *userAccountID)
 
 	responseSlice := []*model.TaskDefinitionResponse{}
 	for _, task := range selectResults {
@@ -60,12 +60,12 @@ func GetTaskDefinitionService(ctx context.Context) ([]*model.TaskDefinitionRespo
 
 // タスク定義を削除
 func DeleteTaskDefinitionService(ctx context.Context, id string) (bool, error) {
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
 
 	// 実行履歴のレコード削除
 	deleteTaskExecuteData := db.DeleteTaskExecuteByDefinitionIdParams{
 		TaskDefinitionID: id,
-		OwnerUserID:      *userAccountId,
+		OwnerUserID:      *userAccountID,
 	}
 	_, err := custom_middleware.GetDbQueries(ctx).DeleteTaskExecuteByDefinitionId(ctx, deleteTaskExecuteData)
 	if err != nil {
@@ -75,7 +75,7 @@ func DeleteTaskDefinitionService(ctx context.Context, id string) (bool, error) {
 	// タスク定義のレコード削除
 	deleteTaskDefinitionData := db.DeleteTaskDefinitionParams{
 		ID:          id,
-		OwnerUserID: *userAccountId,
+		OwnerUserID: *userAccountID,
 	}
 	_, err = custom_middleware.GetDbQueries(ctx).DeleteTaskDefinition(ctx, deleteTaskDefinitionData)
 	if err != nil {
@@ -87,10 +87,10 @@ func DeleteTaskDefinitionService(ctx context.Context, id string) (bool, error) {
 
 // タスクのチェック対象一覧を取得
 func GetTaskCheckDisplayListService(ctx context.Context) ([]*model.TaskCheckDisplayResponse, error) {
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
 
 	// DBからレコード取得
-	selectResults, err := custom_middleware.GetDbQueries(ctx).SelectTaskCheckDisplayList(ctx, *userAccountId)
+	selectResults, err := custom_middleware.GetDbQueries(ctx).SelectTaskCheckDisplayList(ctx, *userAccountID)
 	if err != nil {
 		return []*model.TaskCheckDisplayResponse{}, err
 	}

@@ -41,7 +41,7 @@ func WithUserAccountId() echo.MiddlewareFunc {
 }
 
 // コンテキストからユーザIDを取得する
-func GeUserAccountId(ctx context.Context) *string {
+func GeUserAccountID(ctx context.Context) *string {
 	userAccountId, ok := ctx.Value(userAccountIdContextKey).(*string)
 	if !ok {
 		return nil

@@ -117,8 +117,8 @@ func GetUserRegisterTokenFromLineAuthCode(ctx context.Context, lineAuthCode stri
 
 // Contextの認証情報からユーザ情報を返す
 func GetUserAccountFromContext(ctx context.Context) (*model.UserAccountResponse, error) {
-	userAccountId := custom_middleware.GeUserAccountId(ctx)
-	userAccount, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountById(ctx, *userAccountId)
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+	userAccount, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountById(ctx, *userAccountID)
 	if err != nil {
 		return nil, err
 	}
