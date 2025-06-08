@@ -7,17 +7,17 @@ import (
 	"wasurena-task-api/db"
 )
 
+type CategoryInput struct {
+	Name         string `json:"name"`
+	DisplayOrder *int32 `json:"displayOrder,omitempty"`
+}
+
 type CreateUserRegisterTokenResponse struct {
 	Token    string `json:"token"`
 	LineName string `json:"lineName"`
 }
 
 type Mutation struct {
-}
-
-type NewCategory struct {
-	Name         string `json:"name"`
-	DisplayOrder *int32 `json:"displayOrder,omitempty"`
 }
 
 type NewTask struct {

@@ -102,7 +102,7 @@ func GetTaskCheckDisplayListService(ctx context.Context) ([]*model.TaskCheckDisp
 	}
 	now := time.Now().In(jst)
 
-	// 期限が超過してるタスクをフィルタリング
+	// チェック対象のタスク
 	checkList := []domain.TaskDeadLineCheckTarget{}
 	for _, checkTask := range selectResults {
 		if checkTask.DeadLineCheck != nil {
@@ -120,12 +120,13 @@ func GetTaskCheckDisplayListService(ctx context.Context) ([]*model.TaskCheckDisp
 		CheckTargetList: checkList,
 		NowDateTime:     now,
 	}
+	// 期限が超過してるタスクをフィルタリング
 	exceededList := deadLineCheck.GetExceededTaskList()
 
-	// 期限超過の判定をしてレスポンスのリストを作る
 	exceededResponseSlice := []*model.TaskCheckDisplayResponse{}
 	notExceededResponseSlice := []*model.TaskCheckDisplayResponse{}
 	for _, check := range selectResults {
+		// 期限超過の判定をしてレスポンスのリストを作る
 		isExceededContains := slices.ContainsFunc(exceededList, func(e domain.TaskDeadLineCheckTarget) bool {
 			return e.TaskID == check.ID
 		})

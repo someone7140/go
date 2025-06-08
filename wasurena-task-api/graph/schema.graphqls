@@ -7,7 +7,7 @@ scalar Time
 
 directive @isAuthenticated on FIELD_DEFINITION
 
-input NewCategory {
+input CategoryInput {
   name: String!
   displayOrder: Int
 }
@@ -100,6 +100,8 @@ type Query {
   getRegisteredUser(lineAuthCode: String!): UserAccountResponse
   getUserAccountFromAuthHeader: UserAccountResponse @isAuthenticated
   getTaskCategories: [TaskCategoryResponse!] @isAuthenticated
+  getTaskCategoryById(categoryId: String!): TaskCategoryResponse
+    @isAuthenticated
   getTaskDefinitions: [TaskDefinitionResponse!] @isAuthenticated
   getTaskCheckDisplayList: [TaskCheckDisplayResponse!] @isAuthenticated
   getTaskExecuteListByDefinitionId(
@@ -109,7 +111,8 @@ type Query {
 
 type Mutation {
   executeScheduleCheckBatch(token: String!): Boolean!
-  createCategory(input: NewCategory!): Boolean! @isAuthenticated
+  createCategory(input: CategoryInput!): Boolean! @isAuthenticated
+  updateCategory(id: String!, input: CategoryInput!): Boolean! @isAuthenticated
   deleteCategory(id: String!): Boolean! @isAuthenticated
   createTask(input: NewTask!): Boolean! @isAuthenticated
   deleteTask(id: String!): Boolean! @isAuthenticated

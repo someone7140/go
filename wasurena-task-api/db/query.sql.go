@@ -456,6 +456,34 @@ func (q *Queries) SelectTaskCategories(ctx context.Context, ownerUserID string) 
 	return items, nil
 }
 
+const selectTaskCategoryByID = `-- name: SelectTaskCategoryByID :one
+select
+	id, name, owner_user_id, display_order
+from
+	task_category cate
+where
+	cate.owner_user_id = $1
+	and
+	cate.id = $2
+`
+
+type SelectTaskCategoryByIDParams struct {
+	OwnerUserID string
+	ID          string
+}
+
+func (q *Queries) SelectTaskCategoryByID(ctx context.Context, arg SelectTaskCategoryByIDParams) (TaskCategory, error) {
+	row := q.db.QueryRow(ctx, selectTaskCategoryByID, arg.OwnerUserID, arg.ID)
+	var i TaskCategory
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.OwnerUserID,
+		&i.DisplayOrder,
+	)
+	return i, err
+}
+
 const selectTaskCheckDisplayList = `-- name: SelectTaskCheckDisplayList :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
@@ -799,6 +827,43 @@ func (q *Queries) UpdateAllTaskNotificationFlagByUser(ctx context.Context, arg U
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTaskCategory = `-- name: UpdateTaskCategory :one
+update
+	task_category
+set
+	name = $3,
+	display_order = $4
+where
+	id = $1
+	and
+	owner_user_id = $2
+returning id, name, owner_user_id, display_order
+`
+
+type UpdateTaskCategoryParams struct {
+	ID           string
+	OwnerUserID  string
+	Name         string
+	DisplayOrder *int32
+}
+
+func (q *Queries) UpdateTaskCategory(ctx context.Context, arg UpdateTaskCategoryParams) (TaskCategory, error) {
+	row := q.db.QueryRow(ctx, updateTaskCategory,
+		arg.ID,
+		arg.OwnerUserID,
+		arg.Name,
+		arg.DisplayOrder,
+	)
+	var i TaskCategory
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.OwnerUserID,
+		&i.DisplayOrder,
+	)
+	return i, err
 }
 
 const updateUserAccountLineBotFollow = `-- name: UpdateUserAccountLineBotFollow :one

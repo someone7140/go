@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCategory            func(childComplexity int, input model.NewCategory) int
+		CreateCategory            func(childComplexity int, input model.CategoryInput) int
 		CreateTask                func(childComplexity int, input model.NewTask) int
 		CreateTaskExecute         func(childComplexity int, input model.NewTaskExecute) int
 		CreateUserAccount         func(childComplexity int, input model.NewUserAccount) int
@@ -64,11 +64,13 @@ type ComplexityRoot struct {
 		DeleteTask                func(childComplexity int, id string) int
 		DeleteTaskExecute         func(childComplexity int, taskExecuteID string) int
 		ExecuteScheduleCheckBatch func(childComplexity int, token string) int
+		UpdateCategory            func(childComplexity int, id string, input model.CategoryInput) int
 	}
 
 	Query struct {
 		GetRegisteredUser                func(childComplexity int, lineAuthCode string) int
 		GetTaskCategories                func(childComplexity int) int
+		GetTaskCategoryByID              func(childComplexity int, categoryID string) int
 		GetTaskCheckDisplayList          func(childComplexity int) int
 		GetTaskDefinitions               func(childComplexity int) int
 		GetTaskExecuteListByDefinitionID func(childComplexity int, taskDefinitionID string) int
@@ -126,7 +128,8 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	ExecuteScheduleCheckBatch(ctx context.Context, token string) (bool, error)
-	CreateCategory(ctx context.Context, input model.NewCategory) (bool, error)
+	CreateCategory(ctx context.Context, input model.CategoryInput) (bool, error)
+	UpdateCategory(ctx context.Context, id string, input model.CategoryInput) (bool, error)
 	DeleteCategory(ctx context.Context, id string) (bool, error)
 	CreateTask(ctx context.Context, input model.NewTask) (bool, error)
 	DeleteTask(ctx context.Context, id string) (bool, error)
@@ -139,6 +142,7 @@ type QueryResolver interface {
 	GetRegisteredUser(ctx context.Context, lineAuthCode string) (*model.UserAccountResponse, error)
 	GetUserAccountFromAuthHeader(ctx context.Context) (*model.UserAccountResponse, error)
 	GetTaskCategories(ctx context.Context) ([]*model.TaskCategoryResponse, error)
+	GetTaskCategoryByID(ctx context.Context, categoryID string) (*model.TaskCategoryResponse, error)
 	GetTaskDefinitions(ctx context.Context) ([]*model.TaskDefinitionResponse, error)
 	GetTaskCheckDisplayList(ctx context.Context) ([]*model.TaskCheckDisplayResponse, error)
 	GetTaskExecuteListByDefinitionID(ctx context.Context, taskDefinitionID string) ([]*model.TaskExecuteResponse, error)
@@ -187,7 +191,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateCategory(childComplexity, args["input"].(model.NewCategory)), true
+		return e.complexity.Mutation.CreateCategory(childComplexity, args["input"].(model.CategoryInput)), true
 
 	case "Mutation.createTask":
 		if e.complexity.Mutation.CreateTask == nil {
@@ -273,6 +277,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.ExecuteScheduleCheckBatch(childComplexity, args["token"].(string)), true
 
+	case "Mutation.updateCategory":
+		if e.complexity.Mutation.UpdateCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCategory_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCategory(childComplexity, args["id"].(string), args["input"].(model.CategoryInput)), true
+
 	case "Query.getRegisteredUser":
 		if e.complexity.Query.GetRegisteredUser == nil {
 			break
@@ -291,6 +307,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetTaskCategories(childComplexity), true
+
+	case "Query.getTaskCategoryById":
+		if e.complexity.Query.GetTaskCategoryByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTaskCategoryById_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTaskCategoryByID(childComplexity, args["categoryId"].(string)), true
 
 	case "Query.getTaskCheckDisplayList":
 		if e.complexity.Query.GetTaskCheckDisplayList == nil {
@@ -569,7 +597,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputNewCategory,
+		ec.unmarshalInputCategoryInput,
 		ec.unmarshalInputNewTask,
 		ec.unmarshalInputNewTaskExecute,
 		ec.unmarshalInputNewUserAccount,
@@ -702,13 +730,13 @@ func (ec *executionContext) field_Mutation_createCategory_args(ctx context.Conte
 func (ec *executionContext) field_Mutation_createCategory_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.NewCategory, error) {
+) (model.CategoryInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNNewCategory2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewCategory(ctx, tmp)
+		return ec.unmarshalNCategoryInput2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐCategoryInput(ctx, tmp)
 	}
 
-	var zeroVal model.NewCategory
+	var zeroVal model.CategoryInput
 	return zeroVal, nil
 }
 
@@ -873,6 +901,47 @@ func (ec *executionContext) field_Mutation_executeScheduleCheckBatch_argsToken(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_updateCategory_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateCategory_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updateCategory_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateCategory_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateCategory_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.CategoryInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCategoryInput2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐCategoryInput(ctx, tmp)
+	}
+
+	var zeroVal model.CategoryInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -912,6 +981,29 @@ func (ec *executionContext) field_Query_getRegisteredUser_argsLineAuthCode(
 ) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("lineAuthCode"))
 	if tmp, ok := rawArgs["lineAuthCode"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getTaskCategoryById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_getTaskCategoryById_argsCategoryID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["categoryId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getTaskCategoryById_argsCategoryID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
+	if tmp, ok := rawArgs["categoryId"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -1223,7 +1315,7 @@ func (ec *executionContext) _Mutation_createCategory(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		directive0 := func(rctx context.Context) (any, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["input"].(model.NewCategory))
+			return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["input"].(model.CategoryInput))
 		}
 
 		directive1 := func(ctx context.Context) (any, error) {
@@ -1279,6 +1371,83 @@ func (ec *executionContext) fieldContext_Mutation_createCategory(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateCategory(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateCategory(rctx, fc.Args["id"].(string), fc.Args["input"].(model.CategoryInput))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal bool
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1998,6 +2167,88 @@ func (ec *executionContext) fieldContext_Query_getTaskCategories(_ context.Conte
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TaskCategoryResponse", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getTaskCategoryById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTaskCategoryById(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetTaskCategoryByID(rctx, fc.Args["categoryId"].(string))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal *model.TaskCategoryResponse
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.TaskCategoryResponse); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *wasurena-task-api/graph/model.TaskCategoryResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TaskCategoryResponse)
+	fc.Result = res
+	return ec.marshalOTaskCategoryResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCategoryResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTaskCategoryById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TaskCategoryResponse_id(ctx, field)
+			case "name":
+				return ec.fieldContext_TaskCategoryResponse_name(ctx, field)
+			case "displayOrder":
+				return ec.fieldContext_TaskCategoryResponse_displayOrder(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TaskCategoryResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTaskCategoryById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -5704,8 +5955,8 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNewCategory(ctx context.Context, obj any) (model.NewCategory, error) {
-	var it model.NewCategory
+func (ec *executionContext) unmarshalInputCategoryInput(ctx context.Context, obj any) (model.CategoryInput, error) {
+	var it model.CategoryInput
 	asMap := map[string]any{}
 	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
@@ -5967,6 +6218,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateCategory":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCategory(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "deleteCategory":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteCategory(ctx, field)
@@ -6115,6 +6373,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getTaskCategories(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getTaskCategoryById":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTaskCategoryById(ctx, field)
 				return res
 			}
 
@@ -6851,8 +7128,8 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNNewCategory2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐNewCategory(ctx context.Context, v any) (model.NewCategory, error) {
-	res, err := ec.unmarshalInputNewCategory(ctx, v)
+func (ec *executionContext) unmarshalNCategoryInput2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐCategoryInput(ctx context.Context, v any) (model.CategoryInput, error) {
+	res, err := ec.unmarshalInputCategoryInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -7372,6 +7649,13 @@ func (ec *executionContext) marshalOTaskCategoryResponse2ᚕᚖwasurenaᚑtask�
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOTaskCategoryResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCategoryResponse(ctx context.Context, sel ast.SelectionSet, v *model.TaskCategoryResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TaskCategoryResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOTaskCheckDisplayResponse2ᚕᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐTaskCheckDisplayResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TaskCheckDisplayResponse) graphql.Marshaler {

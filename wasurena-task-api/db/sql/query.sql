@@ -23,6 +23,26 @@ where
 order by
 	cate.display_order nulls last
 limit 200;
+-- name: UpdateTaskCategory :one
+update
+	task_category
+set
+	name = $3,
+	display_order = $4
+where
+	id = $1
+	and
+	owner_user_id = $2
+returning *;
+-- name: SelectTaskCategoryByID :one
+select
+	*
+from
+	task_category cate
+where
+	cate.owner_user_id = $1
+	and
+	cate.id = $2;
 -- name: DeleteTaskCategory :one
 delete
 from

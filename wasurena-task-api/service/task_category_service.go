@@ -10,7 +10,7 @@ import (
 )
 
 // カテゴリーを追加する
-func CreateTaskCategoryService(ctx context.Context, input model.NewCategory) (bool, error) {
+func CreateTaskCategoryService(ctx context.Context, input model.CategoryInput) (bool, error) {
 	id := xid.New()
 	userAccountID := custom_middleware.GeUserAccountID(ctx)
 
@@ -47,6 +47,45 @@ func GetTaskCategoriesService(ctx context.Context) ([]*model.TaskCategoryRespons
 	}
 
 	return responseSlice, err
+}
+
+// ID指定でカテゴリーを取得する
+func GetTaskCategoryByIDService(ctx context.Context, categoryID string) (*model.TaskCategoryResponse, error) {
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+
+	category, err := custom_middleware.GetDbQueries(ctx).SelectTaskCategoryByID(ctx, db.SelectTaskCategoryByIDParams{
+		OwnerUserID: *userAccountID,
+		ID:          categoryID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := model.TaskCategoryResponse{
+		ID:           category.ID,
+		Name:         category.Name,
+		DisplayOrder: category.DisplayOrder,
+	}
+
+	return &response, err
+}
+
+// カテゴリーを更新する
+func UpdateTaskCategoryService(ctx context.Context, id string, input model.CategoryInput) (bool, error) {
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+
+	updateData := db.UpdateTaskCategoryParams{
+		ID:           id,
+		Name:         input.Name,
+		OwnerUserID:  *userAccountID,
+		DisplayOrder: input.DisplayOrder,
+	}
+	_, err := custom_middleware.GetDbQueries(ctx).UpdateTaskCategory(ctx, updateData)
+
+	if err != nil {
+		return false, err
+	}
+	return true, err
 }
 
 // カテゴリーを削除する
