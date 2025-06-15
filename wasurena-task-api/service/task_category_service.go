@@ -6,7 +6,9 @@ import (
 	"wasurena-task-api/db"
 	"wasurena-task-api/graph/model"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/rs/xid"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // カテゴリーを追加する
@@ -58,7 +60,15 @@ func GetTaskCategoryByIDService(ctx context.Context, categoryID string) (*model.
 		ID:          categoryID,
 	})
 	if err != nil {
-		return nil, err
+		if err == pgx.ErrNoRows {
+			return nil, &gqlerror.Error{
+				Message: "Can not find taskCategory",
+				Extensions: map[string]any{
+					"code": 404,
+				}}
+		} else {
+			return nil, err
+		}
 	}
 
 	response := model.TaskCategoryResponse{

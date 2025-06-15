@@ -565,6 +565,56 @@ func (q *Queries) SelectTaskCheckDisplayList(ctx context.Context, ownerUserID st
 	return items, nil
 }
 
+const selectTaskDefinitionById = `-- name: SelectTaskDefinitionById :one
+select
+	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
+	task_category.name as category_name
+from
+	task_definition def
+left outer join task_category on
+	task_category.id = def.category_id
+where
+	def.owner_user_id = $1
+	and
+	def.id = $2
+`
+
+type SelectTaskDefinitionByIdParams struct {
+	OwnerUserID string
+	ID          string
+}
+
+type SelectTaskDefinitionByIdRow struct {
+	ID                      string
+	Title                   string
+	OwnerUserID             string
+	DisplayFlag             bool
+	NotificationFlag        bool
+	CategoryID              *string
+	DeadLineCheck           *DeadLineCheckEnum
+	DeadLineCheckSubSetting db_type.Jsonb
+	Detail                  *string
+	CategoryName            *string
+}
+
+func (q *Queries) SelectTaskDefinitionById(ctx context.Context, arg SelectTaskDefinitionByIdParams) (SelectTaskDefinitionByIdRow, error) {
+	row := q.db.QueryRow(ctx, selectTaskDefinitionById, arg.OwnerUserID, arg.ID)
+	var i SelectTaskDefinitionByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.OwnerUserID,
+		&i.DisplayFlag,
+		&i.NotificationFlag,
+		&i.CategoryID,
+		&i.DeadLineCheck,
+		&i.DeadLineCheckSubSetting,
+		&i.Detail,
+		&i.CategoryName,
+	)
+	return i, err
+}
+
 const selectTaskDefinitionList = `-- name: SelectTaskDefinitionList :many
 select
 	def.id, def.title, def.owner_user_id, def.display_flag, def.notification_flag, def.category_id, def.dead_line_check, def.dead_line_check_sub_setting, def.detail,
@@ -862,6 +912,63 @@ func (q *Queries) UpdateTaskCategory(ctx context.Context, arg UpdateTaskCategory
 		&i.Name,
 		&i.OwnerUserID,
 		&i.DisplayOrder,
+	)
+	return i, err
+}
+
+const updateTaskDefinition = `-- name: UpdateTaskDefinition :one
+update
+	task_definition
+set
+	title = $3,
+	display_flag = $4,
+	notification_flag = $5,
+	dead_line_check = $6,
+	dead_line_check_sub_setting = $7,
+	category_id = $8,
+	detail = $9
+where
+	id = $1
+	and
+	owner_user_id = $2
+ returning id, title, owner_user_id, display_flag, notification_flag, category_id, dead_line_check, dead_line_check_sub_setting, detail
+`
+
+type UpdateTaskDefinitionParams struct {
+	ID                      string
+	OwnerUserID             string
+	Title                   string
+	DisplayFlag             bool
+	NotificationFlag        bool
+	DeadLineCheck           *DeadLineCheckEnum
+	DeadLineCheckSubSetting db_type.Jsonb
+	CategoryID              *string
+	Detail                  *string
+}
+
+func (q *Queries) UpdateTaskDefinition(ctx context.Context, arg UpdateTaskDefinitionParams) (TaskDefinition, error) {
+	row := q.db.QueryRow(ctx, updateTaskDefinition,
+		arg.ID,
+		arg.OwnerUserID,
+		arg.Title,
+		arg.DisplayFlag,
+		arg.NotificationFlag,
+		arg.DeadLineCheck,
+		arg.DeadLineCheckSubSetting,
+		arg.CategoryID,
+		arg.Detail,
+	)
+	var i TaskDefinition
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.OwnerUserID,
+		&i.DisplayFlag,
+		&i.NotificationFlag,
+		&i.CategoryID,
+		&i.DeadLineCheck,
+		&i.DeadLineCheckSubSetting,
+		&i.Detail,
 	)
 	return i, err
 }

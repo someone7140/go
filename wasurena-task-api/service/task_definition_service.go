@@ -9,11 +9,13 @@ import (
 	"wasurena-task-api/domain"
 	"wasurena-task-api/graph/model"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/rs/xid"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // タスク定義を追加する
-func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
+func CreateTaskService(ctx context.Context, input model.TaskInput) (bool, error) {
 	id := xid.New()
 	userAccountID := custom_middleware.GeUserAccountID(ctx)
 	createData := db.CreateTaskDefinitionParams{
@@ -29,6 +31,28 @@ func CreateTaskService(ctx context.Context, input model.NewTask) (bool, error) {
 	}
 	_, err := custom_middleware.GetDbQueries(ctx).CreateTaskDefinition(ctx, createData)
 
+	if err != nil {
+		return false, err
+	}
+	return true, err
+}
+
+// タスク定義を更新する
+func UpdateTaskService(ctx context.Context, id string, input model.TaskInput) (bool, error) {
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+	updateData := db.UpdateTaskDefinitionParams{
+		ID:                      id,
+		Title:                   input.Title,
+		OwnerUserID:             *userAccountID,
+		DisplayFlag:             input.DisplayFlag,
+		NotificationFlag:        input.NotificationFlag,
+		CategoryID:              input.CategoryID,
+		DeadLineCheck:           input.DeadLineCheck,
+		DeadLineCheckSubSetting: input.DeadLineCheckSubSetting,
+		Detail:                  input.Detail,
+	}
+
+	_, err := custom_middleware.GetDbQueries(ctx).UpdateTaskDefinition(ctx, updateData)
 	if err != nil {
 		return false, err
 	}
@@ -56,6 +80,39 @@ func GetTaskDefinitionService(ctx context.Context) ([]*model.TaskDefinitionRespo
 	}
 
 	return responseSlice, err
+}
+
+// タスク定義をID指定で取得する
+func GetTaskDefinitionByIDService(ctx context.Context, taskDefinitionID string) (*model.TaskDefinitionResponse, error) {
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+	task, err := custom_middleware.GetDbQueries(ctx).SelectTaskDefinitionById(ctx, db.SelectTaskDefinitionByIdParams{
+		OwnerUserID: *userAccountID,
+		ID:          taskDefinitionID,
+	})
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, &gqlerror.Error{
+				Message: "Can not find taskDefinition",
+				Extensions: map[string]any{
+					"code": 404,
+				}}
+		} else {
+			return nil, err
+		}
+	}
+
+	response := &model.TaskDefinitionResponse{
+		ID:                      task.ID,
+		Title:                   task.Title,
+		DisplayFlag:             task.DisplayFlag,
+		NotificationFlag:        task.NotificationFlag,
+		CategoryID:              task.CategoryID,
+		DeadLineCheck:           task.DeadLineCheck,
+		DeadLineCheckSubSetting: task.DeadLineCheckSubSetting,
+		Detail:                  task.Detail,
+		CategoryName:            task.CategoryName,
+	}
+	return response, err
 }
 
 // タスク定義を削除

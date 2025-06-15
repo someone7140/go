@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"wasurena-task-api/custom_middleware"
 	"wasurena-task-api/db"
@@ -19,7 +18,6 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -30,7 +28,7 @@ func main() {
 	// envの読み込み
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		panic(err)
 	}
 
 	port := os.Getenv("PORT")
@@ -42,13 +40,12 @@ func main() {
 	ech.Use(middleware.Recover())
 
 	// DBの接続設定
-	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, os.Getenv("DB_CONNECT"))
-	queries := db.New(conn)
+	pool, err := custom_middleware.GetConnectionPool()
 	if err != nil {
-		log.Fatal("Error Db Connect")
+		panic(err)
 	}
-	defer conn.Close(ctx)
+	queries := db.New(pool)
+	defer pool.Close()
 
 	// ミドルウェアの設定
 	ech.Use(custom_middleware.WithDbQueries(queries))

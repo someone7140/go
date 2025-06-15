@@ -31,8 +31,13 @@ func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (bool,
 }
 
 // CreateTask is the resolver for the createTask field.
-func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (bool, error) {
+func (r *mutationResolver) CreateTask(ctx context.Context, input model.TaskInput) (bool, error) {
 	return service.CreateTaskService(ctx, input)
+}
+
+// UpdateTask is the resolver for the updateTask field.
+func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.TaskInput) (bool, error) {
+	return service.UpdateTaskService(ctx, id, input)
 }
 
 // DeleteTask is the resolver for the deleteTask field.
@@ -83,6 +88,11 @@ func (r *queryResolver) GetTaskCategoryByID(ctx context.Context, categoryID stri
 // GetTaskDefinitions is the resolver for the getTaskDefinitions field.
 func (r *queryResolver) GetTaskDefinitions(ctx context.Context) ([]*model.TaskDefinitionResponse, error) {
 	return service.GetTaskDefinitionService(ctx)
+}
+
+// GetTaskDefinitionByID is the resolver for the getTaskDefinitionById field.
+func (r *queryResolver) GetTaskDefinitionByID(ctx context.Context, taskDefinitionID string) (*model.TaskDefinitionResponse, error) {
+	return service.GetTaskDefinitionByIDService(ctx, taskDefinitionID)
 }
 
 // GetTaskCheckDisplayList is the resolver for the getTaskCheckDisplayList field.

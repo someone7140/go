@@ -22,7 +22,7 @@ enum DeadLineCheck {
   YearOnceDate
 }
 
-input NewTask {
+input TaskInput {
   title: String!
   displayFlag: Boolean!
   notificationFlag: Boolean!
@@ -103,6 +103,8 @@ type Query {
   getTaskCategoryById(categoryId: String!): TaskCategoryResponse
     @isAuthenticated
   getTaskDefinitions: [TaskDefinitionResponse!] @isAuthenticated
+  getTaskDefinitionById(taskDefinitionId: String!): TaskDefinitionResponse
+    @isAuthenticated
   getTaskCheckDisplayList: [TaskCheckDisplayResponse!] @isAuthenticated
   getTaskExecuteListByDefinitionId(
     taskDefinitionId: String!
@@ -114,7 +116,8 @@ type Mutation {
   createCategory(input: CategoryInput!): Boolean! @isAuthenticated
   updateCategory(id: String!, input: CategoryInput!): Boolean! @isAuthenticated
   deleteCategory(id: String!): Boolean! @isAuthenticated
-  createTask(input: NewTask!): Boolean! @isAuthenticated
+  createTask(input: TaskInput!): Boolean! @isAuthenticated
+  updateTask(id: String!, input: TaskInput!): Boolean! @isAuthenticated
   deleteTask(id: String!): Boolean! @isAuthenticated
   createTaskExecute(input: NewTaskExecute!): Boolean! @isAuthenticated
   deleteTaskExecute(taskExecuteId: String!): Boolean! @isAuthenticated

@@ -128,14 +128,14 @@ func checkWeeklyDay(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
 // 指定された週間隔のタスクの期限が超過していないか
 func checkWeeklyDayInterval(checkTarget TaskDeadLineCheckTarget, now time.Time) bool {
 	// 指定指定された週間隔
-	weeklyDayInterval, ok := checkTarget.DeadLineCheckSubSetting["weeklyDayInterval"].(float64)
+	weekInterval, ok := checkTarget.DeadLineCheckSubSetting["weekInterval"].(float64)
 	if !ok {
 		return false
 	}
 
 	diffHour := now.Sub(checkTarget.LatestExecDateTime).Hours()
 	// 指定した週以内に実行しているか
-	return diffHour <= 7*24*weeklyDayInterval
+	return diffHour <= 7*24*weekInterval
 }
 
 // 月に1度実行されているか（先月以降に実行されているか）

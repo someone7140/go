@@ -20,16 +20,6 @@ type CreateUserRegisterTokenResponse struct {
 type Mutation struct {
 }
 
-type NewTask struct {
-	Title                   string                `json:"title"`
-	DisplayFlag             bool                  `json:"displayFlag"`
-	NotificationFlag        bool                  `json:"notificationFlag"`
-	CategoryID              *string               `json:"categoryId,omitempty"`
-	DeadLineCheck           *db.DeadLineCheckEnum `json:"deadLineCheck,omitempty"`
-	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
-	Detail                  *string               `json:"detail,omitempty"`
-}
-
 type NewTaskExecute struct {
 	TaskDefinitionID string  `json:"taskDefinitionId"`
 	Memo             *string `json:"memo,omitempty"`
@@ -81,6 +71,16 @@ type TaskExecuteResponse struct {
 	TaskDefinitionID string    `json:"taskDefinitionId"`
 	ExecuteDateTime  time.Time `json:"executeDateTime"`
 	Memo             *string   `json:"memo,omitempty"`
+}
+
+type TaskInput struct {
+	Title                   string                `json:"title"`
+	DisplayFlag             bool                  `json:"displayFlag"`
+	NotificationFlag        bool                  `json:"notificationFlag"`
+	CategoryID              *string               `json:"categoryId,omitempty"`
+	DeadLineCheck           *db.DeadLineCheckEnum `json:"deadLineCheck,omitempty"`
+	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
+	Detail                  *string               `json:"detail,omitempty"`
 }
 
 type UserAccountResponse struct {

@@ -77,6 +77,22 @@ values (
     $8,
     $9
 ) returning *;
+-- name: UpdateTaskDefinition :one
+update
+	task_definition
+set
+	title = $3,
+	display_flag = $4,
+	notification_flag = $5,
+	dead_line_check = $6,
+	dead_line_check_sub_setting = $7,
+	category_id = $8,
+	detail = $9
+where
+	id = $1
+	and
+	owner_user_id = $2
+ returning *;
 -- name: UpdateAllTaskNotificationFlagByUser :many
 update
 	task_definition
@@ -134,6 +150,18 @@ order by
 		task_category.display_order nulls last,
 		def.id desc
 limit 300;
+-- name: SelectTaskDefinitionById :one
+select
+	def.*,
+	task_category.name as category_name
+from
+	task_definition def
+left outer join task_category on
+	task_category.id = def.category_id
+where
+	def.owner_user_id = $1
+	and
+	def.id = $2;
 -- name: SelectTaskCheckDisplayList :many
 select
 	def.*,
