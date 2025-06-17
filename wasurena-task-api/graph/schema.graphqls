@@ -43,6 +43,11 @@ input NewUserAccount {
   userName: String!
 }
 
+input UpdateUserAccountInput {
+  userSettingId: String!
+  userName: String!
+}
+
 type CreateUserRegisterTokenResponse {
   token: String!
   lineName: String!
@@ -85,6 +90,7 @@ type TaskCheckDisplayResponse {
   deadLineCheckSubSetting: Map
   detail: String
   latestExecDateTime: Time
+  nextDeadLineDateTime: Time
   isExceedDeadLine: Boolean!
 }
 
@@ -122,4 +128,6 @@ type Mutation {
   createTaskExecute(input: NewTaskExecute!): Boolean! @isAuthenticated
   deleteTaskExecute(taskExecuteId: String!): Boolean! @isAuthenticated
   createUserAccount(input: NewUserAccount!): UserAccountResponse
+  updateUserAccount(input: UpdateUserAccountInput!): UserAccountResponse
+    @isAuthenticated
 }

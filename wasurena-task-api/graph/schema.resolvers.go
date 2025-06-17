@@ -60,6 +60,11 @@ func (r *mutationResolver) CreateUserAccount(ctx context.Context, input model.Ne
 	return service.CreateUserAccount(ctx, input)
 }
 
+// UpdateUserAccount is the resolver for the updateUserAccount field.
+func (r *mutationResolver) UpdateUserAccount(ctx context.Context, input model.UpdateUserAccountInput) (*model.UserAccountResponse, error) {
+	return service.UpdateUserAccount(ctx, input)
+}
+
 // GetUserRegisterToken is the resolver for the getUserRegisterToken field.
 func (r *queryResolver) GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
 	return service.GetUserRegisterTokenFromLineAuthCode(ctx, lineAuthCode)

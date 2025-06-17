@@ -80,6 +80,62 @@ func CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.
 	}, err
 }
 
+// ユーザーのアカウント情報を更新する
+func UpdateUserAccount(ctx context.Context, input model.UpdateUserAccountInput) (*model.UserAccountResponse, error) {
+	// 現在のアカウント情報を取得
+	userAccountID := custom_middleware.GeUserAccountID(ctx)
+	userAccount, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountById(ctx, *userAccountID)
+	if err != nil {
+		return nil, err
+	}
+	userSettingID := userAccount.UserSettingID
+
+	// UserSettingIDが変更されているか
+	if userSettingID != input.UserSettingID {
+		// UserSettingIDが重複してるかチェック
+		_, err := custom_middleware.GetDbQueries(ctx).SelectUserAccountByUserSettingId(ctx, input.UserSettingID)
+		if err != nil {
+			if err != pgx.ErrNoRows {
+				return nil, err
+			}
+		} else {
+			// ユーザが取得できていたら重複エラー
+			return nil, &gqlerror.Error{
+				Message: "Dupilicate userSettingId",
+				Extensions: map[string]any{
+					"code": 400,
+				}}
+		}
+		userSettingID = input.UserSettingID
+	}
+
+	// DBを更新する
+	updateData := db.UpdateUserAccountInfoParams{
+		ID:            *userAccountID,
+		UserSettingID: userSettingID,
+		UserName:      input.UserName,
+	}
+	updatedDbUser, err := custom_middleware.GetDbQueries(ctx).UpdateUserAccountInfo(ctx, updateData)
+	if err != nil {
+		return nil, err
+	}
+
+	// レスポンス構築
+	updatedUser := domain.UserAccount(updatedDbUser)
+	userToken, err := updatedUser.GetAccountUserToken()
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserAccountResponse{
+		Token:           userToken,
+		UserSettingID:   updatedUser.UserSettingID,
+		UserName:        updatedUser.UserName,
+		ImageURL:        updatedUser.ImageUrl,
+		IsLineBotFollow: updatedUser.IsLineBotFollow,
+	}, err
+}
+
 // LINEの認証コードから登録用トークンを返す
 func GetUserRegisterTokenFromLineAuthCode(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error) {
 	// 認証コードからLINEのユーザ情報を取得しトークン化する

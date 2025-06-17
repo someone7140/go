@@ -51,6 +51,7 @@ type TaskCheckDisplayResponse struct {
 	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
 	Detail                  *string               `json:"detail,omitempty"`
 	LatestExecDateTime      *time.Time            `json:"latestExecDateTime,omitempty"`
+	NextDeadLineDateTime    *time.Time            `json:"nextDeadLineDateTime,omitempty"`
 	IsExceedDeadLine        bool                  `json:"isExceedDeadLine"`
 }
 
@@ -81,6 +82,11 @@ type TaskInput struct {
 	DeadLineCheck           *db.DeadLineCheckEnum `json:"deadLineCheck,omitempty"`
 	DeadLineCheckSubSetting map[string]any        `json:"deadLineCheckSubSetting,omitempty"`
 	Detail                  *string               `json:"detail,omitempty"`
+}
+
+type UpdateUserAccountInput struct {
+	UserSettingID string `json:"userSettingId"`
+	UserName      string `json:"userName"`
 }
 
 type UserAccountResponse struct {

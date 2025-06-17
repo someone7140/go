@@ -177,32 +177,41 @@ func GetTaskCheckDisplayListService(ctx context.Context) ([]*model.TaskCheckDisp
 		CheckTargetList: checkList,
 		NowDateTime:     now,
 	}
-	// 期限が超過してるタスクをフィルタリング
-	exceededList := deadLineCheck.GetExceededTaskList()
 
 	exceededResponseSlice := []*model.TaskCheckDisplayResponse{}
 	notExceededResponseSlice := []*model.TaskCheckDisplayResponse{}
-	for _, check := range selectResults {
-		// 期限超過の判定をしてレスポンスのリストを作る
-		isExceededContains := slices.ContainsFunc(exceededList, func(e domain.TaskDeadLineCheckTarget) bool {
-			return e.TaskID == check.ID
+	for _, result := range selectResults {
+		// チェック対象のタスクから設定する項目
+		isExceedDeadLine := false
+		var nextDeadLineDateTime *time.Time
+		// チェック対象のタスクか
+		checkTargetIndex := slices.IndexFunc(deadLineCheck.CheckTargetList, func(t domain.TaskDeadLineCheckTarget) bool {
+			return t.TaskID == result.ID
 		})
+		if checkTargetIndex != -1 {
+			checkTarget := deadLineCheck.CheckTargetList[checkTargetIndex]
+			// 期限超過しているか
+			isExceedDeadLine = !checkTarget.CheckTaskDeadLine(deadLineCheck.NowDateTime)
+			// 次回の実行期限
+			nextDeadLineDateTime = checkTarget.GetNextDeadLineDateTime(deadLineCheck.NowDateTime)
+		}
 
 		response := model.TaskCheckDisplayResponse{
-			ID:                      check.ID,
-			Title:                   check.Title,
-			DisplayFlag:             check.DisplayFlag,
-			NotificationFlag:        check.NotificationFlag,
-			CategoryID:              check.CategoryID,
-			CategoryName:            check.CategoryName,
-			DeadLineCheck:           check.DeadLineCheck,
-			DeadLineCheckSubSetting: check.DeadLineCheckSubSetting,
-			Detail:                  check.Detail,
-			LatestExecDateTime:      getLatestExecDateTimeForDisplay(check.LatestExecDateTime, jst),
-			IsExceedDeadLine:        isExceededContains,
+			ID:                      result.ID,
+			Title:                   result.Title,
+			DisplayFlag:             result.DisplayFlag,
+			NotificationFlag:        result.NotificationFlag,
+			CategoryID:              result.CategoryID,
+			CategoryName:            result.CategoryName,
+			DeadLineCheck:           result.DeadLineCheck,
+			DeadLineCheckSubSetting: result.DeadLineCheckSubSetting,
+			Detail:                  result.Detail,
+			LatestExecDateTime:      getLatestExecDateTimeForDisplay(result.LatestExecDateTime, jst),
+			NextDeadLineDateTime:    nextDeadLineDateTime,
+			IsExceedDeadLine:        isExceedDeadLine,
 		}
 		// 期限超過してるかで入れる配列を判定
-		if isExceededContains {
+		if isExceedDeadLine {
 			exceededResponseSlice = append(exceededResponseSlice, &response)
 		} else {
 			notExceededResponseSlice = append(notExceededResponseSlice, &response)

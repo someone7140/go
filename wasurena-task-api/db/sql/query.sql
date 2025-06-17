@@ -307,3 +307,12 @@ set
 where
 	id = $1
 returning *;
+-- name: UpdateUserAccountInfo :one
+update
+	user_accounts
+set
+	user_setting_id = $2,
+	user_name = $3
+where
+	id = $1
+returning *;

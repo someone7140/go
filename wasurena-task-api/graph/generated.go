@@ -66,6 +66,7 @@ type ComplexityRoot struct {
 		ExecuteScheduleCheckBatch func(childComplexity int, token string) int
 		UpdateCategory            func(childComplexity int, id string, input model.CategoryInput) int
 		UpdateTask                func(childComplexity int, id string, input model.TaskInput) int
+		UpdateUserAccount         func(childComplexity int, input model.UpdateUserAccountInput) int
 	}
 
 	Query struct {
@@ -96,6 +97,7 @@ type ComplexityRoot struct {
 		ID                      func(childComplexity int) int
 		IsExceedDeadLine        func(childComplexity int) int
 		LatestExecDateTime      func(childComplexity int) int
+		NextDeadLineDateTime    func(childComplexity int) int
 		NotificationFlag        func(childComplexity int) int
 		Title                   func(childComplexity int) int
 	}
@@ -139,6 +141,7 @@ type MutationResolver interface {
 	CreateTaskExecute(ctx context.Context, input model.NewTaskExecute) (bool, error)
 	DeleteTaskExecute(ctx context.Context, taskExecuteID string) (bool, error)
 	CreateUserAccount(ctx context.Context, input model.NewUserAccount) (*model.UserAccountResponse, error)
+	UpdateUserAccount(ctx context.Context, input model.UpdateUserAccountInput) (*model.UserAccountResponse, error)
 }
 type QueryResolver interface {
 	GetUserRegisterToken(ctx context.Context, lineAuthCode string) (*model.CreateUserRegisterTokenResponse, error)
@@ -304,6 +307,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateTask(childComplexity, args["id"].(string), args["input"].(model.TaskInput)), true
+
+	case "Mutation.updateUserAccount":
+		if e.complexity.Mutation.UpdateUserAccount == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserAccount_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserAccount(childComplexity, args["input"].(model.UpdateUserAccountInput)), true
 
 	case "Query.getRegisteredUser":
 		if e.complexity.Query.GetRegisteredUser == nil {
@@ -477,6 +492,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.TaskCheckDisplayResponse.LatestExecDateTime(childComplexity), true
 
+	case "TaskCheckDisplayResponse.nextDeadLineDateTime":
+		if e.complexity.TaskCheckDisplayResponse.NextDeadLineDateTime == nil {
+			break
+		}
+
+		return e.complexity.TaskCheckDisplayResponse.NextDeadLineDateTime(childComplexity), true
+
 	case "TaskCheckDisplayResponse.notificationFlag":
 		if e.complexity.TaskCheckDisplayResponse.NotificationFlag == nil {
 			break
@@ -629,6 +651,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewTaskExecute,
 		ec.unmarshalInputNewUserAccount,
 		ec.unmarshalInputTaskInput,
+		ec.unmarshalInputUpdateUserAccountInput,
 	)
 	first := true
 
@@ -1008,6 +1031,29 @@ func (ec *executionContext) field_Mutation_updateTask_argsInput(
 	}
 
 	var zeroVal model.TaskInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserAccount_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateUserAccount_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateUserAccount_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.UpdateUserAccountInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateUserAccountInput2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUpdateUserAccountInput(ctx, tmp)
+	}
+
+	var zeroVal model.UpdateUserAccountInput
 	return zeroVal, nil
 }
 
@@ -2072,6 +2118,92 @@ func (ec *executionContext) fieldContext_Mutation_createUserAccount(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateUserAccount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUserAccount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateUserAccount(rctx, fc.Args["input"].(model.UpdateUserAccountInput))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.IsAuthenticated == nil {
+				var zeroVal *model.UserAccountResponse
+				return zeroVal, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UserAccountResponse); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *wasurena-task-api/graph/model.UserAccountResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAccountResponse)
+	fc.Result = res
+	return ec.marshalOUserAccountResponse2ᚖwasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUserAccountResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUserAccount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_UserAccountResponse_token(ctx, field)
+			case "userSettingId":
+				return ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+			case "userName":
+				return ec.fieldContext_UserAccountResponse_userName(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+			case "isLineBotFollow":
+				return ec.fieldContext_UserAccountResponse_isLineBotFollow(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAccountResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUserAccount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getUserRegisterToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getUserRegisterToken(ctx, field)
 	if err != nil {
@@ -2677,6 +2809,8 @@ func (ec *executionContext) fieldContext_Query_getTaskCheckDisplayList(_ context
 				return ec.fieldContext_TaskCheckDisplayResponse_detail(ctx, field)
 			case "latestExecDateTime":
 				return ec.fieldContext_TaskCheckDisplayResponse_latestExecDateTime(ctx, field)
+			case "nextDeadLineDateTime":
+				return ec.fieldContext_TaskCheckDisplayResponse_nextDeadLineDateTime(ctx, field)
 			case "isExceedDeadLine":
 				return ec.fieldContext_TaskCheckDisplayResponse_isExceedDeadLine(ctx, field)
 			}
@@ -3440,6 +3574,47 @@ func (ec *executionContext) _TaskCheckDisplayResponse_latestExecDateTime(ctx con
 }
 
 func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_latestExecDateTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TaskCheckDisplayResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TaskCheckDisplayResponse_nextDeadLineDateTime(ctx context.Context, field graphql.CollectedField, obj *model.TaskCheckDisplayResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TaskCheckDisplayResponse_nextDeadLineDateTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NextDeadLineDateTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TaskCheckDisplayResponse_nextDeadLineDateTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TaskCheckDisplayResponse",
 		Field:      field,
@@ -6396,6 +6571,40 @@ func (ec *executionContext) unmarshalInputTaskInput(ctx context.Context, obj any
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserAccountInput(ctx context.Context, obj any) (model.UpdateUserAccountInput, error) {
+	var it model.UpdateUserAccountInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userSettingId", "userName"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userSettingId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userSettingId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserSettingID = data
+		case "userName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserName = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -6533,6 +6742,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createUserAccount":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUserAccount(ctx, field)
+			})
+		case "updateUserAccount":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserAccount(ctx, field)
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6867,6 +7080,8 @@ func (ec *executionContext) _TaskCheckDisplayResponse(ctx context.Context, sel a
 			out.Values[i] = ec._TaskCheckDisplayResponse_detail(ctx, field, obj)
 		case "latestExecDateTime":
 			out.Values[i] = ec._TaskCheckDisplayResponse_latestExecDateTime(ctx, field, obj)
+		case "nextDeadLineDateTime":
+			out.Values[i] = ec._TaskCheckDisplayResponse_nextDeadLineDateTime(ctx, field, obj)
 		case "isExceedDeadLine":
 			out.Values[i] = ec._TaskCheckDisplayResponse_isExceedDeadLine(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7507,6 +7722,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateUserAccountInput2wasurenaᚑtaskᚑapiᚋgraphᚋmodelᚐUpdateUserAccountInput(ctx context.Context, v any) (model.UpdateUserAccountInput, error) {
+	res, err := ec.unmarshalInputUpdateUserAccountInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

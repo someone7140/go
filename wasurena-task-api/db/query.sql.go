@@ -973,6 +973,37 @@ func (q *Queries) UpdateTaskDefinition(ctx context.Context, arg UpdateTaskDefini
 	return i, err
 }
 
+const updateUserAccountInfo = `-- name: UpdateUserAccountInfo :one
+update
+	user_accounts
+set
+	user_setting_id = $2,
+	user_name = $3
+where
+	id = $1
+returning id, user_setting_id, line_id, user_name, image_url, is_line_bot_follow
+`
+
+type UpdateUserAccountInfoParams struct {
+	ID            string
+	UserSettingID string
+	UserName      string
+}
+
+func (q *Queries) UpdateUserAccountInfo(ctx context.Context, arg UpdateUserAccountInfoParams) (UserAccount, error) {
+	row := q.db.QueryRow(ctx, updateUserAccountInfo, arg.ID, arg.UserSettingID, arg.UserName)
+	var i UserAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserSettingID,
+		&i.LineID,
+		&i.UserName,
+		&i.ImageUrl,
+		&i.IsLineBotFollow,
+	)
+	return i, err
+}
+
 const updateUserAccountLineBotFollow = `-- name: UpdateUserAccountLineBotFollow :one
 update
 	user_accounts
