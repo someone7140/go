@@ -15,7 +15,7 @@ type DXORShortestWalkRoute struct {
 	w     int
 }
 
-func main() {
+func DXORShortestWalkMain() {
 	var n, m int
 	fmt.Scan(&n, &m)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)

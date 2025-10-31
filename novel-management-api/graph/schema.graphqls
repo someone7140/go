@@ -1,0 +1,40 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Todo {
+  id: ID!
+  text: String!
+  done: Boolean!
+  user: User!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type UserAccountResponse {
+  token: String!
+  userSettingId: String!
+  name: String!
+  imageUrl: String!
+}
+
+input NewTodo {
+  text: String!
+  userId: String!
+}
+
+type Query {
+  todos: [Todo!]!
+  getUserAccountRegisterTokenFromGoogleAuthCode(authCode: String!): String
+}
+
+type Mutation {
+  addUserAccountByGoogleAuth(
+    registerToken: String!
+    userSettingId: String!
+    name: String!
+  ): UserAccountResponse
+}

@@ -1,0 +1,2 @@
+- `go run github.com/99designs/gqlgen generate`で、graphql のスキーマからソースコードを生成
+- `go run db/cmd/gen_main.go`db のスキーマからソースコードを生成
