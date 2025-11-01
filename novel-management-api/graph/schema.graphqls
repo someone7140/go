@@ -2,6 +2,8 @@
 #
 # https://gqlgen.com/getting-started/
 
+directive @isAuthenticated on FIELD_DEFINITION
+
 type Todo {
   id: ID!
   text: String!
@@ -29,6 +31,7 @@ input NewTodo {
 type Query {
   todos: [Todo!]!
   getUserAccountRegisterTokenFromGoogleAuthCode(authCode: String!): String
+  getUserAccountFromAuthHeader: UserAccountResponse @isAuthenticated
 }
 
 type Mutation {
@@ -37,4 +40,5 @@ type Mutation {
     userSettingId: String!
     name: String!
   ): UserAccountResponse
+  loginByGoogleAuth(authCode: String!): UserAccountResponse
 }

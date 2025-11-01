@@ -1,18 +1,25 @@
 package main
 
 import (
+	"context"
 	"log"
+	"main/custom_middleware"
 	"main/db/query"
 	"main/graph"
 	"os"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/joho/godotenv"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const defaultPort = "8080"
@@ -42,7 +49,11 @@ func main() {
 	})
 
 	// データベース接続
-	db, err := gorm.Open(postgres.Open(os.Getenv("DB_CONNECT")), &gorm.Config{})
+	gormConfig := &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)}
+	if os.Getenv("DEV_MODE") == "true" {
+		gormConfig = &gorm.Config{}
+	}
+	db, err := gorm.Open(postgres.Open(os.Getenv("DB_CONNECT")), gormConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -51,9 +62,27 @@ func main() {
 	// GraphQLハンドラーの作成
 	playgroundHandler := playground.Handler("GraphQL", "/query")
 	app.Get("/playground", adaptor.HTTPHandler(playgroundHandler))
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &graph.Resolver{},
-	}))
+	// GraphQLのディレクティブ設定
+	graphQLConfig := graph.Config{Resolvers: &graph.Resolver{}}
+	graphQLConfig.Directives.IsAuthenticated = func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+		if custom_middleware.GeUserAccountIDFromContext(ctx) == nil {
+			return nil, &gqlerror.Error{
+				Message: "Authentication Error",
+				Extensions: map[string]any{
+					"code": 401,
+				}}
+		}
+		return next(ctx)
+	}
+
+	srv := handler.New(graph.NewExecutableSchema(graphQLConfig))
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.Options{})
+	if os.Getenv("DEV_MODE") == "true" {
+		srv.Use(extension.Introspection{})
+	}
+	srv.AroundOperations(custom_middleware.SetAuthContextFromHeader)
 	app.Post("/query", adaptor.HTTPHandler(srv))
 
 	log.Fatal(app.Listen(":" + port))

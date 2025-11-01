@@ -44,14 +44,17 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	IsAuthenticated func(ctx context.Context, obj any, next graphql.Resolver) (res any, err error)
 }
 
 type ComplexityRoot struct {
 	Mutation struct {
 		AddUserAccountByGoogleAuth func(childComplexity int, registerToken string, userSettingID string, name string) int
+		LoginByGoogleAuth          func(childComplexity int, authCode string) int
 	}
 
 	Query struct {
+		GetUserAccountFromAuthHeader                  func(childComplexity int) int
 		GetUserAccountRegisterTokenFromGoogleAuthCode func(childComplexity int, authCode string) int
 		Todos                                         func(childComplexity int) int
 	}
@@ -78,10 +81,12 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	AddUserAccountByGoogleAuth(ctx context.Context, registerToken string, userSettingID string, name string) (*graphql_model.UserAccountResponse, error)
+	LoginByGoogleAuth(ctx context.Context, authCode string) (*graphql_model.UserAccountResponse, error)
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]*graphql_model.Todo, error)
 	GetUserAccountRegisterTokenFromGoogleAuthCode(ctx context.Context, authCode string) (*string, error)
+	GetUserAccountFromAuthHeader(ctx context.Context) (*graphql_model.UserAccountResponse, error)
 }
 
 type executableSchema struct {
@@ -114,7 +119,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.AddUserAccountByGoogleAuth(childComplexity, args["registerToken"].(string), args["userSettingId"].(string), args["name"].(string)), true
+	case "Mutation.loginByGoogleAuth":
+		if e.complexity.Mutation.LoginByGoogleAuth == nil {
+			break
+		}
 
+		args, err := ec.field_Mutation_loginByGoogleAuth_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.LoginByGoogleAuth(childComplexity, args["authCode"].(string)), true
+
+	case "Query.getUserAccountFromAuthHeader":
+		if e.complexity.Query.GetUserAccountFromAuthHeader == nil {
+			break
+		}
+
+		return e.complexity.Query.GetUserAccountFromAuthHeader(childComplexity), true
 	case "Query.getUserAccountRegisterTokenFromGoogleAuthCode":
 		if e.complexity.Query.GetUserAccountRegisterTokenFromGoogleAuthCode == nil {
 			break
@@ -342,6 +364,17 @@ func (ec *executionContext) field_Mutation_addUserAccountByGoogleAuth_args(ctx c
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_loginByGoogleAuth_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "authCode", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["authCode"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -467,6 +500,57 @@ func (ec *executionContext) fieldContext_Mutation_addUserAccountByGoogleAuth(ctx
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_loginByGoogleAuth(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_loginByGoogleAuth,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().LoginByGoogleAuth(ctx, fc.Args["authCode"].(string))
+		},
+		nil,
+		ec.marshalOUserAccountResponse2ᚖmainᚋgraphᚋgraphql_modelᚐUserAccountResponse,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_loginByGoogleAuth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_UserAccountResponse_token(ctx, field)
+			case "userSettingId":
+				return ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+			case "name":
+				return ec.fieldContext_UserAccountResponse_name(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAccountResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_loginByGoogleAuth_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -543,6 +627,58 @@ func (ec *executionContext) fieldContext_Query_getUserAccountRegisterTokenFromGo
 	if fc.Args, err = ec.field_Query_getUserAccountRegisterTokenFromGoogleAuthCode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUserAccountFromAuthHeader(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_getUserAccountFromAuthHeader,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().GetUserAccountFromAuthHeader(ctx)
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.IsAuthenticated == nil {
+					var zeroVal *graphql_model.UserAccountResponse
+					return zeroVal, errors.New("directive isAuthenticated is not implemented")
+				}
+				return ec.directives.IsAuthenticated(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalOUserAccountResponse2ᚖmainᚋgraphᚋgraphql_modelᚐUserAccountResponse,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserAccountFromAuthHeader(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_UserAccountResponse_token(ctx, field)
+			case "userSettingId":
+				return ec.fieldContext_UserAccountResponse_userSettingId(ctx, field)
+			case "name":
+				return ec.fieldContext_UserAccountResponse_name(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserAccountResponse_imageUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAccountResponse", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -2462,6 +2598,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addUserAccountByGoogleAuth(ctx, field)
 			})
+		case "loginByGoogleAuth":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_loginByGoogleAuth(ctx, field)
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2536,6 +2676,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getUserAccountRegisterTokenFromGoogleAuthCode(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUserAccountFromAuthHeader":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserAccountFromAuthHeader(ctx, field)
 				return res
 			}
 

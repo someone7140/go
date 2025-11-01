@@ -7,13 +7,19 @@ package graph
 import (
 	"context"
 	"fmt"
+	"main/custom_middleware"
 	"main/graph/graphql_model"
 	"main/service"
 )
 
 // AddUserAccountByGoogleAuth is the resolver for the addUserAccountByGoogleAuth field.
 func (r *mutationResolver) AddUserAccountByGoogleAuth(ctx context.Context, registerToken string, userSettingID string, name string) (*graphql_model.UserAccountResponse, error) {
-	panic(fmt.Errorf("not implemented: AddUserAccountByGoogleAuth - addUserAccountByGoogleAuth"))
+	return service.AddUserAccountByGoogleAuth(registerToken, userSettingID, name)
+}
+
+// LoginByGoogleAuth is the resolver for the loginByGoogleAuth field.
+func (r *mutationResolver) LoginByGoogleAuth(ctx context.Context, authCode string) (*graphql_model.UserAccountResponse, error) {
+	return service.GetUserAccountByGoogleAuthCode(authCode)
 }
 
 // Todos is the resolver for the todos field.
@@ -23,7 +29,13 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*graphql_model.Todo, error
 
 // GetUserAccountRegisterTokenFromGoogleAuthCode is the resolver for the getUserAccountRegisterTokenFromGoogleAuthCode field.
 func (r *queryResolver) GetUserAccountRegisterTokenFromGoogleAuthCode(ctx context.Context, authCode string) (*string, error) {
-	return service.GetUserAccountRegisterToken(authCode)
+	return service.GetUserAccountRegisterTokenByGoogleAuthCode(authCode)
+}
+
+// GetUserAccountFromAuthHeader is the resolver for the getUserAccountFromAuthHeader field.
+func (r *queryResolver) GetUserAccountFromAuthHeader(ctx context.Context) (*graphql_model.UserAccountResponse, error) {
+	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
+	return service.GetUserAccountByUserAccountID(*userAccountID)
 }
 
 // Mutation returns MutationResolver implementation.
