@@ -27,7 +27,7 @@ CREATE TABLE novel_settings (
 	owner_user_account_id varchar NOT NULL,
 	parent_setting_id varchar,
 	display_order int4,
-	"attributes" varchar[],
+	"attributes" varchar[] NOT NULL,
 	description text,
 	CONSTRAINT novel_settings_pkey PRIMARY KEY (id)
 );

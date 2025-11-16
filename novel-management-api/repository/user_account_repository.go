@@ -25,3 +25,19 @@ func AddUserAccount(ctx context.Context, userAccount db_model.UserAccount) error
 	u := query.UserAccount
 	return u.WithContext(ctx).Create(&userAccount)
 }
+
+func UpdateUserAccountByInput(ctx context.Context, userAccountID string, userSettingID string, name string) error {
+	u := query.UserAccount
+	_, err := u.WithContext(ctx).
+		Where(u.ID.Eq(userAccountID)).
+		Updates(map[string]any{"user_setting_id": userSettingID, "name": name})
+	return err
+}
+
+func UpdateUserAccountImageUrl(ctx context.Context, userAccountID string, imageURL string) error {
+	u := query.UserAccount
+	_, err := u.WithContext(ctx).
+		Where(u.ID.Eq(userAccountID)).
+		UpdateSimple(u.ImageURL.Value(imageURL))
+	return err
+}

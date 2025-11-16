@@ -61,12 +61,17 @@ func GetUserAccountByGoogleAuthCode(authCode string) (*graphql_model.UserAccount
 	if err != nil {
 		return nil, err
 	}
+	// imageURLを最新のもので更新する
+	err = repository.UpdateUserAccountImageUrl(ctx, userAccount.ID, googleUserInfo.Picture)
+	if err != nil {
+		return nil, err
+	}
 
 	return &graphql_model.UserAccountResponse{
 		Token:         *authToken,
 		UserSettingID: userAccount.UserSettingID,
 		Name:          userAccount.Name,
-		ImageURL:      *userAccount.ImageURL,
+		ImageURL:      googleUserInfo.Picture,
 	}, nil
 }
 
@@ -143,6 +148,31 @@ func AddUserAccountByGoogleAuth(registerToken string, userSettingID string, name
 		UserSettingID: userSettingID,
 		Name:          name,
 		ImageURL:      imageUrl,
+	}, nil
+}
+
+func EditUserAccountByGoogleAuth(userAccountID string, userSettingID string, name string) (*graphql_model.UserAccountResponse, error) {
+	ctx := context.Background()
+	userAccount, err := repository.GetUserAccountByID(ctx, userAccountID)
+	err = checkErrorUserAccountNotFound(err)
+	if err != nil {
+		return nil, err
+	}
+
+	err = repository.UpdateUserAccountByInput(ctx, userAccountID, userSettingID, name)
+	if err != nil {
+		return nil, err
+	}
+	authToken, err := GenerateAuthToken(userAccountID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &graphql_model.UserAccountResponse{
+		Token:         *authToken,
+		UserSettingID: userSettingID,
+		Name:          name,
+		ImageURL:      *userAccount.ImageURL,
 	}, nil
 }
 

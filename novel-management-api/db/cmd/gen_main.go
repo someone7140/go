@@ -31,7 +31,9 @@ func main() {
 	})
 
 	g.UseDB(db)
-
+	g.WithDataTypeMap(map[string]func(gorm.ColumnType) string{
+		"character varying[]": func(columnType gorm.ColumnType) string { return "[]string" },
+	})
 	// 全テーブルを生成
 	g.ApplyBasic(g.GenerateAllTable()...)
 

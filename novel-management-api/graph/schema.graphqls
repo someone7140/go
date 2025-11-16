@@ -4,16 +4,14 @@
 
 directive @isAuthenticated on FIELD_DEFINITION
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
+input NovelSettingRegisterInput {
+  id: String
   name: String!
+  novelId: String!
+  parentSettingId: String
+  displayOrder: Int
+  attributes: [String!]!
+  description: String
 }
 
 type UserAccountResponse {
@@ -23,15 +21,31 @@ type UserAccountResponse {
   imageUrl: String!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+type NovelResponse {
+  id: String!
+  title: String!
+  description: String
+}
+
+type NovelSettingResponse {
+  id: String!
+  name: String!
+  novelId: String!
+  parentSettingId: String
+  displayOrder: Int
+  attributes: [String!]!
+  description: String
 }
 
 type Query {
-  todos: [Todo!]!
   getUserAccountRegisterTokenFromGoogleAuthCode(authCode: String!): String
   getUserAccountFromAuthHeader: UserAccountResponse @isAuthenticated
+  getMyNovels: [NovelResponse!]! @isAuthenticated
+  getMyNovelById(novelId: String!): NovelResponse @isAuthenticated
+  getMyNovelSettings: [NovelSettingResponse!]! @isAuthenticated
+  getNovelSettingsByParentSettingId(
+    parentId: String!
+  ): [NovelSettingResponse!]! @isAuthenticated @isAuthenticated
 }
 
 type Mutation {
@@ -41,4 +55,14 @@ type Mutation {
     name: String!
   ): UserAccountResponse
   loginByGoogleAuth(authCode: String!): UserAccountResponse
+  editUserAccount(userSettingId: String!, name: String!): UserAccountResponse
+    @isAuthenticated
+  addNovel(title: String!, description: String): Boolean @isAuthenticated
+  editNovel(id: String!, title: String!, description: String): Boolean
+    @isAuthenticated
+  deleteNovelMutation(id: String!): Boolean @isAuthenticated
+  registerNovelSettings(inputs: [NovelSettingRegisterInput!]!): Boolean
+    @isAuthenticated
+  deleteNovelSettingById(id: String!): Boolean @isAuthenticated
+  deleteNovelSettingByIds(ids: [String!]!): Boolean @isAuthenticated
 }
