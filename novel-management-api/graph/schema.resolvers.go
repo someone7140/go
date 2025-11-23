@@ -39,8 +39,8 @@ func (r *mutationResolver) EditNovel(ctx context.Context, id string, title strin
 	return service.EditNovel(*userAccountID, id, title, description)
 }
 
-// DeleteNovelMutation is the resolver for the deleteNovelMutation field.
-func (r *mutationResolver) DeleteNovelMutation(ctx context.Context, id string) (*bool, error) {
+// DeleteNovel is the resolver for the deleteNovel field.
+func (r *mutationResolver) DeleteNovel(ctx context.Context, id string) (*bool, error) {
 	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
 	return service.DeleteNovel(*userAccountID, id)
 }
@@ -86,10 +86,10 @@ func (r *queryResolver) GetMyNovelByID(ctx context.Context, novelID string) (*gr
 	return service.GetMyNovelByID(*userAccountID, novelID)
 }
 
-// GetMyNovelSettings is the resolver for the getMyNovelSettings field.
-func (r *queryResolver) GetMyNovelSettings(ctx context.Context) ([]graphql_model.NovelSettingResponse, error) {
+// GetNovelSettingsByNovelID is the resolver for the getNovelSettingsByNovelId field.
+func (r *queryResolver) GetNovelSettingsByNovelID(ctx context.Context, novelID string) ([]graphql_model.NovelSettingResponse, error) {
 	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
-	return service.GetMyNovelSettings(*userAccountID)
+	return service.GetNovelSettingsByNovelID(*userAccountID, novelID)
 }
 
 // GetNovelSettingsByParentSettingID is the resolver for the getNovelSettingsByParentSettingId field.
@@ -106,3 +106,16 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) GetMyNovelSettings(ctx context.Context, novelID string) ([]graphql_model.NovelSettingResponse, error) {
+	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
+	return service.GetMyNovelSettings(*userAccountID, novelID)
+}
+*/

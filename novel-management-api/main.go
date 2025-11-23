@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"gorm.io/driver/postgres"
@@ -75,6 +76,13 @@ func main() {
 		return next(ctx)
 	}
 
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     os.Getenv("FRONTEND_DOMAIN"),
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,Apollo-Require-Preflight",
+		AllowCredentials: true,
+	}))
+
 	srv := handler.New(graph.NewExecutableSchema(graphQLConfig))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.GET{})
@@ -83,7 +91,7 @@ func main() {
 		srv.Use(extension.Introspection{})
 	}
 	srv.AroundOperations(custom_middleware.SetAuthContextFromHeader)
-	app.Post("/query", adaptor.HTTPHandler(srv))
+	app.Post("/graphql", adaptor.HTTPHandler(srv))
 
 	log.Fatal(app.Listen(":" + port))
 }

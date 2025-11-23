@@ -42,7 +42,8 @@ type Query {
   getUserAccountFromAuthHeader: UserAccountResponse @isAuthenticated
   getMyNovels: [NovelResponse!]! @isAuthenticated
   getMyNovelById(novelId: String!): NovelResponse @isAuthenticated
-  getMyNovelSettings: [NovelSettingResponse!]! @isAuthenticated
+  getNovelSettingsByNovelId(novelId: String!): [NovelSettingResponse!]!
+    @isAuthenticated
   getNovelSettingsByParentSettingId(
     parentId: String!
   ): [NovelSettingResponse!]! @isAuthenticated @isAuthenticated
@@ -60,7 +61,7 @@ type Mutation {
   addNovel(title: String!, description: String): Boolean @isAuthenticated
   editNovel(id: String!, title: String!, description: String): Boolean
     @isAuthenticated
-  deleteNovelMutation(id: String!): Boolean @isAuthenticated
+  deleteNovel(id: String!): Boolean @isAuthenticated
   registerNovelSettings(inputs: [NovelSettingRegisterInput!]!): Boolean
     @isAuthenticated
   deleteNovelSettingById(id: String!): Boolean @isAuthenticated

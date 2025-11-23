@@ -1,6 +1,7 @@
 package main
 
 import (
+	"main/db/db_model"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -34,8 +35,11 @@ func main() {
 	g.WithDataTypeMap(map[string]func(gorm.ColumnType) string{
 		"character varying[]": func(columnType gorm.ColumnType) string { return "[]string" },
 	})
-	// 全テーブルを生成
-	g.ApplyBasic(g.GenerateAllTable()...)
+
+	g.ApplyBasic(db_model.NovelSetting{})
+	novelModel := g.GenerateModel("novels")
+	userAccountModel := g.GenerateModel("user_accounts")
+	g.ApplyBasic(novelModel, userAccountModel)
 
 	g.Execute()
 }

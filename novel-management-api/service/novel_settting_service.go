@@ -60,9 +60,9 @@ func RegisterNovelSettings(userAccountID string, inputs []graphql_model.NovelSet
 	return &result, nil
 }
 
-func GetMyNovelSettings(userAccountID string) ([]graphql_model.NovelSettingResponse, error) {
+func GetNovelSettingsByNovelID(userAccountID string, novelID string) ([]graphql_model.NovelSettingResponse, error) {
 	ctx := context.Background()
-	settingsFromDB, err := repository.GetMyNovelSettings(ctx, userAccountID)
+	settingsFromDB, err := repository.GetNovelSettingsByNovelID(ctx, userAccountID, novelID)
 	if err != nil {
 		return nil, err
 	}
