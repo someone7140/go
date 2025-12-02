@@ -33,3 +33,17 @@ CREATE TABLE novel_settings (
 );
 CREATE INDEX idx_novel_settings_novel_id ON novel_settings USING btree (novel_id);
 CREATE INDEX idx_novel_settings_owner_user_account_id ON novel_settings USING btree (owner_user_account_id);
+
+CREATE TABLE novel_contents (
+	id varchar NOT NULL,
+	chapter_name varchar NOT NULL,
+	novel_id varchar NOT NULL,
+	owner_user_account_id varchar NOT NULL,
+	parent_contents_id varchar,
+	display_order int4,
+	contents text,
+	description text,
+	CONSTRAINT novel_contents_pkey PRIMARY KEY (id)
+);
+CREATE INDEX idx_novel_contents_novel_id ON novel_contents USING btree (novel_id);
+CREATE INDEX idx_novel_contents_owner_user_account_id ON novel_contents USING btree (owner_user_account_id);

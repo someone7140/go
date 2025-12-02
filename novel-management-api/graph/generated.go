@@ -52,12 +52,25 @@ type ComplexityRoot struct {
 		AddNovel                   func(childComplexity int, title string, description *string) int
 		AddUserAccountByGoogleAuth func(childComplexity int, registerToken string, userSettingID string, name string) int
 		DeleteNovel                func(childComplexity int, id string) int
+		DeleteNovelContentsByID    func(childComplexity int, id string) int
+		DeleteNovelContentsByIds   func(childComplexity int, ids []string) int
 		DeleteNovelSettingByID     func(childComplexity int, id string) int
 		DeleteNovelSettingByIds    func(childComplexity int, ids []string) int
 		EditNovel                  func(childComplexity int, id string, title string, description *string) int
 		EditUserAccount            func(childComplexity int, userSettingID string, name string) int
 		LoginByGoogleAuth          func(childComplexity int, authCode string) int
+		RegisterNovelContents      func(childComplexity int, inputs []graphql_model.NovelContentsRegisterInput) int
 		RegisterNovelSettings      func(childComplexity int, inputs []graphql_model.NovelSettingRegisterInput) int
+	}
+
+	NovelContentsResponse struct {
+		ChapterName      func(childComplexity int) int
+		Contents         func(childComplexity int) int
+		Description      func(childComplexity int) int
+		DisplayOrder     func(childComplexity int) int
+		ID               func(childComplexity int) int
+		NovelID          func(childComplexity int) int
+		ParentContentsID func(childComplexity int) int
 	}
 
 	NovelResponse struct {
@@ -79,6 +92,7 @@ type ComplexityRoot struct {
 	Query struct {
 		GetMyNovelByID                                func(childComplexity int, novelID string) int
 		GetMyNovels                                   func(childComplexity int) int
+		GetNovelContentsByNovelID                     func(childComplexity int, novelID string) int
 		GetNovelSettingsByNovelID                     func(childComplexity int, novelID string) int
 		GetNovelSettingsByParentSettingID             func(childComplexity int, parentID string) int
 		GetUserAccountFromAuthHeader                  func(childComplexity int) int
@@ -103,6 +117,9 @@ type MutationResolver interface {
 	RegisterNovelSettings(ctx context.Context, inputs []graphql_model.NovelSettingRegisterInput) (*bool, error)
 	DeleteNovelSettingByID(ctx context.Context, id string) (*bool, error)
 	DeleteNovelSettingByIds(ctx context.Context, ids []string) (*bool, error)
+	RegisterNovelContents(ctx context.Context, inputs []graphql_model.NovelContentsRegisterInput) (*bool, error)
+	DeleteNovelContentsByID(ctx context.Context, id string) (*bool, error)
+	DeleteNovelContentsByIds(ctx context.Context, ids []string) (*bool, error)
 }
 type QueryResolver interface {
 	GetUserAccountRegisterTokenFromGoogleAuthCode(ctx context.Context, authCode string) (*string, error)
@@ -111,6 +128,7 @@ type QueryResolver interface {
 	GetMyNovelByID(ctx context.Context, novelID string) (*graphql_model.NovelResponse, error)
 	GetNovelSettingsByNovelID(ctx context.Context, novelID string) ([]graphql_model.NovelSettingResponse, error)
 	GetNovelSettingsByParentSettingID(ctx context.Context, parentID string) ([]graphql_model.NovelSettingResponse, error)
+	GetNovelContentsByNovelID(ctx context.Context, novelID string) ([]graphql_model.NovelContentsResponse, error)
 }
 
 type executableSchema struct {
@@ -165,6 +183,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteNovel(childComplexity, args["id"].(string)), true
+	case "Mutation.deleteNovelContentsById":
+		if e.complexity.Mutation.DeleteNovelContentsByID == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteNovelContentsById_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteNovelContentsByID(childComplexity, args["id"].(string)), true
+	case "Mutation.deleteNovelContentsByIds":
+		if e.complexity.Mutation.DeleteNovelContentsByIds == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteNovelContentsByIds_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteNovelContentsByIds(childComplexity, args["ids"].([]string)), true
 	case "Mutation.deleteNovelSettingById":
 		if e.complexity.Mutation.DeleteNovelSettingByID == nil {
 			break
@@ -220,6 +260,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.LoginByGoogleAuth(childComplexity, args["authCode"].(string)), true
+	case "Mutation.registerNovelContents":
+		if e.complexity.Mutation.RegisterNovelContents == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_registerNovelContents_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RegisterNovelContents(childComplexity, args["inputs"].([]graphql_model.NovelContentsRegisterInput)), true
 	case "Mutation.registerNovelSettings":
 		if e.complexity.Mutation.RegisterNovelSettings == nil {
 			break
@@ -231,6 +282,49 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.RegisterNovelSettings(childComplexity, args["inputs"].([]graphql_model.NovelSettingRegisterInput)), true
+
+	case "NovelContentsResponse.chapterName":
+		if e.complexity.NovelContentsResponse.ChapterName == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.ChapterName(childComplexity), true
+	case "NovelContentsResponse.contents":
+		if e.complexity.NovelContentsResponse.Contents == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.Contents(childComplexity), true
+	case "NovelContentsResponse.description":
+		if e.complexity.NovelContentsResponse.Description == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.Description(childComplexity), true
+	case "NovelContentsResponse.displayOrder":
+		if e.complexity.NovelContentsResponse.DisplayOrder == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.DisplayOrder(childComplexity), true
+	case "NovelContentsResponse.id":
+		if e.complexity.NovelContentsResponse.ID == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.ID(childComplexity), true
+	case "NovelContentsResponse.novelId":
+		if e.complexity.NovelContentsResponse.NovelID == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.NovelID(childComplexity), true
+	case "NovelContentsResponse.parentContentsId":
+		if e.complexity.NovelContentsResponse.ParentContentsID == nil {
+			break
+		}
+
+		return e.complexity.NovelContentsResponse.ParentContentsID(childComplexity), true
 
 	case "NovelResponse.description":
 		if e.complexity.NovelResponse.Description == nil {
@@ -311,6 +405,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetMyNovels(childComplexity), true
+	case "Query.getNovelContentsByNovelId":
+		if e.complexity.Query.GetNovelContentsByNovelID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getNovelContentsByNovelId_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetNovelContentsByNovelID(childComplexity, args["novelId"].(string)), true
 	case "Query.getNovelSettingsByNovelId":
 		if e.complexity.Query.GetNovelSettingsByNovelID == nil {
 			break
@@ -384,6 +489,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputNovelContentsRegisterInput,
 		ec.unmarshalInputNovelSettingRegisterInput,
 	)
 	first := true
@@ -538,6 +644,28 @@ func (ec *executionContext) field_Mutation_addUserAccountByGoogleAuth_args(ctx c
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteNovelContentsById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteNovelContentsByIds_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "ids", ec.unmarshalNString2ᚕstringᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["ids"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteNovelSettingById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -619,6 +747,17 @@ func (ec *executionContext) field_Mutation_loginByGoogleAuth_args(ctx context.Co
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_registerNovelContents_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "inputs", ec.unmarshalNNovelContentsRegisterInput2ᚕmainᚋgraphᚋgraphql_modelᚐNovelContentsRegisterInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["inputs"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_registerNovelSettings_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -642,6 +781,17 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 }
 
 func (ec *executionContext) field_Query_getMyNovelById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "novelId", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["novelId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getNovelContentsByNovelId_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "novelId", ec.unmarshalNString2string)
@@ -1223,6 +1373,371 @@ func (ec *executionContext) fieldContext_Mutation_deleteNovelSettingByIds(ctx co
 	if fc.Args, err = ec.field_Mutation_deleteNovelSettingByIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_registerNovelContents(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_registerNovelContents,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().RegisterNovelContents(ctx, fc.Args["inputs"].([]graphql_model.NovelContentsRegisterInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.IsAuthenticated == nil {
+					var zeroVal *bool
+					return zeroVal, errors.New("directive isAuthenticated is not implemented")
+				}
+				return ec.directives.IsAuthenticated(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_registerNovelContents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_registerNovelContents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteNovelContentsById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteNovelContentsById,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteNovelContentsByID(ctx, fc.Args["id"].(string))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.IsAuthenticated == nil {
+					var zeroVal *bool
+					return zeroVal, errors.New("directive isAuthenticated is not implemented")
+				}
+				return ec.directives.IsAuthenticated(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteNovelContentsById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteNovelContentsById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteNovelContentsByIds(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteNovelContentsByIds,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteNovelContentsByIds(ctx, fc.Args["ids"].([]string))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.IsAuthenticated == nil {
+					var zeroVal *bool
+					return zeroVal, errors.New("directive isAuthenticated is not implemented")
+				}
+				return ec.directives.IsAuthenticated(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteNovelContentsByIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteNovelContentsByIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_id(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_chapterName(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_chapterName,
+		func(ctx context.Context) (any, error) {
+			return obj.ChapterName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_chapterName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_novelId(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_novelId,
+		func(ctx context.Context) (any, error) {
+			return obj.NovelID, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_novelId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_parentContentsId(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_parentContentsId,
+		func(ctx context.Context) (any, error) {
+			return obj.ParentContentsID, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_parentContentsId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_displayOrder(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_displayOrder,
+		func(ctx context.Context) (any, error) {
+			return obj.DisplayOrder, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint32,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_displayOrder(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_contents(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_contents,
+		func(ctx context.Context) (any, error) {
+			return obj.Contents, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_contents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NovelContentsResponse_description(ctx context.Context, field graphql.CollectedField, obj *graphql_model.NovelContentsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NovelContentsResponse_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_NovelContentsResponse_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NovelContentsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -1812,15 +2327,8 @@ func (ec *executionContext) _Query_getNovelSettingsByParentSettingId(ctx context
 				}
 				return ec.directives.IsAuthenticated(ctx, nil, directive0)
 			}
-			directive2 := func(ctx context.Context) (any, error) {
-				if ec.directives.IsAuthenticated == nil {
-					var zeroVal []graphql_model.NovelSettingResponse
-					return zeroVal, errors.New("directive isAuthenticated is not implemented")
-				}
-				return ec.directives.IsAuthenticated(ctx, nil, directive1)
-			}
 
-			next = directive2
+			next = directive1
 			return next
 		},
 		ec.marshalNNovelSettingResponse2ᚕmainᚋgraphᚋgraphql_modelᚐNovelSettingResponseᚄ,
@@ -1863,6 +2371,76 @@ func (ec *executionContext) fieldContext_Query_getNovelSettingsByParentSettingId
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getNovelSettingsByParentSettingId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getNovelContentsByNovelId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_getNovelContentsByNovelId,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().GetNovelContentsByNovelID(ctx, fc.Args["novelId"].(string))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.IsAuthenticated == nil {
+					var zeroVal []graphql_model.NovelContentsResponse
+					return zeroVal, errors.New("directive isAuthenticated is not implemented")
+				}
+				return ec.directives.IsAuthenticated(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNNovelContentsResponse2ᚕmainᚋgraphᚋgraphql_modelᚐNovelContentsResponseᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_getNovelContentsByNovelId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_NovelContentsResponse_id(ctx, field)
+			case "chapterName":
+				return ec.fieldContext_NovelContentsResponse_chapterName(ctx, field)
+			case "novelId":
+				return ec.fieldContext_NovelContentsResponse_novelId(ctx, field)
+			case "parentContentsId":
+				return ec.fieldContext_NovelContentsResponse_parentContentsId(ctx, field)
+			case "displayOrder":
+				return ec.fieldContext_NovelContentsResponse_displayOrder(ctx, field)
+			case "contents":
+				return ec.fieldContext_NovelContentsResponse_contents(ctx, field)
+			case "description":
+				return ec.fieldContext_NovelContentsResponse_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NovelContentsResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getNovelContentsByNovelId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3539,6 +4117,75 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputNovelContentsRegisterInput(ctx context.Context, obj any) (graphql_model.NovelContentsRegisterInput, error) {
+	var it graphql_model.NovelContentsRegisterInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "chapterName", "novelId", "parentContentsId", "displayOrder", "contents", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "chapterName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chapterName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ChapterName = data
+		case "novelId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("novelId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NovelID = data
+		case "parentContentsId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentContentsId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ParentContentsID = data
+		case "displayOrder":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayOrder"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DisplayOrder = data
+		case "contents":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contents"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Contents = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNovelSettingRegisterInput(ctx context.Context, obj any) (graphql_model.NovelSettingRegisterInput, error) {
 	var it graphql_model.NovelSettingRegisterInput
 	asMap := map[string]any{}
@@ -3671,6 +4318,75 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteNovelSettingByIds(ctx, field)
 			})
+		case "registerNovelContents":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_registerNovelContents(ctx, field)
+			})
+		case "deleteNovelContentsById":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteNovelContentsById(ctx, field)
+			})
+		case "deleteNovelContentsByIds":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteNovelContentsByIds(ctx, field)
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var novelContentsResponseImplementors = []string{"NovelContentsResponse"}
+
+func (ec *executionContext) _NovelContentsResponse(ctx context.Context, sel ast.SelectionSet, obj *graphql_model.NovelContentsResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, novelContentsResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NovelContentsResponse")
+		case "id":
+			out.Values[i] = ec._NovelContentsResponse_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "chapterName":
+			out.Values[i] = ec._NovelContentsResponse_chapterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "novelId":
+			out.Values[i] = ec._NovelContentsResponse_novelId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "parentContentsId":
+			out.Values[i] = ec._NovelContentsResponse_parentContentsId(ctx, field, obj)
+		case "displayOrder":
+			out.Values[i] = ec._NovelContentsResponse_displayOrder(ctx, field, obj)
+		case "contents":
+			out.Values[i] = ec._NovelContentsResponse_contents(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._NovelContentsResponse_description(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3930,6 +4646,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getNovelSettingsByParentSettingId(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getNovelContentsByNovelId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getNovelContentsByNovelId(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4376,6 +5114,74 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNNovelContentsRegisterInput2mainᚋgraphᚋgraphql_modelᚐNovelContentsRegisterInput(ctx context.Context, v any) (graphql_model.NovelContentsRegisterInput, error) {
+	res, err := ec.unmarshalInputNovelContentsRegisterInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNovelContentsRegisterInput2ᚕmainᚋgraphᚋgraphql_modelᚐNovelContentsRegisterInputᚄ(ctx context.Context, v any) ([]graphql_model.NovelContentsRegisterInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]graphql_model.NovelContentsRegisterInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNovelContentsRegisterInput2mainᚋgraphᚋgraphql_modelᚐNovelContentsRegisterInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNNovelContentsResponse2mainᚋgraphᚋgraphql_modelᚐNovelContentsResponse(ctx context.Context, sel ast.SelectionSet, v graphql_model.NovelContentsResponse) graphql.Marshaler {
+	return ec._NovelContentsResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNNovelContentsResponse2ᚕmainᚋgraphᚋgraphql_modelᚐNovelContentsResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []graphql_model.NovelContentsResponse) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNNovelContentsResponse2mainᚋgraphᚋgraphql_modelᚐNovelContentsResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNNovelResponse2mainᚋgraphᚋgraphql_modelᚐNovelResponse(ctx context.Context, sel ast.SelectionSet, v graphql_model.NovelResponse) graphql.Marshaler {

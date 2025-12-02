@@ -117,10 +117,10 @@ func DeleteNovelSettingByID(userAccountID string, id string) (*bool, error) {
 		var ids []string
 		for _, child := range children {
 			ids = append(ids, child.ID)
-			err = repository.DeleteNovelSettings(ctx, userAccountID, ids)
-			if err != nil {
-				return nil, err
-			}
+		}
+		err = repository.DeleteNovelSettings(ctx, userAccountID, ids)
+		if err != nil {
+			return nil, err
 		}
 	}
 

@@ -18,6 +18,7 @@ import (
 var (
 	Q            = new(Query)
 	Novel        *novel
+	NovelContent *novelContent
 	NovelSetting *novelSetting
 	UserAccount  *userAccount
 )
@@ -25,6 +26,7 @@ var (
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Novel = &Q.Novel
+	NovelContent = &Q.NovelContent
 	NovelSetting = &Q.NovelSetting
 	UserAccount = &Q.UserAccount
 }
@@ -33,6 +35,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:           db,
 		Novel:        newNovel(db, opts...),
+		NovelContent: newNovelContent(db, opts...),
 		NovelSetting: newNovelSetting(db, opts...),
 		UserAccount:  newUserAccount(db, opts...),
 	}
@@ -42,6 +45,7 @@ type Query struct {
 	db *gorm.DB
 
 	Novel        novel
+	NovelContent novelContent
 	NovelSetting novelSetting
 	UserAccount  userAccount
 }
@@ -52,6 +56,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:           db,
 		Novel:        q.Novel.clone(db),
+		NovelContent: q.NovelContent.clone(db),
 		NovelSetting: q.NovelSetting.clone(db),
 		UserAccount:  q.UserAccount.clone(db),
 	}
@@ -69,6 +74,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:           db,
 		Novel:        q.Novel.replaceDB(db),
+		NovelContent: q.NovelContent.replaceDB(db),
 		NovelSetting: q.NovelSetting.replaceDB(db),
 		UserAccount:  q.UserAccount.replaceDB(db),
 	}
@@ -76,6 +82,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 
 type queryCtx struct {
 	Novel        INovelDo
+	NovelContent INovelContentDo
 	NovelSetting INovelSettingDo
 	UserAccount  IUserAccountDo
 }
@@ -83,6 +90,7 @@ type queryCtx struct {
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		Novel:        q.Novel.WithContext(ctx),
+		NovelContent: q.NovelContent.WithContext(ctx),
 		NovelSetting: q.NovelSetting.WithContext(ctx),
 		UserAccount:  q.UserAccount.WithContext(ctx),
 	}

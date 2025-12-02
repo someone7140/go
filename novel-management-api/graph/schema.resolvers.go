@@ -63,6 +63,24 @@ func (r *mutationResolver) DeleteNovelSettingByIds(ctx context.Context, ids []st
 	return service.DeleteNovelSettingByIDs(*userAccountID, ids)
 }
 
+// RegisterNovelContents is the resolver for the registerNovelContents field.
+func (r *mutationResolver) RegisterNovelContents(ctx context.Context, inputs []graphql_model.NovelContentsRegisterInput) (*bool, error) {
+	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
+	return service.RegisterNovelContents(*userAccountID, inputs)
+}
+
+// DeleteNovelContentsByID is the resolver for the deleteNovelContentsById field.
+func (r *mutationResolver) DeleteNovelContentsByID(ctx context.Context, id string) (*bool, error) {
+	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
+	return service.DeleteNovelContentsByID(*userAccountID, id)
+}
+
+// DeleteNovelContentsByIds is the resolver for the deleteNovelContentsByIds field.
+func (r *mutationResolver) DeleteNovelContentsByIds(ctx context.Context, ids []string) (*bool, error) {
+	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
+	return service.DeleteNovelContentsByIDs(*userAccountID, ids)
+}
+
 // GetUserAccountRegisterTokenFromGoogleAuthCode is the resolver for the getUserAccountRegisterTokenFromGoogleAuthCode field.
 func (r *queryResolver) GetUserAccountRegisterTokenFromGoogleAuthCode(ctx context.Context, authCode string) (*string, error) {
 	return service.GetUserAccountRegisterTokenByGoogleAuthCode(authCode)
@@ -98,6 +116,12 @@ func (r *queryResolver) GetNovelSettingsByParentSettingID(ctx context.Context, p
 	return service.GetNovelSettingsByParentID(*userAccountID, parentID)
 }
 
+// GetNovelContentsByNovelID is the resolver for the getNovelContentsByNovelId field.
+func (r *queryResolver) GetNovelContentsByNovelID(ctx context.Context, novelID string) ([]graphql_model.NovelContentsResponse, error) {
+	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
+	return service.GetNovelContentsByNovelID(*userAccountID, novelID)
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -106,16 +130,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) GetMyNovelSettings(ctx context.Context, novelID string) ([]graphql_model.NovelSettingResponse, error) {
-	userAccountID := custom_middleware.GeUserAccountIDFromContext(ctx)
-	return service.GetMyNovelSettings(*userAccountID, novelID)
-}
-*/

@@ -37,9 +37,10 @@ func main() {
 	})
 
 	g.ApplyBasic(db_model.NovelSetting{})
-	novelModel := g.GenerateModel("novels")
 	userAccountModel := g.GenerateModel("user_accounts")
-	g.ApplyBasic(novelModel, userAccountModel)
+	novelModel := g.GenerateModel("novels")
+	novelContentsModel := g.GenerateModel("novel_contents")
+	g.ApplyBasic(userAccountModel, novelModel, novelContentsModel)
 
 	g.Execute()
 }

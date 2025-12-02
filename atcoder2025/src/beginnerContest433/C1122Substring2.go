@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func C1122Substring2Main() {
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
 	sStrArray := strings.Split(C1122Substring2Rdr(rdr), "")
 	sLen := len(sStrArray)

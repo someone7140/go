@@ -5,6 +5,26 @@ package graphql_model
 type Mutation struct {
 }
 
+type NovelContentsRegisterInput struct {
+	ID               *string `json:"id,omitempty"`
+	ChapterName      string  `json:"chapterName"`
+	NovelID          string  `json:"novelId"`
+	ParentContentsID *string `json:"parentContentsId,omitempty"`
+	DisplayOrder     *int32  `json:"displayOrder,omitempty"`
+	Contents         *string `json:"contents,omitempty"`
+	Description      *string `json:"description,omitempty"`
+}
+
+type NovelContentsResponse struct {
+	ID               string  `json:"id"`
+	ChapterName      string  `json:"chapterName"`
+	NovelID          string  `json:"novelId"`
+	ParentContentsID *string `json:"parentContentsId,omitempty"`
+	DisplayOrder     *int32  `json:"displayOrder,omitempty"`
+	Contents         *string `json:"contents,omitempty"`
+	Description      *string `json:"description,omitempty"`
+}
+
 type NovelResponse struct {
 	ID          string  `json:"id"`
 	Title       string  `json:"title"`
