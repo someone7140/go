@@ -12,7 +12,7 @@ type NovelSetting struct {
 	OwnerUserAccountID string         `gorm:"column:owner_user_account_id;not null" json:"owner_user_account_id"`
 	ParentSettingID    *string        `gorm:"column:parent_setting_id" json:"parent_setting_id"`
 	DisplayOrder       *int32         `gorm:"column:display_order" json:"display_order"`
-	Attributes         pq.StringArray `gorm:"column:attributes;not null;type:text[]" json:"attributes"`
+	Attributes         pq.StringArray `gorm:"column:attributes;not null;type:varchar[]" json:"attributes"`
 	Description        *string        `gorm:"column:description" json:"description"`
 }
 
