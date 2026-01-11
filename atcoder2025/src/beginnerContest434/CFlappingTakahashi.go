@@ -14,7 +14,7 @@ type CFlappingTakahashiTlu struct {
 	upper int64
 }
 
-func main() {
+func CFlappingTakahashiMain() {
 	var t int
 	fmt.Scan(&t)
 	var rdr = bufio.NewReaderSize(os.Stdin, 10000)
